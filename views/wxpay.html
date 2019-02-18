@@ -32,7 +32,7 @@
     <div class="mod-ct">
         <div class="order">
         </div>
-        <div class="amount" id="money">￥{{price}}</div>
+        <div class="amount" id="money">{{price}}&nbsp;元</div>
         
         <div class="qrcode-img-wrapper" data-role="qrPayImgWrapper">
             <div data-role="qrPayImg" class="qrcode-img-area">
@@ -42,14 +42,15 @@
                     <input id="code" style="display: none;" value="{{codeUrl}}"></input>
                     <img onclick="$('#use').hide()" id="use" src="/public/img/wxpay.png"
                          style="position: absolute;top: 50%;left: 50%;width:39px;height:39px;margin-left: -16px;margin-top: -23px">
-                    <div id="orderNumber" style="display: none;">{{orderNumber}}</div>       
+                    <div id="orderNumber" style="display: none;">{{orderNumber}}</div>
+                    <div id="expire" style="display: none;">{{ expire }}</div>
                 </div>
             </div>
         </div>
                 
         <div class="time-item" style = "padding-top: 10px">
 <script type="text/javascript">
-    var expires_in = 300
+         var expires_in = $('#expire').html()
             var do_expire = function (h) {
                 clearInterval(h)
                 $("#count_down").html("订单已过期");
@@ -74,14 +75,12 @@
             text: codeUrl,
             width: 288,
             height: 288,
-            colorDark : '#000000',
-            colorLight : '#ffffff',
             correctLevel : QRCode.CorrectLevel.L
     })
     $('#code').remove()
     var myTimer = window.setInterval(function () {
         checkOrder()
-    },2000)
+    },1000)
     function checkOrder() {
         $.post(
             "/server/api/query",

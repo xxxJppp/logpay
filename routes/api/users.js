@@ -5,11 +5,10 @@ const bcrypt = require('bcrypt')
 const secret = require('../../config/config').secret
 const jwt = require('jsonwebtoken')
 const passport = require('passport')
-let  Tools  = require('../../config/utils')
+const Tools = require('../../config/utils')
 // 注册新用户
 let tools = new Tools()
 router.post('/user/register',(req, res)=>{
-    console.log(req.body)
     let { email, password } = req.body
     User.findOne({ email })
          .then(data=>{
@@ -19,7 +18,6 @@ router.post('/user/register',(req, res)=>{
                  let uid = ''
                  User.find()
                      .then( data => {
-                         console.log(data)
                          if (data) {
                             uid = 10001 + data.length
                          } else {
@@ -37,7 +35,7 @@ router.post('/user/register',(req, res)=>{
                                     meal:'mf',
                                     mealtime: '-',
                                     money,
-                                    userid:'2088422582171022',
+                                    userid:'',
                                 })
                                 // 密码加密
                             bcrypt.genSalt(10, (err, salt) => {
@@ -59,7 +57,6 @@ router.post('/user/register',(req, res)=>{
 
 //登陆  返回token
 router.post('/user/login',(req,res)=>{
-    console.log(req.body)
     let { email, password } = req.body
     //查询数据库
     User.findOne( {email} )
@@ -156,6 +153,12 @@ router.post('/user/cpassword',(req, res)=>{
         
 })
 
+router.post('/user/userid',(req, res)=>{
+    let { uid, userid } = req.body
+    User.updateOne({uid},{userid})
+         .then( data => res.json('success'))     
+         .catch( err => res.json('error'))
+})
 router.post('/user/cmeal',(req, res)=>{
     let { uid, meal, mealtime, cmoney } = req.body
     let date = new Date()
@@ -168,7 +171,7 @@ router.post('/user/cmeal',(req, res)=>{
         date.setMonth(m1)
         date.setDate(d1)
         date.setMonth(date.getMonth()+ month )
-        return `${date.getFullYear()}-${date.getMonth().toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')}`
+        return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')}`
       }
     User.findOne({uid})
         .then( data =>{

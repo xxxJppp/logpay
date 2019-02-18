@@ -14,13 +14,13 @@
   </div>
   <div class="header" style="height:99px;">
     <div class="hleft">
-      <el-button type="danger" >到期时间</el-button>
+      <el-button type="danger" >套餐到期时间</el-button>
       <p>{{ mealtime }}</p>
     </div>
     <div class="hright">
-      <el-button type="warning" >手机状态</el-button>
-      <p v-if="phoneStatus" style="color:#67C23A;">连接成功</p>
-      <p style="color:#F56C6C;" v-else>请打开app连接</p>
+      <el-button type="warning" >注意</el-button>
+      <p v-if="phoneStatus" style="color:#67C23A;">保持手机常亮</p>
+      <!-- <p style="color:#F56C6C;" v-else>请打开app连接</p> -->
     </div>
   </div>
     <div class="today">
@@ -83,7 +83,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-
+// import axios from 'axios'
 export default {
   computed: {
     ...mapGetters([
@@ -98,7 +98,7 @@ export default {
         jc:'',
         bz:'',
         gj:'',
-        phoneStatus:false,
+        phoneStatus: true,
         today_data: [
           {pid: '手机1',
           today_wx: '16000',

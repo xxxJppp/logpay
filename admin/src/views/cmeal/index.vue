@@ -211,8 +211,8 @@ export default {
         date.setFullYear(y1)
         date.setMonth(m1)
         date.setDate(d1)
-        date.setMonth(date.getMonth()+ month )
-        return `${date.getFullYear()}-${date.getMonth().toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')}`
+        date.setMonth(date.getMonth()+ month -1 )
+        return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')}`
       },
       submit() {
         if (this.value1 == 'mf' && this.meal == 'mf') {

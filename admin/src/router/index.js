@@ -74,12 +74,6 @@ export const constantRouterMap = [
         name: 'Order',
         component: () => import('@/views/order/index'),
         meta: { title: '交易订单', icon: '' }
-      },
-      {
-        path: 'order',
-        name: 'order',
-        component: () => import('@/views/order/index'),
-        meta: { title: '交易订单', icon: '' }
       }
     ]
   },

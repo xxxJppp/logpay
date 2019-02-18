@@ -36,6 +36,14 @@
                 <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
                 <div class="el-upload__tip" slot="tip">只能上传jpg/png/jpge文件，且不超过2MB</div>
             </el-upload>
+            <div class="attention">
+                <p style="color:red;">注意!&nbsp;&nbsp;&nbsp;1.支付宝收款推荐使用支付宝userid(企业,个人都可以),收款支付宝扫描二维码获得userid</p>
+            <img src="../../assets/images/userid.jpg" />
+            <div class="userid">
+               <el-input v-model="userid" placeholder="填写扫描所得的userid"></el-input>
+               <el-button type="danger" @click="submitUserid" round>配置</el-button> 
+            </div>
+            </div>
             <!-- 二维码展示 -->
             <template>
                 <el-table
@@ -98,7 +106,8 @@ export default {
         num: 10,
         total: 0
         },
-        qrCode: []
+        qrCode: [],
+        userid:''
     }
     },
     mounted () {
@@ -115,6 +124,23 @@ export default {
             }
     },
     methods:{
+        submitUserid () {
+            if (!this.userid || this.userid.length != 16) {
+                this.$message.error('请认真配置支付宝收款userid')
+                return
+            }
+            axios.post('http://192.168.0.107:9000/user/userid',{ uid:this.uid ,userid:this.userid})
+                 .then( data =>{
+                     if(data = 'success') {
+                         this.$message.success('配置成功')
+                     } else {
+                     this.$message.error('配置失败!请重新配置')
+                     }
+                 })
+                 .catch( err =>{
+                     this.$message.error('配置失败!请重新配置')
+                 })
+        },
         handleDelete (row) { // 删除
                 let that = this
                 that.$confirm('确定删除此收款二维码?', '提示', {
@@ -214,7 +240,6 @@ export default {
                 this.$message.error('上传图片不能大于 2MB!');
                 }
                 this.upData.key = + new Date() + '.' + file.type.substring(6); // 更改上传图片名称
-                console.log(this.upData.key)
                 return isJPG && isLt2M;
             },
             upSuccess (response, file, fileList) { // 图片上传成功
@@ -283,6 +308,18 @@ export default {
     padding-top: 1.8%;
     width: 94%;
     margin: 0 auto;
+  }
+  .attention {
+      .userid {
+          width: 100%;
+          display: inline-block;
+          .el-input {
+              width: 70%;
+          }
+          .el-button {
+              margin-left: 10px;
+          }
+      }
   }
 .message-title{
     cursor: pointer;

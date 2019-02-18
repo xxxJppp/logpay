@@ -9,7 +9,7 @@ const Jimp = require('jimp')
 const qiniu = require('qiniu')
 const readTxt = (url) => {
     return new Promise((resolve, reject) => {
-        client.generalBasicUrl(url)
+        client.webImageUrl(url)
               .then(data => {
                 resolve(JSON.stringify(data))})
               .catch( err => reject(err))//网络发生错误

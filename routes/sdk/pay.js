@@ -7,7 +7,7 @@ const User = require('../../models/Users')
 //配置art-template
 // art-template
 // app.engine('html', require('express-art-template'))
-// app.set('postData', './postData');
+// app.set('postData', './postData')
 let logpay = new Logpay(config.uid,config.token)
 router.get('/sdk/pay', (req, res)=>{
     let { payType, price, orderUid, orderName } = req.query
@@ -31,10 +31,28 @@ router.post('/sdk/notify',(req, res)=>{
         User.findOne( {uid:orderUid})
             .then( data =>{
                 if (data) {
-                    let money = parseFloat(data.money) + parseFloat(pay_price)
+                    let money = parseFloat(data.money) + parseFloat(price)
                     let Money = parseFloat(money).toFixed(2)
                     User.updateOne({ uid:orderUid },{ money:Money })
-                        .then( data => res.send('SUCCESS'))
+                        .then( data => {
+                            if (orderUid != '10001') {
+                                User.findOne({uid:'10001'})
+                                    .then( data => {
+                                        if (data) {
+                                            let money = parseFloat(data.money) + parseFloat(price)
+                                            let Money = parseFloat(money).toFixed(2)
+                                            User.updateOne({uid:'10001'},{ money:Money })
+                                                .then( data =>{
+                                                   res.send('SUCCESS')
+                                                })
+                                                .catch( err => res.send('请联系客服,充值发生错误!'))
+                                        }
+                                })
+                                .catch(err => res.send('请联系客服,充值发生错误!'))   
+                            } else {
+                                res.send('SUCCESS')
+                            }
+                        })
                         .catch( err => res.send('请联系客服,充值发生错误!'))
                 }
             })

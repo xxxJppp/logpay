@@ -54,11 +54,11 @@ export default {
     methods: {
         alipay() {
                 if(parseFloat(this.money)<=0) return false
-                location.href = `http://192.168.0.107:9000/sdk/pay?price=${this.money}&payType=alipay&orderUid=${this.uid}&orderName=账户充值`
+                location.href = `http://192.168.0.107:9000/sdk/pay?price=${this.money}&payType=alipay&orderUid=${this.uid}&orderName=LogPay账户充值`
         },
         wxpay() {
              if(parseFloat(this.money)<=0) return false
-                location.href = `http://192.168.0.107:9000/sdk/pay?price=${this.money}&payType=wxpay&orderUid=${this.uid}&orderName=账户充值`
+                location.href = `http://192.168.0.107:9000/sdk/pay?price=${this.money}&payType=wxpay&orderUid=${this.uid}&orderName=LogPay账户充值`
         },
         select(item,moneyList) {
             this.money = moneyList.money
