@@ -69,6 +69,14 @@ let orderSchema = new Schema({
     expire: {
         type: Number,
         required: true
+    },
+    fee: {
+        type: String,
+        required: true
+    },
+    pid:{
+        type:Number,
+        required:true
     }
 })
 

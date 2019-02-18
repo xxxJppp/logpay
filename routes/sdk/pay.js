@@ -4,6 +4,7 @@ let router = express.Router()
 let config = require('../sdk/config')
 let Logpay = require('../sdk/lib/logpay.class')
 const User = require('../../models/Users')
+const Order = require('../../models/Orders')
 //配置art-template
 // art-template
 // app.engine('html', require('express-art-template'))
@@ -28,34 +29,48 @@ router.post('/sdk/notify',(req, res)=>{
     let data = { orderUid, pay_price, price, orderNumber, sign1 }
     let sign = logpay.Signfornotify(data)
     if (sign === sign2) {
-        User.findOne( {uid:orderUid})
-            .then( data =>{
-                if (data) {
-                    let money = parseFloat(data.money) + parseFloat(price)
-                    let Money = parseFloat(money).toFixed(2)
-                    User.updateOne({ uid:orderUid },{ money:Money })
-                        .then( data => {
-                            if (orderUid != '10001') {
-                                User.findOne({uid:'10001'})
-                                    .then( data => {
-                                        if (data) {
-                                            let money = parseFloat(data.money) + parseFloat(price)
-                                            let Money = parseFloat(money).toFixed(2)
-                                            User.updateOne({uid:'10001'},{ money:Money })
-                                                .then( data =>{
-                                                   res.send('SUCCESS')
-                                                })
-                                                .catch( err => res.send('请联系客服,充值发生错误!'))
-                                        }
-                                })
-                                .catch(err => res.send('请联系客服,充值发生错误!'))   
-                            } else {
-                                res.send('SUCCESS')
-                            }
-                        })
-                        .catch( err => res.send('请联系客服,充值发生错误!'))
-                }
-            })
+        if (orderUid === '10001') {
+            User.findOne({uid:'10001'})
+                .then( admin => {
+                    if (admin) {
+                        let money = parseFloat(admin.money) + parseFloat(price)
+                        let Money = money.toFixed(2, '0')
+                        User.updateOne({uid:'10001'},{ money:Money })
+                            .then( data =>{
+                            return res.send('SUCCESS')
+                            })
+                            .catch( err => res.send('请联系客服,充值发生错误!'))
+                    }
+                })
+                .catch(err => res.send('请联系客服,充值发生错误!'))
+        } else {
+                User.findOne( {uid:orderUid})
+                    .then( user =>{
+                        if (user) {
+                            let money = parseFloat(user.money) + parseFloat(price)
+                            let Money = money.toFixed(2, '0')
+                            User.updateOne({ uid:orderUid },{ money:Money })
+                                .then( data => {
+                                        User.findOne({uid:'10001'})
+                                            .then( admin => {
+                                                if (admin) {
+                                                    let money = parseFloat(admin.money) + parseFloat(price)
+                                                    let Money = money.toFixed(2, '0')
+                                                    User.updateOne({uid:'10001'},{ money:Money })
+                                                        .then( data =>{
+                                                        res.send('SUCCESS')
+                                                        })
+                                                        .catch( err => res.send('请联系客服,充值发生错误!'))
+                                                    }
+                                            })
+                                            .catch(err => res.send('请联系客服,充值发生错误!'))
+                                    })
+
+                                .catch( err => res.send('请联系客服,充值发生错误!'))
+                                }
+                            })   
+                        }
+            // }
     } else {
         res.send('签名验证失败')
     }

@@ -8,7 +8,7 @@ const bcrypt = require('bcrypt')
 let tools = new Tools()
 //注意每个路由的时间戳不一样
 router.get('/server/api/updateOrder',(req, res)=>{
-    let { price, sign, type, e } = req.query
+    let { price, type, e } = req.query
     User.findOne( {email:e} )
         .then( data => {
             if (!data) {

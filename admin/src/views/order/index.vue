@@ -47,7 +47,7 @@
       </el-table-column>
       <el-table-column prop="pay_price" label="支付金额" align="center">
       </el-table-column>
-      <el-table-column prop="pay_price" label="服务费" align="center">
+      <el-table-column prop="fee" label="服务费" align="center">
       </el-table-column>
       <el-table-column prop="status" label="状态" align="center">
         <template slot-scope="scope">
