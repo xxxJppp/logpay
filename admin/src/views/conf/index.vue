@@ -129,7 +129,7 @@ export default {
                 this.$message.error('请认真配置支付宝收款userid')
                 return
             }
-            axios.post('http://192.168.0.107:9000/user/userid',{ uid:this.uid ,userid:this.userid})
+            axios.post('http://129.204.199.91:9000/user/userid',{ uid:this.uid ,userid:this.userid})
                  .then( data =>{
                      if(data = 'success') {
                          this.$message.success('配置成功')
@@ -172,7 +172,7 @@ export default {
             delQrCode (id) {
                 return new Promise(async (res, rej) => {
                     axios({
-                        url: 'http://192.168.0.107:9000/qrcode/del',
+                        url: 'http://129.204.199.91:9000/qrcode/del',
                         method: 'delete',
                         data: {
                             id: id
@@ -201,7 +201,7 @@ export default {
             upqiniu (e) {
                 let self = this
                 axios({
-                    url: 'http://192.168.0.107:9000/qrcode/updata',
+                    url: 'http://129.204.199.91:9000/qrcode/updata',
                     method: 'post',
                 }).then(res  => {
                     if (res.data.code == -1) {
@@ -214,7 +214,7 @@ export default {
             },
             getQrList () {
                 axios({
-                    url: 'http://192.168.0.107:9000/qrcode/all',
+                    url: 'http://129.204.199.91:9000/qrcode/all',
                     method: 'get',
                     params: {
                         uid: this.uid,
@@ -249,7 +249,7 @@ export default {
             getQrContent (url) {
                 let self = this
                 axios({
-                    url: 'http://192.168.0.107:9000/qrcode/add',
+                    url: 'http://129.204.199.91:9000/qrcode/add',
                     method: 'post',
                     data: {url: url,uid:self.uid}
                 }).then(res => {
@@ -267,7 +267,6 @@ export default {
 </script>
 <style lang="scss" scoped>
 .wrapper {
-  width: 100%;
   .header {
     border-radius: 8px;
     background-color: #eeeeee;
@@ -276,6 +275,7 @@ export default {
     margin: 0 auto;
     margin-top: 8px;
     .top {
+        width: 100%;
     display: flex;
     .uid {
       margin-left: 16px;
@@ -292,6 +292,7 @@ export default {
       margin-top: 10px;
       margin-left: 20px;
       p {
+        font-size: 16px;
         color: #ffffff;
         border-radius: 10px;
         padding: 6px;

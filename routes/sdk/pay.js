@@ -76,6 +76,6 @@ router.post('/sdk/notify',(req, res)=>{
     }
 })
 router.get('/sdk/return',(req,res)=>{
-    res.redirect('http://192.168.0.107:9259/#/index')
+    res.redirect('http://129.204.199.91:9259/#/index')
 })
 module.exports = router

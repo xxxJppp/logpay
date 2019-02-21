@@ -224,7 +224,7 @@ export default {
           alert('充值参数有误!')
           return false
         }
-        axios.post('http://192.168.0.107:9000/user/cmeal',{ uid:this.uid, meal:this.value1,mealtime:this.value2,cmoney:this.price })
+        axios.post('http://129.204.199.91:9000/user/cmeal',{ uid:this.uid, meal:this.value1,mealtime:this.value2,cmoney:this.price })
              .then()
              .catch(err => console.log(err))
         location.href = '/'

@@ -61,7 +61,15 @@
               <el-button
               size="mini"
               type="danger"
-              @click="handleNotify(scope.row.orderNumber)">手动回调</el-button>
+              @click="handleNotify(scope.row.orderNumber)" v-if="scope.row.status == 1">手动回调</el-button>
+              <el-button
+              size="mini"
+              type="primary"
+              v-if="scope.row.status == 2">^-^</el-button>
+              <el-button
+              size="mini"
+              type="Info"
+              v-else-if="scope.row.status == -1">........</el-button>
           </template>
       </el-table-column>
     </el-table>
@@ -131,7 +139,7 @@ export default {
   },
   methods: {
     handleNotify(orderNumber) {
-      axios.post('http://192.168.0.107:9000/server/api/query',{orderNumber:orderNumber})
+      axios.post('http://129.204.199.91:9000/server/api/query',{orderNumber:orderNumber})
            .then(data => {
              this.getOrder()
              })
@@ -158,7 +166,7 @@ export default {
     getOrder() {
       this.listLoading = true
       axios({
-        url: 'http://192.168.0.107:9000/order/getOrder',
+        url: 'http://129.204.199.91:9000/order/getOrder',
         method: 'get',
         params: {
             orderNumber:this.number,
@@ -174,8 +182,8 @@ export default {
             this.$message.error(res.data.msg)
             return false
         }
-        this.list = res.data.data.data
-        this.page.total = res.data.data.result.length
+        this.list = res.data.data.select
+        this.page.total = res.data.data.order.length
         this.listLoading = false
     })
     }

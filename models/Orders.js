@@ -77,6 +77,10 @@ let orderSchema = new Schema({
     pid:{
         type:Number,
         required:true
+    },
+    createTime:{
+        type:Date,
+        default:Date.now
     }
 })
 

@@ -46,7 +46,7 @@ export default {
       })
     },
     toCpassword() {
-      location.href = 'http://192.168.0.107:9259/#/user/cpassword'
+      location.href = 'http://129.204.199.91/#/user/cpassword'
     }
   }
 }
@@ -75,7 +75,7 @@ export default {
     position: absolute;
     right: 20px;
     .avatar-wrapper {
-      margin-top: -12px;
+      margin-top: -14px;
       cursor: pointer;
       display: flex;
       align-items: center;

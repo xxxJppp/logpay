@@ -140,10 +140,10 @@ router.post('/qrcode/add', async (req, res) => {
 router.get('/qrcode/all', async (req, res) => {
     try {
         let params = req.query
-        if (parseInt(params.page) != params.page && parseInt(params.num) != params.num) {
+        if (parseInt(params .page) != params.page && parseInt(params.num) != params.num) {
             throw ('参数有误!')
         }
-        Qrcode.find()
+        Qrcode.find({uid:params.uid})
               .then( result =>{
                 let skip = (parseInt(params.page-1))*parseInt(params.num)
                 let limit = parseInt(params.num)

@@ -10,47 +10,45 @@ const Tools = require('../../config/utils')
 let tools = new Tools()
 router.post('/user/register',(req, res)=>{
     let { email, password } = req.body
-    User.findOne({ email })
-         .then(data=>{
-             if (data) {
+     User.findOne({ email })
+         .then(user1=>{
+             if (user1) {
                  return res.json({ msg:"邮箱已经被注册!",code:20001 })
              } else {
                  let uid = ''
                  User.find()
-                     .then( data => {
-                         if (data) {
-                            uid = 10001 + data.length
+                     .then( user2 => {
+                         if (user2) {
+                            uid = 10001 + user2.length
                          } else {
                             uid = '10001'
                          }
-                        
-                        let date = new Date()
-                                let token = tools.getToken(uid)
-                                let money = '0.00'
-                                let user = new User({
-                                    email,
-                                    password,
-                                    uid,
-                                    token,
-                                    meal:'mf',
-                                    mealtime: '-',
-                                    money,
-                                    userid:'',
-                                })
-                                // 密码加密
-                            bcrypt.genSalt(10, (err, salt) => {
-                                bcrypt.hash( user.password, salt, (err, hash) => {
-                                    if (err) throw err
-                                    user.password = hash
-                                    user.save()
-                                        .then(data => res.json({
-                                            code: 20000,
-                                            msg:'注册成功!'
-                                        }))
-                                        .catch(err => console.log(err))
-                                })
-                            })
-                     })
+                        let token = tools.getToken(uid)
+                        let money = '0.00'
+                        let user = new User({
+                            email,
+                            password,
+                            uid,
+                            token,
+                            meal:'mf',
+                            mealtime: '-',
+                            money,
+                            userid:'',
+                        })
+                        // 密码加密
+                    bcrypt.genSalt(10, (err, salt) => {
+                        bcrypt.hash( user.password, salt, (err, hash) => {
+                            if (err) throw err
+                            user.password = hash
+                            user.save()
+                                .then(user3 => res.json({
+                                    code: 20000,
+                                    msg:'注册成功!'
+                                }))
+                                .catch(err => res.json('注册失败请重新注册'))
+                        })
+                    })
+                })
              }
          })
 })
@@ -60,19 +58,19 @@ router.post('/user/login',(req,res)=>{
     let { email, password } = req.body
     //查询数据库
     User.findOne( {email} )
-    .then( data => {
-        if (!data) {
+    .then( user => {
+        if (!user) {
             return res.json({
                 code:20001,
                 msg:'您的邮箱未注册!'
             })
         }
-        bcrypt.compare(password, data.password)
+        bcrypt.compare(password, user.password)
         // 比较密码 返回isMatch 错误正确   
         .then(isMatch=>{
                 if (isMatch) {
                     // jwt.sign( "规则", "加密名字", "过期时间", "箭头函数")
-                    let rule = { id:data.id, email:data.email }
+                    let rule = { id:user.id, email:user.email }
                     jwt.sign( rule, secret,{expiresIn:3600},(err, token)=>{
                         if (err) throw err
                         res.json({
@@ -118,8 +116,8 @@ router.post('/user/logout',(req, res)=>{
 router.post('/user/cpassword',(req, res)=>{
     let { email, oldpassword, password } = req.body
     User.findOne( {email} )
-        .then( data => {
-        bcrypt.compare(oldpassword, data.password)
+        .then( user => {
+        bcrypt.compare(oldpassword, user.password)
             // 比较密码 返回isMatch 错误正确  
             .then(isMatch=>{
                     if (isMatch) {
@@ -130,11 +128,11 @@ router.post('/user/cpassword',(req, res)=>{
                                 password = hash
                                 User.updateOne({ email },{ password })
                                     .then()
-                                    .catch(err => console.log(err))
+                                    .catch(err => res.json('修改密码失败,请重试'))
                             })
                         })
                         // jwt.sign( "规则", "加密名字", "过期时间", "箭头函数")
-                        let rule = { id:data.id, email:data.email }
+                        let rule = { id:user.id, email:user.email }
                         jwt.sign( rule, secret,{expiresIn:3600},(err, token)=>{
                             if (err) throw err
                             res.json({
@@ -174,54 +172,54 @@ router.post('/user/cmeal',(req, res)=>{
         return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')}`
       }
     User.findOne({uid})
-        .then( data =>{
-            if (data) {
-                if (data.meal == meal) {
+        .then( user =>{
+            if (user) {
+                if (user.meal == meal) {
                     if (meal == 'mf') {
                         res.redirect('http://192.168.0.107:9259/#/user/cmeal')
                     }
                     if (mealtime == 'ygy') {
-                        data.mealtime = getTime(data.mealtime ,1)
+                        user.mealtime = getTime(user.mealtime ,1)
                      } else if (mealtime == 'sgy') {
-                        data.mealtime = getTime(data.mealtime, 3)
+                        user.mealtime = getTime(user.mealtime, 3)
                      } else if (mealtime == 'bn') {
-                        data.mealtime = getTime(data.mealtime, 6)
+                        user.mealtime = getTime(user.mealtime, 6)
                      } else if (mealtime == 'yn') {
-                        data.mealtime = getTime(data.mealtime, 12)
+                        user.mealtime = getTime(user.mealtime, 12)
                      }
-                } else if (data.meal == 'mf') {
+                } else if (user.meal == 'mf') {
                     if (meal == 'gj' || meal == 'bz') {
                     let date = new Date()
                     let now = `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')}`
                     if (mealtime == 'ygy') {
-                        data.mealtime = getTime(now,1)
+                        user.mealtime = getTime(now,1)
                      } else if (mealtime == 'sgy') {
-                        data.mealtime = getTime(now, 3)
+                        user.mealtime = getTime(now, 3)
                      } else if (mealtime == 'bn') {
-                        data.mealtime = getTime(now, 6)
+                        user.mealtime = getTime(now, 6)
                      } else if (mealtime == 'yn') {
-                        data.mealtime = getTime(now, 12)
+                        user.mealtime = getTime(now, 12)
                      }
                     }
-                } else if (data.meal == 'bz' && meal == 'gj') {
+                } else if (user.meal == 'bz' && meal == 'gj') {
                     let date = new Date()
                     let now = `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')}`
                     if (mealtime == 'ygy') {
-                        data.mealtime = getTime(now,1)
+                        user.mealtime = getTime(now,1)
                      } else if (mealtime == 'sgy') {
-                        data.mealtime = getTime(now, 3)
+                        user.mealtime = getTime(now, 3)
                      } else if (mealtime == 'bn') {
-                        data.mealtime = getTime(now, 6)
+                        user.mealtime = getTime(now, 6)
                      } else if (mealtime == 'yn') {
-                        data.mealtime = getTime(now, 12)
+                        user.mealtime = getTime(now, 12)
                      }
                 }
-                data.meal = meal
-                data.money = parseFloat(data.money - cmoney).toFixed(2,'0')
-                if ((data.money) < 0) {
+                user.meal = meal
+                user.money = parseFloat(user.money - cmoney).toFixed(2,'0')
+                if ((user.money) < 0) {
                     return false
                 }
-                User.update({uid},{meal:data.meal, mealtime:data.mealtime, money:data.money})
+                User.update({uid},{meal:user.meal, mealtime:user.mealtime, money:user.money})
                     .then()
                     .catch(err => res.json('请联系客服!'))
             }
