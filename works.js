@@ -3,7 +3,7 @@ process.on('message', (remoteData) => {
         setInterval(()=>{
         remoteData.expire--
         if (remoteData.expire < 0 ) {
-            return
+            process.kill(remoteData.pid, 'SIGTERM')
         }
         Order.updateOne({ orderNumber: remoteData.orderNumber}, { expire: remoteData.expire })
              .then()

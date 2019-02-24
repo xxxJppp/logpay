@@ -1,4 +1,4 @@
-import { login, logout, getInfo, cpassword, register } from '@/api/login'
+import { login, logout, getInfo, cpassword, register, fpassword } from '@/api/login'
 import { getKey, setKey, removeKey } from '@/utils/auth'
 
 const user = {
@@ -59,7 +59,7 @@ const user = {
     Register({ commit }, userInfo) {
       const email = userInfo.email.trim()
       return new Promise((resolve, reject) => {
-        register(email, userInfo.password).then(response => {
+        register(email, userInfo.password).then(() => {
           login(email, userInfo.password).then(response => {
             const data = response.data
             setKey(data.token)
@@ -113,6 +113,19 @@ const user = {
       })
     },
 
+    // // 密码重置
+    // Fpassword(emailInfo) {
+    //   return new Promise((resolve, reject) => {
+    //     fpassword(emailInfo.email)
+    //       .then(response => {
+    //         console.log(response.data)
+    //         resolve()
+    //       }).catch(error => {
+    //         reject(error)
+    //       })
+    //   })
+    // },
+
     // 前端 登出
     FedLogOut({ commit }) {
       return new Promise(resolve => {
@@ -124,7 +137,7 @@ const user = {
 
     // 修改密码
     Cpassword({ commit, state }, password) {
-      return new Promise(resolve => {
+      return new Promise((resolve, reject) => {
         cpassword(state.email, password.oldpass, password.pass).then(response => {
           const data = response.data
           setKey(data.token)
@@ -137,5 +150,4 @@ const user = {
     }
   }
 }
-
 export default user

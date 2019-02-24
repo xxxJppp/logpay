@@ -36,6 +36,9 @@
           <el-button :loading="loading" type="primary" style="width:100%;" @click.native.prevent="handleRegister" v-else>
             注册
           </el-button>
+          <el-button style="width:100%;backgroundColor:#F2F6FC;margin:0 auto;margin-top:5px;" @click.native.prevent="handleFpassword">
+            忘记密码?
+          </el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -119,6 +122,9 @@ export default {
           return false
         }
       })
+    },
+    handleFpassword() {
+      location.href = 'http://129.204.199.91/#/user/fpassword'
     }
   }
 }

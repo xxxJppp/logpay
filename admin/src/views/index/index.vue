@@ -109,10 +109,13 @@ export default {
         gj:'',
         tod_yes_data: [
           {tod_yes: '今日',ali:'加载中...',wx:'加载中...',all:'加载中...'},
-          {tod_yes: '昨日',ali:'加载中...',wx:'加载中...',all:'加载中...'}],
+          {tod_yes: '昨日',ali:'加载中...',wx:'加载中...',all:'加载中...'},
+          {tod_yes: '总',ali:'加载中...',wx:'加载中...',all:'加载中...'}
+          ],
         yes_tod_data: [
           { yes_tod:'今日', all_orderNumber:'加载中...', no_orderNumber:'加载中...', pay_orderNumber:'加载中...',pay_all: '加载中...' },
-          { yes_tod:'昨日', all_orderNumber:'加载中...', no_orderNumber:'加载中...', pay_orderNumber:'加载中...',pay_all: '加载中...' }
+          { yes_tod:'昨日', all_orderNumber:'加载中...', no_orderNumber:'加载中...', pay_orderNumber:'加载中...',pay_all: '加载中...' },
+          { yes_tod:'总', all_orderNumber:'加载中...', no_orderNumber:'加载中...', pay_orderNumber:'加载中...',pay_all: '加载中...' }
         ]
       }
     },
@@ -120,8 +123,7 @@ export default {
     getDayMoney() {
       axios.get('http://129.204.199.91:9000/order/getDayMoney',{
         params:{
-        uid:this.uid,
-        backtime: 0
+        uid:this.uid
         }
       })
       .then(res => {
@@ -130,15 +132,31 @@ export default {
               return false
           }
           if (res.data.data.all_fee && this.uid==='10001') {
-            this.tod_yes_data[0].ali = `${res.data.data.ali}(${res.data.data.ali_fee})`
-            this.tod_yes_data[0].wx = `${res.data.data.wx}(${res.data.data.wx_fee})`
-            this.tod_yes_data[0].all = `${res.data.data.all}(${res.data.data.all_fee})`
-            this.yes_tod_data[0].pay_all = res.data.data.all
+            this.tod_yes_data[0].ali = `${res.data.data.tod_ali}(${res.data.data.tod_ali_fee})`
+            this.tod_yes_data[0].wx = `${res.data.data.tod_wx}(${res.data.data.tod_wx_fee})`
+            this.tod_yes_data[0].all = `${res.data.data.tod_all}(${res.data.data.tod_all_fee})`
+            this.yes_tod_data[0].pay_all = res.data.data.tod_all
+            this.tod_yes_data[1].ali = `${res.data.data.yes_ali}(${res.data.data.yes_ali_fee})`
+            this.tod_yes_data[1].wx = `${res.data.data.yes_wx}(${res.data.data.yes_wx_fee})`
+            this.tod_yes_data[1].all = `${res.data.data.yes_all}(${res.data.data.yes_all_fee})`
+            this.yes_tod_data[1].pay_all = res.data.data.yes_all
+            this.tod_yes_data[2].ali = `${res.data.data.all_ali}(${res.data.data.all_ali_fee})`
+            this.tod_yes_data[2].wx = `${res.data.data.all_wx}(${res.data.data.all_wx_fee})`
+            this.tod_yes_data[2].all = `${res.data.data.all_all}(${res.data.data.all_all_fee})`
+            this.yes_tod_data[2].pay_all = res.data.data.all_all
           } else {
-            this.tod_yes_data[0].ali = res.data.data.ali
-            this.tod_yes_data[0].wx = res.data.data.wx
-            this.tod_yes_data[0].all = res.data.data.all
-            this.yes_tod_data[0].pay_all = res.data.data.all
+            this.tod_yes_data[0].ali = res.data.data.tod_ali
+            this.tod_yes_data[0].wx = res.data.data.tod_wx
+            this.tod_yes_data[0].all = res.data.data.tod_all
+            this.yes_tod_data[0].pay_all = res.data.data.tod_all
+            this.tod_yes_data[1].ali = res.data.data.yes_ali
+            this.tod_yes_data[1].wx = res.data.data.yes_wx
+            this.tod_yes_data[1].all = res.data.data.yes_all
+            this.yes_tod_data[1].pay_all = res.data.data.yes_all
+            this.tod_yes_data[2].ali = res.data.data.all_ali
+            this.tod_yes_data[2].wx = res.data.data.all_wx
+            this.tod_yes_data[2].all = res.data.data.all_all
+            this.yes_tod_data[2].pay_all = res.data.data.all_all
           }
       })
     },
@@ -159,30 +177,10 @@ export default {
           this.yes_tod_data[1].pay_orderNumber = res.data.data.yes_success_order.length
           this.yes_tod_data[1].no_orderNumber = res.data.data.yes_no_order.length
           this.yes_tod_data[1].all_orderNumber = res.data.data.yes_all_order.length
+          this.yes_tod_data[2].pay_orderNumber = res.data.data.all_success_order.length
+          this.yes_tod_data[2].no_orderNumber = res.data.data.all_no_order.length
+          this.yes_tod_data[2].all_orderNumber = res.data.data.all_order.length
       })
-      axios.get('http://129.204.199.91:9000/order/getDayMoney',{
-          params:{
-          uid:this.uid,
-          backtime: -1
-          }
-          })
-          .then(res => {
-              if (res.data.code == -1) {
-                  this.$message.error(res.data.msg)
-                  return false
-              }
-              if (this.uid==='10001' && res.data.data.all_fee) {
-                this.tod_yes_data[1].ali = `${res.data.data.ali}(${res.data.data.ali_fee})`
-                this.tod_yes_data[1].wx = `${res.data.data.wx}(${res.data.data.wx_fee})`
-                this.tod_yes_data[1].all = `${res.data.data.all}(${res.data.data.all_fee})`
-                this.yes_tod_data[1].pay_all = res.data.data.all
-              } else {
-                this.tod_yes_data[1].ali = res.data.data.ali
-                this.tod_yes_data[1].wx = res.data.data.wx
-                this.tod_yes_data[1].all = res.data.data.all
-                this.yes_tod_data[1].pay_all = res.data.data.all
-              }
-          })
     },
     getMeal() {
       if (this.meal == 'mf') {

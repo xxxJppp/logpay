@@ -6,6 +6,8 @@ const secret = require('../../config/config').secret
 const jwt = require('jsonwebtoken')
 const passport = require('passport')
 const Tools = require('../../config/utils')
+const JWT = require('jwt-simple')
+const nodemailer = require('nodemailer')
 // 注册新用户
 let tools = new Tools()
 router.post('/user/register',(req, res)=>{
@@ -157,6 +159,7 @@ router.post('/user/userid',(req, res)=>{
          .then( data => res.json('success'))     
          .catch( err => res.json('error'))
 })
+
 router.post('/user/cmeal',(req, res)=>{
     let { uid, meal, mealtime, cmoney } = req.body
     let date = new Date()
@@ -224,5 +227,128 @@ router.post('/user/cmeal',(req, res)=>{
                     .catch(err => res.json('请联系客服!'))
             }
         })
+})
+
+router.post('/user/passwordreset', (req, res)=>{
+    if (req.body.email !== undefined) {
+        let emailAddress = req.body.email
+        User.findOne({email:emailAddress})
+            .then( user =>{
+                if (!user) {
+                    return res.json({
+                        code:20001,
+                        msg:'邮箱未注册'
+                    })
+                    }
+                    let payload = {
+                        id:user.id,
+                        email:emailAddress
+                    }
+                    let resetsecret = user.password + secret + user.date.getTime()
+                    let token = JWT.encode(payload, resetsecret)
+                    // 发送邮件
+                    let transporter = nodemailer.createTransport({
+                    // host: 'smtp.ethereal.email',
+                    service: 'qq', // 使用了内置传输发送邮件 查看支持列表：https://nodemailer.com/smtp/well-known/
+                    port: 465, // SMTP 端口
+                    secureConnection: true, // 使用了 SSL
+                    auth: {
+                        user: '963359789@qq.com',//你的邮箱
+                        // 这里密码不是qq密码，是你设置的smtp授权码
+                        pass: 'tllmuanfzhzabdjd',
+                    }
+                    })
+                    let HTML = '<a href="http://129.204.199.91:9000/user/resetpassword/' + user.id+ '/'+token+'">重置密码</a>'
+                    let mailOptions = {
+                    from: '"LogPay密码重置" <963359789@qq.com>', // sender address
+                    to: emailAddress, // list of receivers
+                    subject: 'LogPay密码重置', // Subject line
+                    // 发送text或者html格式
+                    // text: '', // plain text body
+                    html: HTML
+                    }
+                    // send mail with defined transport object
+                    transporter.sendMail(mailOptions, (error, info) => {
+                    if (error) {
+                        return res.json({
+                            code:-1,
+                            msg:'系统繁忙,请重试!'
+                        })
+                    }
+                    res.json({
+                        code:1,
+                        msg:'邮箱发送成功,请注意查收!'
+                    })
+                    })
+            })
+            .catch(err => res.json({
+                code: 20003,
+                msg: '系统繁忙'
+            }))
+    } else {
+        res.json({
+            code:20002,
+            msg:'请认真填写邮箱'
+        })
+    }
+})
+
+router.get('/user/resetpassword/:id/:token', (req, res)=>{
+    User.findOne({_id:req.params.id})
+            .then( user =>{
+                if (!user) {
+                    return res.json({
+                        code:20001,
+                        msg:'邮箱未注册'
+                    })
+                    }
+                    let resetsecret = user.password + secret + user.date.getTime()
+                    let payload = JWT.decode(req.params.token, resetsecret)
+                    let token = req.params.token
+                    res.render('fpassword.html', {
+                        payload,
+                        token
+                    })
+
+            })
+            .catch(err => res.json({
+                code:20003,
+                msg:'系统繁忙'
+            }))
+})
+
+router.post('/user/resetpassword', (req, res)=>{
+    User.findOne({_id:req.body.id})
+            .then( user =>{
+                if (!user) {
+                    return res.json({
+                        code:20001,
+                        msg:'邮箱未注册'
+                    })
+                    }
+                    let resetsecret = user.password + secret + user.date.getTime()
+                    let payload = JWT.decode(req.body.token, resetsecret)
+                    // 密码加密
+                    bcrypt.genSalt(10, (err, salt) => {
+                        bcrypt.hash( req.body.password, salt, (err, hash) => {
+                            if (err) throw err
+                            User.updateOne({_id:req.body.id},{password:hash})
+                                .then()
+                                .catch(err => res.json({
+                                    code:20003,
+                                    msg:'系统繁忙'
+                                }))
+                        })
+                    })
+                    res.send({
+                        code:20000,
+                        msg:'密码重置成功'
+                    })
+
+            })
+            .catch(err => res.json({
+                code:20003,
+                msg:'系统繁忙'
+            }))
 })
 module.exports = router
