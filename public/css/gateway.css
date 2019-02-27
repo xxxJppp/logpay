@@ -169,8 +169,8 @@ body, .body {
 }
 
 .mod-ct .amount {
-    font-size: 42px;
-    margin-top: 10px
+    font-size: 28px;
+    margin:10px 0px 3px 0px;
 }
 
 .mod-ct .qr-image {

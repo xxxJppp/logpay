@@ -10,6 +10,9 @@ const JWT = require('jwt-simple')
 const nodemailer = require('nodemailer')
 // 注册新用户
 let tools = new Tools()
+router.get('/',(req, res)=>{
+	res.render('index.html')
+})
 router.post('/user/register',(req, res)=>{
     let { email, password } = req.body
      User.findOne({ email })
@@ -161,7 +164,7 @@ router.post('/user/userid',(req, res)=>{
 })
 
 router.post('/user/cmeal',(req, res)=>{
-    let { uid, meal, mealtime, cmoney } = req.body
+    let { uid, meal, mealtime, cmoney, renew } = req.body
     let date = new Date()
     function getTime(time, month) {
         let y1 = time.substring(0,4)
@@ -179,7 +182,7 @@ router.post('/user/cmeal',(req, res)=>{
             if (user) {
                 if (user.meal == meal) {
                     if (meal == 'mf') {
-                        res.redirect('http://192.168.0.107:9259/#/user/cmeal')
+                        res.redirect('/#/user/cmeal')
                     }
                     if (mealtime == 'ygy') {
                         user.mealtime = getTime(user.mealtime ,1)
@@ -222,7 +225,7 @@ router.post('/user/cmeal',(req, res)=>{
                 if ((user.money) < 0) {
                     return false
                 }
-                User.update({uid},{meal:user.meal, mealtime:user.mealtime, money:user.money})
+                User.update({uid},{meal:user.meal, mealtime:user.mealtime, money:user.money, renew})
                     .then()
                     .catch(err => res.json('请联系客服!'))
             }
@@ -232,6 +235,7 @@ router.post('/user/cmeal',(req, res)=>{
 router.post('/user/passwordreset', (req, res)=>{
     if (req.body.email !== undefined) {
         let emailAddress = req.body.email
+        let tokenExpiresTime = 1000 * 60 * 10
         User.findOne({email:emailAddress})
             .then( user =>{
                 if (!user) {
@@ -242,7 +246,8 @@ router.post('/user/passwordreset', (req, res)=>{
                     }
                     let payload = {
                         id:user.id,
-                        email:emailAddress
+                        email:emailAddress,
+                        expires: Date.now() + tokenExpiresTime
                     }
                     let resetsecret = user.password + secret + user.date.getTime()
                     let token = JWT.encode(payload, resetsecret)
@@ -258,7 +263,7 @@ router.post('/user/passwordreset', (req, res)=>{
                         pass: 'tllmuanfzhzabdjd',
                     }
                     })
-                    let HTML = '<a href="http://129.204.199.91:9000/user/resetpassword/' + user.id+ '/'+token+'">重置密码</a>'
+                    let HTML = 'http://114.115.150.18/user/resetpassword/' + user.id+ '/'+token
                     let mailOptions = {
                     from: '"LogPay密码重置" <963359789@qq.com>', // sender address
                     to: emailAddress, // list of receivers
@@ -304,6 +309,9 @@ router.get('/user/resetpassword/:id/:token', (req, res)=>{
                     }
                     let resetsecret = user.password + secret + user.date.getTime()
                     let payload = JWT.decode(req.params.token, resetsecret)
+					 if (payload.expires < Date.now()) {
+                        return res.send('该网址已过期')   
+                    }
                     let token = req.params.token
                     res.render('fpassword.html', {
                         payload,
@@ -318,6 +326,9 @@ router.get('/user/resetpassword/:id/:token', (req, res)=>{
 })
 
 router.post('/user/resetpassword', (req, res)=>{
+	if( req.body.password !== req.body.checkPassword ) {
+		return res.send('两次密码输入不一致')
+	}
     User.findOne({_id:req.body.id})
             .then( user =>{
                 if (!user) {
@@ -340,15 +351,20 @@ router.post('/user/resetpassword', (req, res)=>{
                                 }))
                         })
                     })
-                    res.send({
-                        code:20000,
-                        msg:'密码重置成功'
-                    })
+                    res.send('密码重置成功')
 
             })
             .catch(err => res.json({
                 code:20003,
                 msg:'系统繁忙'
             }))
+})
+// 配置文件下载
+router.get("/download/APK", (req, res)=>{
+    res.download("public/download/LogPay.apk")
+})
+
+router.get("/download/SDK", (req, res)=>{
+    res.download("public/download/logpay-phpsdk.zip")
 })
 module.exports = router

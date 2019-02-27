@@ -16,7 +16,7 @@ const android = require('./routes/api/android')
 const sdk = require('./routes/sdk/pay')
 const bodyParser = require('body-parser')
 const passport = require('passport')
-const port = process.env.PORT || 9000
+const port = process.env.PORT || 80
 
 
 app.use(bodyParser.urlencoded({extended:false}))
@@ -24,6 +24,7 @@ app.use(bodyParser.json())
 // 开放文件夹
 app.use('/node_modules/',express.static('./node_modules'))
 app.use('/public/', express.static('./public'))
+app.use('/static/', express.static('./views/static'))
 // art-template
 app.engine('html', require('express-art-template'))
 

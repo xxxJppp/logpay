@@ -15,8 +15,10 @@ module.exports = passport => {
         .then( user =>{
             if (user) {
                 return done(null, user)
+            } else {
+                res.json({ msg:'登陆失效',code:20001 })
+                return done(null, false)
             }
-            return done(null, false)
         })
         .catch( err => res.json({ msg:'获取用户信息失败!',code:20001 }) ) 
     }))

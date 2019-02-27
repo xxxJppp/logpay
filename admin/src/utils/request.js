@@ -18,8 +18,13 @@ service.interceptors.request.use(
     return config
   },
   error => {
+    Message({
+      message: '登陆过期',
+      type: 'error',
+      duration: 5 * 1000
+    })
     // Do something with request error
-    console.log(error) // for debug
+    // console.log(error) // for debug
     Promise.reject(error)
   }
 )

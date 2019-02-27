@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -32,31 +30,30 @@
     <div class="mod-ct">
         <div class="order">
         </div>
-        <div class="amount" id="money">{{price}}&nbsp;元</div>
-        
+        <div class="amount" id="money">{{ money }}&nbsp;元</div>
+		<div id="random_price" style="color:red;font-size:20px;margin-bottom:8px;"></div>
         <div class="qrcode-img-wrapper" data-role="qrPayImgWrapper">
             <div data-role="qrPayImg" class="qrcode-img-area">
                 <div class="ui-loading qrcode-loading" data-role="qrPayImgLoading" ></div>
                 <div style="position: relative;display: inline-block;">
-                    <div id="qrcode" style=" width: 289px; height: 289px; margin-top: 10px;margin-left: 10px;"></div>
+                    <div id="qrcode"></div>
                     <input id="code" style="display: none;" value="{{codeUrl}}"></input>
-                    <img onclick="$('#use').hide()" id="use" src="/public/img/wxpay.png"
-                         style="position: absolute;top: 50%;left: 50%;width:39px;height:39px;margin-left: -16px;margin-top: -23px">
-                    <div id="orderNumber" style="display: none;">{{orderNumber}}</div>
+                    <div id="orderNumber" style="display: none;">{{ orderNumber }}</div>
                     <div id="expire" style="display: none;">{{ expire }}</div>
+                    <div id="uid" style="display: none;">{{ uid }}</div>
+					<div id="price" style="display:none">{{ price }}</div>
+					<div id="pay_price" style="display:none">{{ pay_price }}</div>
                 </div>
-            </div>
         </div>
-                
         <div class="time-item" style = "padding-top: 10px">
 <script type="text/javascript">
-         var expires_in = $('#expire').html()
+     
+     var expires_in = $('#expire').html()
             var do_expire = function (h) {
                 clearInterval(h)
                 $("#count_down").html("订单已过期");
-                $("#qrcode img").css("width","288px")
-                $("#qrcode img").css("height","288px")
-                $("#use").remove()
+                $("#qrcode img").css("width","218px")
+                $("#qrcode img").css("height","218px")
                 $("#qrcode img").attr("src","data:image/png;base64,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")
             }
 
@@ -71,10 +68,17 @@
             }, 1000)
     var codeUrl = $('#code').val()
     var orderNumber = $('#orderNumber').html()
+    var uid = $('#uid').html()
+	var price = $('#price').html()
+	var pay_price = $('#pay_price').html()
+	var random_price = (parseFloat(price) - parseFloat(pay_price)).toFixed(2,'0')
+	if ( parseFloat(random_price) !== 0.00 ) {
+	    $('#random_price').html('随机立减 ' + parseFloat(random_price).toFixed(2,'0') + ' 元')
+	}
     var qrcode = new QRCode(document.getElementById('qrcode'), {
             text: codeUrl,
-            width: 288,
-            height: 288,
+            width: 218,
+            height: 218,
             correctLevel : QRCode.CorrectLevel.L
     })
     $('#code').remove()
@@ -85,12 +89,13 @@
         $.post(
             "/server/api/query",
             {
-                orderNumber: orderNumber
+                orderNumber,
+                uid
             },
              function (data) {
                  if (data.code > 0) {
-                    $("#qrcode img").css("width","288px")
-                     $("#qrcode img").css("height","288px")
+                    $("#qrcode img").css("width","218px")
+                     $("#qrcode img").css("height","218px")
                      $("#qrcode img").attr("src", "/public/img/pay_ok.png")
                      $('#orderNumber').remove()
                      window.clearInterval(myTimer)
@@ -106,16 +111,16 @@
         )
     }
 </script>
+
                  <!--手机支付-->
-<p style="color:#ff9800; font-size: 22px; text-align: center;" id="count_down"></p>
+<p style="color:red; font-size: 20px; " id="count_down"></p>
 <div class="time-item" id="msg"><h1><h1>支付完成后，自动跳转商户页面</h1></div>
-<div class="time-item"><h1>订单:{{ orderNumber }}</h1> </div>        
+<div class="time-item"><h1>订单:{{ orderNumber }}</h1></div>
         </div>
         <div class="tip">
             <div class="ico-scan"></div>
-            <div class="tip-text">
-                <!--在PC里-->
-                <p id="showtext">打开微信支付 [扫一扫]</p>
+            <div class="tip-text"><!--在PC里-->
+                    <p id="showtext">打开支付宝支付 [扫一扫]</p>
             </div>
         </div>
         <div class="tip-text"></div>
@@ -123,11 +128,10 @@
     <div class="foot">
         <div class="inner" style="display:none;">
             <p>手机用户可保存上方二维码到手机中</p>
-            <p>在微信扫一扫中选择“相册”即可</p>
+            <p>在支付宝扫一扫中选择“相册”即可</p>
             <p></p>
         </div>
     </div>
     </div>
 </body>
 </html>
-

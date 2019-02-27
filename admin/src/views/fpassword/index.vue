@@ -1,13 +1,13 @@
 <template>
-    <div class="login-container">
-      <el-form ref="ForgotForm" :model="ForgotForm" :rules="ForgotRule" class="login-form" auto-complete="on" label-position="left">
+    <div class="fpassword-container">
+      <el-form ref="FpasswordForm" :model="FpasswordForm" :rules="FpasswordRule" class="fpassword-form" auto-complete="on" label-position="left">
         <h3 class="title">重置密码</h3>
         <el-form-item prop="email">
           <span class="svg-container">
             <svg-icon icon-class="user" />
           </span>
           <el-input 
-          v-model="ForgotForm.email" 
+          v-model="FpasswordForm.email" 
           name="email" 
           type="email" 
           auto-complete="on" 
@@ -39,10 +39,10 @@ export default {
     }
     return {
       checked:false,
-      ForgotForm: {
+      FpasswordForm: {
         email: ''
       },
-      ForgotRule: {
+      FpasswordRule: {
         email: [{ required: true, trigger: 'blur', validator: validateEmail }]
       },
       loading: false,
@@ -51,7 +51,7 @@ export default {
   },
   methods: {
     handleForget() {
-    axios.post('http://129.204.199.91:9000/user/passwordreset',{ email:this.ForgotForm.email })
+    axios.post('http://logpay.paywz.cn/user/passwordreset',{ email:this.FpasswordForm.email })
          .then( res => {
            if (res.data.code === -1) {
              this.$message.error(res.data.msg)
@@ -72,7 +72,7 @@ $bg:transparent;
 $light_gray:#333;
 
 /* reset element-ui css */
-.login-container {
+.fpassword-container {
   .el-input {
     display: inline-block;
     height: 47px;
@@ -105,15 +105,16 @@ $light_gray:#333;
 </style>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
-$bg:#409EFF;
 $dark_gray:#333;
 $light_gray:#454545;
-.login-container {
+.fpassword-container {
   position: fixed;
-  height: 100%;
-  width: 100%;
-  background-color: $bg;
-  .login-form {
+  background-size: cover;
+  background-position: center 0;
+  background-image: url('../../assets/images/bg.jpg');
+  width:100%;
+  height:100%;
+  .fpassword-form {
     background-color: #fff;
     position: absolute;
     left: 0;

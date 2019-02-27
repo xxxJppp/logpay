@@ -139,7 +139,7 @@ export default {
   },
   methods: {
     handleNotify(orderNumber) {
-      axios.post('http://129.204.199.91:9000/server/api/query',{orderNumber:orderNumber})
+      axios.post('http://logpay.paywz.cn/server/api/query',{orderNumber:orderNumber})
            .then(data => {
              this.getOrder()
              })
@@ -166,7 +166,7 @@ export default {
     getOrder() {
       this.listLoading = true
       axios({
-        url: 'http://129.204.199.91:9000/order/getOrder',
+        url: 'http://logpay.paywz.cn/order/getOrder',
         method: 'get',
         params: {
             orderNumber:this.number,

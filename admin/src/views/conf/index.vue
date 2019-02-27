@@ -15,7 +15,7 @@
         </div>
       </div>    
       <div>
-      <a href="/#/config/doc" style="color:blue;display:block;">查看接口文档</a>
+      <a href="https://www.kancloud.cn/alei123/logpay-api-document/954360" style="color:blue;display:block;">查看接口文档</a>
       </div>
     </div>
     <div class="code">
@@ -129,7 +129,7 @@ export default {
                 this.$message.error('请认真配置支付宝收款userid')
                 return
             }
-            axios.post('http://129.204.199.91:9000/user/userid',{ uid:this.uid ,userid:this.userid})
+            axios.post('http://logpay.paywz.cn/user/userid',{ uid:this.uid ,userid:this.userid})
                  .then( data =>{
                      if(data = 'success') {
                          this.$message.success('配置成功')
@@ -172,7 +172,7 @@ export default {
             delQrCode (id) {
                 return new Promise(async (res, rej) => {
                     axios({
-                        url: 'http://129.204.199.91:9000/qrcode/del',
+                        url: 'http://logpay.paywz.cn/qrcode/del',
                         method: 'delete',
                         data: {
                             id: id
@@ -201,7 +201,7 @@ export default {
             upqiniu (e) {
                 let self = this
                 axios({
-                    url: 'http://129.204.199.91:9000/qrcode/updata',
+                    url: 'http://logpay.paywz.cn/qrcode/updata',
                     method: 'post',
                 }).then(res  => {
                     if (res.data.code == -1) {
@@ -214,7 +214,7 @@ export default {
             },
             getQrList () {
                 axios({
-                    url: 'http://129.204.199.91:9000/qrcode/all',
+                    url: 'http://logpay.paywz.cn/qrcode/all',
                     method: 'get',
                     params: {
                         uid: this.uid,
@@ -249,7 +249,7 @@ export default {
             getQrContent (url) {
                 let self = this
                 axios({
-                    url: 'http://129.204.199.91:9000/qrcode/add',
+                    url: 'http://logpay.paywz.cn/qrcode/add',
                     method: 'post',
                     data: {url: url,uid:self.uid}
                 }).then(res => {

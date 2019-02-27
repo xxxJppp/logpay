@@ -1,4 +1,4 @@
-import { login, logout, getInfo, cpassword, register, fpassword } from '@/api/login'
+import { login, logout, getInfo, cpassword, register } from '@/api/login'
 import { getKey, setKey, removeKey } from '@/utils/auth'
 
 const user = {
@@ -113,25 +113,13 @@ const user = {
       })
     },
 
-    // // 密码重置
-    // Fpassword(emailInfo) {
-    //   return new Promise((resolve, reject) => {
-    //     fpassword(emailInfo.email)
-    //       .then(response => {
-    //         console.log(response.data)
-    //         resolve()
-    //       }).catch(error => {
-    //         reject(error)
-    //       })
-    //   })
-    // },
-
     // 前端 登出
     FedLogOut({ commit }) {
-      return new Promise(resolve => {
+      return new Promise((resolve, reject) => {
         commit('SET_KEY', '')
         removeKey()
         resolve()
+        reject()
       })
     },
 

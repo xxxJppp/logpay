@@ -1,5 +1,5 @@
 <template>
-    <div class="login-container">
+    <div class="login-container" ref="login-container">
       <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
         <h3 class="title">LogPay 个人收款</h3>
         <el-form-item prop="email">
@@ -29,6 +29,7 @@
           </span>
         </el-form-item>
         <el-checkbox v-model="checked" style="margin-bottom:3px;">注册一个新用户</el-checkbox>
+        <a href="http://logpay.paywz.cn/#/user/argeement" v-if="checked" style="color:#409EFF;display:block;text-align:center;margin:5px 0;font-size:15px;">注册即代表同意《LogPay 用户协议》</a>
         <el-form-item>
           <el-button :loading="loading" type="success" style="width:100%;" @click.native.prevent="handleLogin" v-if="!checked">
             登陆
@@ -124,7 +125,7 @@ export default {
       })
     },
     handleFpassword() {
-      location.href = 'http://129.204.199.91/#/user/fpassword'
+      location.href = 'http://logpay.paywz.cn/#/user/fpassword'
     }
   }
 }
@@ -168,23 +169,26 @@ $light_gray:#333;
 </style>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
-$bg:#409EFF;
 $dark_gray:#333;
 $light_gray:#454545;
 .login-container {
   position: fixed;
-  height: 100%;
-  width: 100%;
-  background-color: $bg;
+  background-size: cover;
+  background-position:top center;
+  background-image: url('../../assets/images/bg.jpg');
+  width:100%;
+  height:100%;
+  background-color: #fff;
+  background-repeat: no-repeat;
   .login-form {
     background-color: #fff;
     position: absolute;
     left: 0;
     right: 0;
-    width: 488px;
+    width: 433px;
     max-width: 88%;
-    padding: 35px 35px 15px 35px;
-    margin: 120px auto;
+    padding: 20px 26px 8px 26px;
+    margin: 13% auto;
   }
   .tips {
     font-size: 14px;
@@ -207,7 +211,7 @@ $light_gray:#454545;
     font-size: 26px;
     font-weight: 400;
     color: $light_gray;
-    margin: 0px auto 40px auto;
+    margin: 12px auto 30px auto;
     text-align: center;
     font-weight: bold;
   }

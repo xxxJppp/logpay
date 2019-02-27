@@ -2,13 +2,13 @@
 <div class="wrapper">
   <div class="header">
     <div class="hleft">
-      <el-button type="primary" size="mini"><a href="http://129.204.199.91/#/user/cmeal">修改套餐</a></el-button>
+      <el-button type="primary" size="mini"><a href="http://logpay.paywz.cn/#/user/cmeal">修改套餐</a></el-button>
       <p v-if="mf">免费版</p>
       <p v-else-if="bz">标准版</p>
       <p v-else-if="gj">高级版</p>
     </div>
     <div class="hright">
-      <el-button type="success" size="mini"><a href="http://129.204.199.91/#/user/recharge">账户充值</a></el-button>
+      <el-button type="success" size="mini"><a href="http://logpay.paywz.cn/#/user/recharge">账户充值</a></el-button>
       <p>{{ money }}</p>
     </div>
   </div>
@@ -121,7 +121,7 @@ export default {
     },
   methods: {
     getDayMoney() {
-      axios.get('http://129.204.199.91:9000/order/getDayMoney',{
+      axios.get('http://logpay.paywz.cn/order/getDayMoney',{
         params:{
         uid:this.uid
         }
@@ -161,7 +161,7 @@ export default {
       })
     },
     getOrderNumber() {
-      axios.get('http://129.204.199.91:9000/order/getOrderNumber',{
+      axios.get('http://logpay.paywz.cn/order/getOrderNumber',{
         params:{
         uid:this.uid
         }

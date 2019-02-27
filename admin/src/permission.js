@@ -5,7 +5,7 @@ import 'nprogress/nprogress.css'// Progress 进度条样式
 import { Message } from 'element-ui'
 import { getKey } from '@/utils/auth' // 验权
 
-const whiteList = ['/login', '/user/fpassword'] // 不重定向白名单
+const whiteList = ['/login', '/user/fpassword', '/user/argeement'] // 不重定向白名单
 router.beforeEach((to, from, next) => {
   NProgress.start()
   if (getKey()) {
@@ -33,8 +33,10 @@ router.beforeEach((to, from, next) => {
     // 如果/fpassword 跳/fpassword
     } else if (whiteList.includes('fpassword')) {
       next()
+    } else if (whiteList.includes('argeement')) {
+      next()
     } else {
-      next(`/login?redirect=${to.path}`)  // 否则全部重定向到登录页 
+      next(`/login?redirect=${to.path}`)
       NProgress.done()
     }
   }

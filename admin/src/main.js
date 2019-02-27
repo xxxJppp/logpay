@@ -13,7 +13,7 @@ import router from './router'
 import '@/icons' // icon
 import '@/permission' // permission control
 
-Vue.prototype.$staticUrl = 'http://pm1fi5f4g.bkt.clouddn.com/'
+Vue.prototype.$staticUrl = 'http://logpay.qdzhan.cn/'
 Vue.use(ElementUI)
 
 Vue.config.productionTip = false

@@ -25,12 +25,21 @@ import Layout from '../views/layout/Layout'
 export const constantRouterMap = [
   { path: '/login', component: () => import('@/views/login/index'), hidden: true },
   { path: '/404', component: () => import('@/views/404'), hidden: true },
+  // 忘记密码
   {
     path: '/user/fpassword',
     name: 'fpassword',
     hidden: true,
     component: () => import('@/views/fpassword/index')
   },
+  // 用户协议
+  {
+    path: '/user/argeement',
+    name: 'argeement',
+    hidden: true,
+    component: () => import('@/views/argeement/index')
+  },
+  // 控制台
   {
     path: '/',
     component: Layout,
@@ -42,6 +51,7 @@ export const constantRouterMap = [
       meta: { title: '控制台', icon: 'example' }
     }]
   },
+  // 应用配置
   {
     path: '/config',
     name: 'config',
@@ -55,19 +65,26 @@ export const constantRouterMap = [
         meta: { title: '配置参数', icon: '' }
       },
       {
-        path: 'doc',
+        path: 'https://www.kancloud.cn/alei123/logpay-api-document/954360',
         name: 'doc',
         component: () => import('@/views/doc/index'),
         meta: { title: '接口文档', icon: '' }
       },
       {
-        path: 'SDk',
+        path: 'http://logpay.paywz.cn/download/SDK',
         name: 'SDK',
         component: () => import('@/views/sdk/index'),
         meta: { title: 'SDK下载', icon: '' }
+      },
+      {
+        path: 'http://logpay.paywz.cn/download/APK',
+        name: 'APK',
+        component: () => import('@/views/apk/index'),
+        meta: { title: 'APK下载', icon: '' }
       }
     ]
   },
+  // 订单管理
   {
     path: '/manage',
     name: 'manage',
@@ -82,6 +99,7 @@ export const constantRouterMap = [
       }
     ]
   },
+  // 个人中心
   {
     path: '/user',
     component: Layout,
@@ -108,6 +126,7 @@ export const constantRouterMap = [
       }
     ]
   },
+  // 其他的404
   { path: '*', redirect: '/404', hidden: true }
 ]
 

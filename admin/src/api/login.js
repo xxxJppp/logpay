@@ -47,13 +47,3 @@ export function cpassword(email, oldpassword, password) {
     }
   })
 }
-
-export function fpassword(email) {
-  return request({
-    url: '/user/passwordreset',
-    method: 'post',
-    data: {
-      email
-    }
-  })
-}
