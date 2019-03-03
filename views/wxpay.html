@@ -105,7 +105,7 @@
                      $("#msg").html("<h1>即将<a href= " + data.url + ">跳转</a>回商家页</h1>")
                      setTimeout(function () {
                          window.location = data.url
-                     }, 3000);
+                     }, 500);
                  }
              }
         )
@@ -120,15 +120,15 @@
         <div class="tip">
             <div class="ico-scan"></div>
             <div class="tip-text"><!--在PC里-->
-                    <p id="showtext">打开支付宝支付 [扫一扫]</p>
+                    <p id="showtext">打开微信 [扫一扫]</p>
             </div>
         </div>
         <div class="tip-text"></div>
     </div>
     <div class="foot">
-        <div class="inner" style="display:none;">
+        <div class="inner">
             <p>手机用户可保存上方二维码到手机中</p>
-            <p>在支付宝扫一扫中选择“相册”即可</p>
+            <p>在微信扫一扫中选择“相册”即可</p>
             <p></p>
         </div>
     </div>

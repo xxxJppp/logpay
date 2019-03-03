@@ -12,6 +12,8 @@ router.get('/order/getOrder',(req, res)=>{
         let orderUid = params.orderUid
         let status = params.status
         let payType = params.payType
+		let start = params.start
+		let end = params.end
         let query = {}
         if (orderNumber) {
            query.orderNumber = orderNumber           
@@ -25,6 +27,9 @@ router.get('/order/getOrder',(req, res)=>{
         if (payType) {
             query.payType = payType           
         }
+		if (end && start) {
+			query.createTime = {$gte:start,$lt:end}
+		}
         query.uid = params.uid
          Order.find(query)
               .then( order =>{

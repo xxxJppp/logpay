@@ -20,7 +20,7 @@ let orderSchema = new Schema({
     },
     orderName: {
         type: String,
-        required: true
+        required: false
     },
     price: {
         type: String,

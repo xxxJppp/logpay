@@ -174,7 +174,7 @@ router.post('/server/api/pay', async (req,res)=>{
         }
     }
     if (!o) {
-        Order.findOne({ uid, orderUid, payType, price, pay_price, status:-1, expire:{$gt:0,$lt:300}})
+        Order.findOne({ uid, orderUid, payType, price, status:-1, expire:{$gt:0,$lt:300}})
         .then(order=>{
             if (!order) {
                 // 验证签名
@@ -267,10 +267,11 @@ router.post('/server/api/pay', async (req,res)=>{
                     pay_price = expireArr1[0].pay_price - 0.01
                     // 处理算法
                     expireArr2.sort(compareMax("pay_price"))
-                    function mathTest (order1) {
-                        for (let i = 0; i < order1.length; i++) {
-                        if( order1[i].pay_price != price - i*0.01) {
-                        pay_price = price - 0.01*i
+					// 判断前面的订单排序
+                    function mathTest (arr) {
+                        for (let i = 0; i < arr.length; i++) {
+                        if( arr[i].pay_price != (parseFloat(price) - i*0.01).toFixed(2,'0')) {
+                        pay_price = parseFloat(price) - 0.01*i
                         return pay_price
                         }
                     }
@@ -280,7 +281,7 @@ router.post('/server/api/pay', async (req,res)=>{
                     }
                     }
                     pay_price = parseFloat(pay_price).toFixed(2)
-                    price = parseFloat(price).toFixed(2)
+					price = parseFloat(price).toFixed(2)
                     // 存数据库
                     let date = new Date()
                     let YearMD = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')} `
@@ -503,13 +504,24 @@ router.post('/server/api/query', (req,res)=>{
             }
             // data.status = 1 // 当监听到支付宝到账时,就确定此订单交易成功，监控会发一个修改status请求改为1
             if (order.status === 1) {
+				function getClientIP(req) {
+				  let target = req.headers['x-forwarded-for'] || // 判断是否有反向代理 IP
+				  req.connection.remoteAddress || // 判断 connection 的远程 IP
+				  req.socket.remoteAddress || // 判断后端的 socket 的 IP
+				  req.connection.socket.remoteAddress
+				  let ip = []
+				  let reg =  /(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
+				  ip = reg.exec(target)
+				  return ip[0]
+				};
+				let { pay_price, price ,payType,orderName, orderUid , orderNumber, sign1, sign2, notify_url,status, return_url, uid, expire,fee, pid} = order
+			    let returnUrl = return_url + '?sign1=' + sign1 + '&sign2=' + sign2 + '&orderUid=' + orderUid + '&orderNumber=' + orderNumber +'&pay_price='+pay_price +'&price=' + price + '&ip=' + getClientIP(req)
                 res.json({
                     code : 1,
                     msg : '支付成功,未通知回调',
-                    url : order.return_url // return_url
+                    url : returnUrl // return_url
                 })
                 // 异步通知
-                let { pay_price, price ,payType,orderName, orderUid , orderNumber, sign1, sign2, notify_url,status, return_url, uid, expire,fee, pid} = order
                 let requestData = {
                     orderUid,
                     pay_price,
@@ -519,18 +531,17 @@ router.post('/server/api/query', (req,res)=>{
                     pay_price,
                     sign2
                 }
-                httprequest(notify_url,requestData)
-                function httprequest(url,data){
                     request({
-                        url: url,
+                        url: notify_url,
                         method: "POST",
                         json: true,
                         headers: {
                             "content-type": "application/json",
                         },
-                        body: data
-                    }, (error, response, body) => {
+                        body: requestData
+                    }, (error, response, body) => {						
                         if (!error && response.statusCode == 200) {
+							
                             //异步回调成功
                             if (body === 'SUCCESS') {
                                 let date = new Date()
@@ -570,7 +581,6 @@ router.post('/server/api/query', (req,res)=>{
                             }
                         }
                     })
-                }
             } else {
                 res.send({
                     code : -1,
