@@ -5,6 +5,13 @@ import 'nprogress/nprogress.css'// Progress 进度条样式
 import { Message } from 'element-ui'
 import { getKey } from '@/utils/auth' // 验权
 
+// // permission judge function
+// function hasPermission(roles, permissionRoles) {
+//   if (roles.includes('admin')) return true // admin permission passed directly
+//   if (!permissionRoles) return true
+//   return roles.some(role => permissionRoles.includes(role))
+// }
+
 const whiteList = ['/login', '/user/fpassword', '/user/argeement'] // 不重定向白名单
 router.beforeEach((to, from, next) => {
   NProgress.start()
@@ -16,19 +23,30 @@ router.beforeEach((to, from, next) => {
       // 如果用户id没有的话拉取用户信息
       if (store.getters.id === '') {
         store.dispatch('GetInfo').then(res => { // 拉取用户信息
-          next()
+          const roles = res.data.roles // note: roles must be a array! such as: ['editor','develop']
+          store.dispatch('GenerateRoutes', { roles }).then(() => { // 根据roles权限生成可访问的路由表
+            router.addRoutes(store.getters.addRouters) // 动态添加可访问路由表
+            next({ ...to, replace: true }) // hack方法 确保addRoutes已完成 ,set the replace: true so the navigation will not leave a history record
+          })
         }).catch((err) => {
           store.dispatch('FedLogOut').then(() => {
-            Message.error('登陆已过期')
+            Message.error(err)
             next({ path: '/' })
           })
         })
       } else {
+        // 没有动态改变权限的需求可直接next() 删除下方权限判断 ↓
+        // if (hasPermission(store.getters.roles, to.meta.roles)) {
+        //   next()
+        // } else {
+        //   next({ path: '/401', replace: true, query: { noGoBack: true }})
+        // }
+        // 可删 ↑
         next()
       }
     }
   } else {
-    if (whiteList.indexOf(to.path) !== -1) {
+    if (whiteList.includes(to.path)) {
       next()
     // 如果/fpassword 跳/fpassword
     } else if (whiteList.includes('fpassword')) {
@@ -36,7 +54,7 @@ router.beforeEach((to, from, next) => {
     } else if (whiteList.includes('argeement')) {
       next()
     } else {
-      next(`/login?redirect=${to.path}`)
+      next(`/login`)
       NProgress.done()
     }
   }

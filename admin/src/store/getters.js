@@ -8,6 +8,9 @@ const getters = {
   meal: state => state.user.meal,
   token: state => state.user.token,
   mealtime: state => state.user.mealtime,
-  money: state => state.user.money
+  money: state => state.user.money,
+  roles: state => state.user.roles,
+  permission_routers: state => state.permission.routers,
+  addRouters: state => state.permission.addRouters
 }
 export default getters

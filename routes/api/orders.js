@@ -1,20 +1,32 @@
 const express = require('express')
 const router = express.Router()
-const Order = require('../../models/Orders') 
-
+const Order = require('../../models/Orders')
+const MissOrder = require('../../models/MissOrders') 
+const Tools = require('../../config/utils')
+// 引用工具
+let tools = new Tools()
 router.get('/order/getOrder',(req, res)=>{
   try {
         let params = req.query
-        if (parseInt(params.page) != params.page && parseInt(params.num) != params.num) {
-            throw ('参数有误!')
-        }
-        let orderNumber = params.orderNumber 
+        let orderNumber = params.orderNumber
         let orderUid = params.orderUid
         let status = params.status
         let payType = params.payType
-		let start = params.start
-		let end = params.end
-        let query = {}
+		let orderDate = params.orderDate
+		let merchantUid = params.merchantUid
+		let role = params.role
+		let uid = params.uid
+		let query = {}
+		if (orderDate) {
+			let trueDate = orderDate.map(v=>{
+			  return tools.localDate(v)
+		    })
+            let start = trueDate[0]
+		    let end = trueDate[1]
+            if ( start && end ) {
+				query.createTime = {$gte:start,$lt:end}
+			}		
+		}
         if (orderNumber) {
            query.orderNumber = orderNumber           
         }
@@ -25,13 +37,18 @@ router.get('/order/getOrder',(req, res)=>{
             query.status = status       
         }
         if (payType) {
-            query.payType = payType           
+            query.payType = payType        
         }
-		if (end && start) {
-			query.createTime = {$gte:start,$lt:end}
+        if (role === 'admin') {
+			if (merchantUid) {
+            query.uid = merchantUid
+			}			
 		}
-        query.uid = params.uid
+		if (role === 'merchant'){
+			query.uid = uid
+		}
          Order.find(query)
+		      .sort({'_id':-1})
               .then( order =>{
                  let skip = (parseInt(params.page-1))*parseInt(params.num)
                  let limit = parseInt(params.num)
@@ -63,12 +80,74 @@ router.get('/order/getOrder',(req, res)=>{
             }
 })
 
+router.get('/order/getMissOrder',(req, res)=>{
+  try {  
+        let params = req.query
+        let payType = params.payType
+		let missOrderDate = params.missOrderDate
+		let pay_price = params.pay_price
+		let query = {}
+		if (pay_price) {
+            query.pay_price = pay_price           
+        }
+		if (missOrderDate) {
+			let trueMissDate = missOrderDate.map(v=>{
+			  return tools.localDate(v)
+		    })
+            let start = trueMissDate[0]
+		    let end = trueMissDate[1]
+            if ( start && end ) {
+				query.createTime = {$gte:start,$lt:end}
+			}			
+		}
+        if (payType) {
+            query.payType = payType           
+        }
+		if (params.uid !== '10001') {
+            query.uid = params.uid		
+		}
+        MissOrder.find(query)
+		         .sort({'_id':-1})
+                 .then( missOrder =>{
+                 let skip = (parseInt(params.page-1))*parseInt(params.num)
+                 let limit = parseInt(params.num)
+             MissOrder.find(query)
+                      .sort({'_id':-1})
+                      .skip(skip)
+                      .limit(limit) 
+                      .exec()
+                      .then( select => {
+                        if (!select) throw ('无数据!')
+                        res.json({
+                          code: 1,
+                          data: {
+                              select,
+                              missOrder
+                          },
+                          msg: '获取成功!'
+                      })
+                    })
+                      .catch( err => res.json('当前系统繁忙'))
+                 })
+                 .catch( err => res.json('当前系统繁忙'))
+            } catch (e) {
+                res.json({
+                    code:-1,
+                    data:'',
+                    msg:e
+                })
+            }
+})
 router.get('/order/getDayMoney', async (req, res)=>{
-    let { uid } = req.query
+try {
+    let { uid,role } = req.query
     let date = new Date()
-        let now = `${date.getFullYear()}-${(date.getMonth()+1)}-${date.getDate()} 0:0:0`
+	    date.setHours(0)
+		date.setSeconds(0)
+		date.setMinutes(0)
+        let now = tools.localDate(date)
         date.setDate(date.getDate()-1)
-        let yes = `${date.getFullYear()}-${(date.getMonth()+1)}-${date.getDate()} 0:0:0`
+        let yes = tools.localDate(date)
         const getDayMoney = (payType,uid, time) => {
         return new Promise((resolve, reject)=>{
             let select = {}
@@ -92,14 +171,11 @@ router.get('/order/getDayMoney', async (req, res)=>{
         const sum = (property,arr) => {
             let s = 0
             arr.forEach(e => {
-                if (e.orderName === 'LogPay账户充值' && e.uid === '10001' && property === 'fee') {
-                    return
-                }
                 s += parseFloat(e[property])
             })
             return parseFloat(s)
         }
-        if (uid==='10001') {
+        if (role === 'admin') {
             // 今日交易额数据
             let tod_ali_success_order = await getDayMoney('alipay','',{$gte:now})
             let tod_ali = sum('pay_price',tod_ali_success_order).toFixed(2,'0')
@@ -184,14 +260,25 @@ router.get('/order/getDayMoney', async (req, res)=>{
                     all_all
                 }
             })
+} catch (e) {
+	res.json({
+		code:-1,
+		data:'',
+		msg:e
+	})
+}
 })
 
 router.get('/order/getOrderNumber', async (req, res)=>{
+try {
     let { uid } = req.query
     let date = new Date()
-        let now = `${date.getFullYear()}-${(date.getMonth()+1)}-${date.getDate()} 0:0:0`
+	    date.setHours(0)
+		date.setSeconds(0)
+		date.setMinutes(0)
+        let now = tools.localDate(date)
         date.setDate(date.getDate()-1)
-        let yes = `${date.getFullYear()}-${(date.getMonth()+1)}-${date.getDate()} 0:0:0`
+        let yes = tools.localDate(date)
         const getOrderNumber = (status, uid, time) => {
         return new Promise((resolve, reject)=>{
             let select = {}
@@ -202,7 +289,7 @@ router.get('/order/getOrderNumber', async (req, res)=>{
                 select.status = status
             }
             if (time) {
-                select.createTime = time                
+                select.createTime = time              
             }
             Order.find(select)
              .then( order=>{
@@ -259,5 +346,12 @@ router.get('/order/getOrderNumber', async (req, res)=>{
                 all_order
             }
         })
+} catch (e) {
+	res.json({
+		code:-1,
+		data:'',
+		msg:e
+	})
+}
 })
 module.exports = router

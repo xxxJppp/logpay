@@ -18,7 +18,6 @@
     <title>微信支付</title>
     <link href="/public/css/gateway.css" rel="stylesheet" media="screen">
     <script src="/public/js/jquery.min.js"></script>
-    <script src="/public/js/qrcode.min.js"></script>
 </head>
 
 <body>
@@ -36,25 +35,53 @@
             <div data-role="qrPayImg" class="qrcode-img-area">
                 <div class="ui-loading qrcode-loading" data-role="qrPayImgLoading" ></div>
                 <div style="position: relative;display: inline-block;">
-                    <div id="qrcode"></div>
-                    <input id="code" style="display: none;" value="{{codeUrl}}"></input>
+                    <img id="qrcode" style="width:208px;height:208px;" src="http://logpay.paywz.cn/qrcode/image?text={{codeUrl}}">
+                    <img id="pay_ok" style="display:none;">
+                    <img id="outTime" style="display:none;">						
+				   <!-- <button style="width:100px;height:50px;background-color:#67C23A;color:#fff;border-radius:5px;display:block;margin:0 auto;">保存二维码</button>-->
                     <div id="orderNumber" style="display: none;">{{ orderNumber }}</div>
                     <div id="expire" style="display: none;">{{ expire }}</div>
                     <div id="uid" style="display: none;">{{ uid }}</div>
 					<div id="price" style="display:none">{{ price }}</div>
 					<div id="pay_price" style="display:none">{{ pay_price }}</div>
+					<!--<div id="codeUrl" style="display: none;">{{ codeUrl }}</div>-->
                 </div>
         </div>
         <div class="time-item" style = "padding-top: 10px">
 <script type="text/javascript">
-     
+//      let codeUrl = 'http://logpay.paywz.cn/qrcode/image?text=' + $('#codeUrl').html()
+//	  $("button").click(function(){
+//})
+//	  $("buttondd").click(function(){
+//	    function downloadIamge(imgsrc, name) {//下载图片地址和图片名
+//        let image = new Image()
+//       // 解决跨域 Canvas 污染问题
+//      image.setAttribute("crossOrigin", "anonymous")
+//       image.onload = function() {
+//           let canvas = document.createElement("canvas")
+//          canvas.width = image.width
+//            canvas.height = image.height
+//            let context = canvas.getContext("2d")
+//            context.drawImage(image, 0, 0, image.width, image.height)
+//            let url = canvas.toDataURL("image/png") //得到图片的base64编码数据
+//            let a = document.createElement("a") // 生成一个a元素
+//           let event = new MouseEvent("click") // 创建一个单击事件
+//            a.download = name || "photo" // 设置图片名称
+//            a.href = url // 将生成的URL设置为a.href属性
+//            a.dispatchEvent(event) // 触发a的单击事件
+//       }
+//       image.src = imgsrc
+//       }
+//        function downs(){
+//          downloadIamge( codeUrl, codeUrl + '.png')
+//        }
+//	    downs()
+//      })
      var expires_in = $('#expire').html()
             var do_expire = function (h) {
                 clearInterval(h)
-                $("#count_down").html("订单已过期");
-                $("#qrcode img").css("width","218px")
-                $("#qrcode img").css("height","218px")
-                $("#qrcode img").attr("src","data:image/png;base64,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")
+                $("#count_down").html("订单已过期")
+                $("#qrcode").attr("src","data:image/png;base64,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")
             }
 
     var handler = setInterval(function () {
@@ -66,7 +93,6 @@
                     $("#count_down").html( (min?(min+ " 分 "):"") + expires_in % 60 + " 秒后订单过期，请及时支付" )
                 }
             }, 1000)
-    var codeUrl = $('#code').val()
     var orderNumber = $('#orderNumber').html()
     var uid = $('#uid').html()
 	var price = $('#price').html()
@@ -75,13 +101,6 @@
 	if ( parseFloat(random_price) !== 0.00 ) {
 	    $('#random_price').html('随机立减 ' + parseFloat(random_price).toFixed(2,'0') + ' 元')
 	}
-    var qrcode = new QRCode(document.getElementById('qrcode'), {
-            text: codeUrl,
-            width: 218,
-            height: 218,
-            correctLevel : QRCode.CorrectLevel.L
-    })
-    $('#code').remove()
     var myTimer = window.setInterval(function () {
         checkOrder()
     },1000)
@@ -89,17 +108,14 @@
         $.post(
             "/server/api/query",
             {
-                orderNumber,
-                uid
+                orderNumber:orderNumber,
+                uid:uid
             },
              function (data) {
-                 if (data.code > 0) {
-                    $("#qrcode img").css("width","218px")
-                     $("#qrcode img").css("height","218px")
-                     $("#qrcode img").attr("src", "/public/img/pay_ok.png")
+                 if (data.code > 1) {
+                     $("#qrcode").attr("src", "/public/img/pay_ok.png")
                      $('#orderNumber').remove()
                      window.clearInterval(myTimer)
-                     $("#use").remove()
                      $("#money").text("支付成功")
                      $("#msg").html("<h1>即将返回商家页</h1>")
                      $("#msg").html("<h1>即将<a href= " + data.url + ">跳转</a>回商家页</h1>")

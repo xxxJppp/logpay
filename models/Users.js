@@ -1,7 +1,6 @@
 // 配置mongoose
 let mongoose = require('mongoose')
 mongoose.connect('mongodb://localhost/mqpay', { useNewUrlParser: true })
-
 // 设计架构模式
 let Schema = mongoose.Schema
 let userSchema = new Schema({
@@ -15,7 +14,7 @@ let userSchema = new Schema({
     },
     date: {
         type: Date,
-        default: Date.now
+        required: true
     },
     uid: {
         type: String,
@@ -40,7 +39,27 @@ let userSchema = new Schema({
     money: {
         type: String,
         required: true
-    }
+    },
+	renew: {
+		type:String,
+		require:true
+	},
+	roles: {
+		type: Array,
+		default: ['merchant']
+	},
+	ip: {
+		type: String,
+		require: false
+	},
+	remark: {
+		type: String,
+		require: false
+	},
+	address: {
+		type: String,
+		require: false
+	}
 })
 
 let User = mongoose.model('User', userSchema)

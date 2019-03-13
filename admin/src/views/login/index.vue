@@ -7,7 +7,7 @@
             <svg-icon icon-class="user" />
           </span>
           <el-input 
-          v-model="loginForm.email" 
+          v-model="loginForm.email"
           name="email" 
           type="email" 
           auto-complete="on" 

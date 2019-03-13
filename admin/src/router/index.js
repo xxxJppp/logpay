@@ -22,6 +22,48 @@ import Layout from '../views/layout/Layout'
     breadcrumb: false            if false, the item will hidden in breadcrumb(default is true)
   }
 **/
+export const asyncRouterMap = [
+  // 商户
+  {
+    path: '/merchant',
+    component: Layout,
+    name: 'merchant',
+    redirect: 'member',
+    meta: { title: '商户', roles: ['admin'] },
+    children: [{
+      path: 'member',
+      component: () => import('@/views/member/index'),
+      meta: { title: '商户', icon: 'peoples', roles: ['admin'] }
+    }]
+  },
+  // 大数据
+  {
+    path: '/data',
+    component: Layout,
+    name: 'data',
+    redirect: 'money',
+    meta: { title: '大数据', roles: ['admin'] },
+    children: [{
+      path: 'money',
+      component: () => import('@/views/money/index'),
+      meta: { title: '大数据', icon: 'chart', roles: ['admin'] }
+    }]
+  },
+  // 套餐设定
+  {
+    path: '/meal',
+    component: Layout,
+    name: 'meal',
+    redirect: 'setMeal',
+    meta: { title: '套餐设定', roles: ['admin'] },
+    children: [{
+      path: 'setMeal',
+      component: () => import('@/views/setMeal/index'),
+      meta: { title: '套餐设定', icon: 'dashboard', roles: ['admin'] }
+    }]
+  }
+]
+
 export const constantRouterMap = [
   { path: '/login', component: () => import('@/views/login/index'), hidden: true },
   { path: '/404', component: () => import('@/views/404'), hidden: true },
@@ -45,6 +87,7 @@ export const constantRouterMap = [
     component: Layout,
     name: 'index',
     redirect: 'index',
+    meta: { title: '控制台' },
     children: [{
       path: 'index',
       component: () => import('@/views/index/index'),
@@ -68,19 +111,19 @@ export const constantRouterMap = [
         path: 'https://www.kancloud.cn/alei123/logpay-api-document/954360',
         name: 'doc',
         component: () => import('@/views/doc/index'),
-        meta: { title: '接口文档', icon: '' }
+        meta: { title: '接口文档' }
       },
       {
         path: 'http://logpay.paywz.cn/download/SDK',
         name: 'SDK',
         component: () => import('@/views/sdk/index'),
-        meta: { title: 'SDK下载', icon: '' }
+        meta: { title: 'SDK下载' }
       },
       {
         path: 'http://logpay.paywz.cn/download/APK',
         name: 'APK',
         component: () => import('@/views/apk/index'),
-        meta: { title: 'APK下载', icon: '' }
+        meta: { title: 'APK下载' }
       }
     ]
   },
@@ -95,7 +138,13 @@ export const constantRouterMap = [
         path: 'order',
         name: 'Order',
         component: () => import('@/views/order/index'),
-        meta: { title: '交易订单', icon: '' }
+        meta: { title: '交易订单' }
+      },
+      {
+        path: 'missOrder',
+        name: 'missOrder',
+        component: () => import('@/views/missorder/index'),
+        meta: { title: '未匹配订单' }
       }
     ]
   },
@@ -110,24 +159,24 @@ export const constantRouterMap = [
         path: 'cpassword',
         name: 'cpassword',
         component: () => import('@/views/cpassword/index'),
-        meta: { title: '修改密码', icon: '' }
+        meta: { title: '修改密码' }
       },
       {
         path: 'cmeal',
         name: 'cmeal',
         component: () => import('@/views/cmeal/index'),
-        meta: { title: '更换套餐', icon: '' }
+        meta: { title: '更换套餐' }
       },
       {
         path: 'recharge',
         name: 'recharge',
         component: () => import('@/views/recharge/index'),
-        meta: { title: '账户充值', icon: '' }
+        meta: { title: '账户充值' }
       }
     ]
-  },
+  }
   // 其他的404
-  { path: '*', redirect: '/404', hidden: true }
+  // { path: '*', redirect: '/404', hidden: true }
 ]
 
 export default new Router({

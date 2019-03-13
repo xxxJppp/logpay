@@ -10,7 +10,8 @@ const user = {
     token: '',
     meal: '',
     mealtime: '',
-    money: ''
+    money: '',
+    roles: []
   },
 
   mutations: {
@@ -37,6 +38,9 @@ const user = {
     },
     SET_MONEY: (state, money) => {
       state.money = money
+    },
+    SET_ROLES: (state, roles) => {
+      state.roles = roles
     }
   },
   actions: {
@@ -79,6 +83,11 @@ const user = {
       return new Promise((resolve, reject) => {
         getInfo(state.key).then(response => {
           const data = response.data
+          if (data.roles && data.roles.length > 0) { // 验证返回的roles是否是一个非空数组
+            commit('SET_ROLES', data.roles)
+          } else {
+            reject('getInfo: roles must be a non-null array!')
+          }
           commit('SET_EMAIL', data.email)
           commit('SET_ID', data.id)
           commit('SET_UID', data.uid)
@@ -136,6 +145,21 @@ const user = {
         })
       })
     }
+
+    // // 动态修改权限
+    // ChangeRoles({ commit, dispatch }, role) {
+    //   return new Promise(resolve => {
+    //     commit('SET_KEY', role)
+    //     setKey(role)
+    //     getInfo(role).then(response => {
+    //       const data = response.data
+    //       commit('SET_ROLES', data.roles)
+    //       commit('SET_EMAIL', data.email)
+    //       dispatch('GenerateRoutes', data) // 动态修改权限后 重绘侧边菜单
+    //       resolve()
+    //     })
+    //   })
+    // }
   }
 }
 export default user

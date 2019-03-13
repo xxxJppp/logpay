@@ -7,7 +7,7 @@ const users = require('./routes/api/users')
 //引入数据读取路由
 const orders = require('./routes/api/orders')
 //引入二维码操作路由
-const qrcodes = require('./routes/api/qrcode')
+const qrcodes = require('./routes/api/qrcodes')
 //引入支付核心
 const core = require('./routes/api/core')
 //引入安卓核心

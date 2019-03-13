@@ -1,7 +1,6 @@
 // 配置mongoose
 let mongoose = require('mongoose')
 mongoose.connect('mongodb://localhost/mqpay', { useNewUrlParser:true })
-
 // 设计架构模式
 let Schema = mongoose.Schema
 let orderSchema = new Schema({
@@ -29,10 +28,6 @@ let orderSchema = new Schema({
     pay_price: {
         type:String,
         required: true
-    },
-    create_time:{
-        type:String,
-        required:true
     },
     pay_time:{
         type:String,
@@ -80,8 +75,20 @@ let orderSchema = new Schema({
     },
     createTime:{
         type:Date,
-        default:Date.now
-    }
+        required:true
+    },
+	Pid:{
+		type:Number,
+		require:false
+	},
+	ip: {
+		type:String,
+		require: false
+	},
+	merchantIp: {
+		type:String,
+		require: true
+	}
 })
 
 let Order = mongoose.model('Order', orderSchema)

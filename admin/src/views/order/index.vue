@@ -1,6 +1,7 @@
   <template>
   <div class="container">
     <div class="header">
+      <el-input style="width:49%;" v-model="merchantUid" placeholder="商户号" v-if="this.roles[0] === 'admin'"></el-input>
       <el-input style="width:49%;" v-model="number" placeholder="订单号"></el-input>
       <el-input style="width:49%;" v-model="name" placeholder="订单用户名"></el-input>
       <el-select style="margin:5px 0;width:49%;" v-model="value1" placeholder="请选择">
@@ -19,20 +20,19 @@
         :value="item.value2">
       </el-option>
       </el-select>
-      <el-button style="margin-bottom:5px;" @click="selectOrder" size="mini">查询</el-button>
-      <el-checkbox style="margin-left:10px;" v-model="ordersExport">订单导出</el-checkbox>
-      <el-button style="margin-bottom:5px;margin:0 10px;" v-if="ordersExport"  @click="exportOrders" size="mini" >确认导出</el-button><span style="color:#cccccc;font-size:10px;" v-if="ordersExport">不支持Safari&nbsp;</span>
       <el-date-picker
-        v-if="ordersExport"
         v-model="orderDate"
-        style="margin-bottom:5px;"
         type="datetimerange"
+        style="margin-bottom:5px;"
         :picker-options="picker"
         range-separator="至"
         start-placeholder="开始日期"
         end-placeholder="结束日期"
         align="right">
       </el-date-picker>
+      <el-button style="margin:0 0 5px 5px;" @click="selectOrder" size="mini">查询</el-button>
+      <el-checkbox style="margin-left:10px;" v-model="ordersExport">订单导出</el-checkbox>
+      <el-button  v-if="ordersExport" style="margin-left:5px;" @click="exportOrders" size="mini" >确认导出</el-button><span style="color:#cccccc;font-size:10px;margin-left:5px;" v-if="ordersExport">不支持Safari&nbsp;</span>
     </div>
     <el-table
       v-loading="listLoading"
@@ -42,13 +42,17 @@
       fit
       :row-class-name="tableRowClassName"
       >
+      <el-table-column prop="uid" label="商户号" align="center" v-if="this.roles[0] === 'admin'">
+      </el-table-column>
       <el-table-column prop="orderName" label="商品名称" align="center">
       </el-table-column>
       <el-table-column prop="orderNumber" label="订单号" align="center">
       </el-table-column>
       <el-table-column prop="orderUid" label="用户名" align="center">
       </el-table-column>
-      <el-table-column prop="create_time" label="创建时间" align="center">
+      <el-table-column prop="ip" label="订单IP" align="center">
+      </el-table-column>
+      <el-table-column prop="createTime" label="创建时间" align="center">
       </el-table-column>
       <el-table-column prop="pay_time" label="支付时间" align="center">
       </el-table-column>
@@ -62,6 +66,8 @@
       </el-table-column>
       <el-table-column prop="fee" label="服务费" align="center">
       </el-table-column>
+      <el-table-column prop="merchantIp" label="商户IP" align="center" v-if="this.roles[0] === 'admin'">
+      </el-table-column>
       <el-table-column prop="status" label="状态" align="center">
         <template slot-scope="scope">
             <span v-if="scope.row.status == '-1'" style="color:red;">未支付</span>
@@ -74,7 +80,7 @@
               <el-button
               size="mini"
               type="danger"
-              @click="handleNotify(scope.row.orderNumber)" v-if="scope.row.status == 1">手动回调</el-button>
+              @click="handleNotify(scope.row.orderNumber, scope.row.Pid)" v-if="scope.row.status == 1">手动回调</el-button>
               <el-button
               size="mini"
               type="primary"
@@ -87,6 +93,7 @@
       </el-table-column>
     </el-table>
     <el-pagination
+      style="width:100%;"
       @size-change="handleSizeChange"
       @current-change="nextPage"
       :page-sizes="[10, 20, 30, 40]"
@@ -138,6 +145,7 @@ export default {
         number:null,
         // 获取订单名称
         name:null,
+        merchantUid:null,
         // 支付渠道得选择
         type: [
           {
@@ -185,7 +193,8 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'uid'
+      'uid',
+      'roles'
     ])
   },
   created() {
@@ -193,8 +202,8 @@ export default {
   },
   methods: {
     // 处理未通知的
-    handleNotify(orderNumber) {
-      axios.post('http://logpay.paywz.cn/server/api/query',{orderNumber,uid:this.uid})
+    handleNotify(orderNumber,Pid) {
+      axios.post('http://logpay.paywz.cn/server/api/query',{orderNumber,Pid,uid:this.uid,checked:'notify',})
            .then(data => {
              this.getOrder()
              })
@@ -224,7 +233,11 @@ export default {
       },
       // 发起导出订单
       exportOrders() {
-          axios({
+        if (this.orderDate === null) {
+          this.orderDate = ''
+        }
+        this.listLoading = true
+        axios({
         url: 'http://logpay.paywz.cn/order/getOrder',
         method: 'get',
         params: {
@@ -235,18 +248,23 @@ export default {
             uid: this.uid,
             page: this.page.page,
             num: this.page.num,
-            start: this.orderDate[0],
-            end:this.orderDate[1]
+            orderDate:this.orderDate,
+            merchantUid:this.merchantUid,
+            role:this.roles[0]
         }
     }).then(res => {
         if (res.data.code == -1) {
             this.$message.error(res.data.msg)
             return false
         }
+        this.listLoading = false
         import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['商品名称', '订单号', '用户名', '支付渠道', '创建时间', '支付时间', '支付金额', '价格', '服务费', '状态']
-        const filterVal = ['orderName', 'orderNumber', 'orderUid', 'payType', 'create_time', 'pay_time', 'pay_price','price', 'fee', 'status']
+        const tHeader = ['商品名称', '订单号','订单IP', '用户名', '支付渠道', '创建时间', '支付时间', '支付金额', '价格', '服务费', '状态']
+        const filterVal = ['orderName', 'orderNumber', 'ip', 'orderUid', 'payType', 'createTime', 'pay_time', 'pay_price','price', 'fee', 'status']
         this.exportList = res.data.data.order
+        this.exportList.map(v=>{
+          v.createTime = `${v.createTime.substring(0,10)} ${v.createTime.substring(11,19)}`
+        })
         const data = this.formatJson(filterVal, this.exportList)
         excel.export_json_to_excel({
           header: tHeader,
@@ -281,6 +299,9 @@ export default {
     },
     // 发起获得订单列表
     getOrder() {
+      if (this.orderDate === null) {
+          this.orderDate = ''
+        }
       this.listLoading = true
       axios({
         url: 'http://logpay.paywz.cn/order/getOrder',
@@ -292,7 +313,10 @@ export default {
             payType:this.value1,
             uid: this.uid,
             page: this.page.page,
-            num: this.page.num
+            num: this.page.num,
+            orderDate:this.orderDate,
+            merchantUid:this.merchantUid,
+            role:this.roles[0]
         }
     }).then(res => {
         if (res.data.code == -1) {
@@ -300,6 +324,9 @@ export default {
             return false
         }
         this.list = res.data.data.select
+        this.list.map(v=>{
+          v.createTime = `${v.createTime.substring(0,10)} ${v.createTime.substring(11,19)}`
+        })
         this.page.total = res.data.data.order.length
         this.listLoading = false
     })

@@ -12,17 +12,6 @@
       <p>{{ money }}</p>
     </div>
   </div>
-  <!-- <div class="header" style="height:99px;">
-    <div class="hleft">
-      <el-button type="danger" >套餐到期时间</el-button>
-      <p>{{ mealtime }}</p>
-    </div>
-    <div class="hright">
-      <el-button type="warning" >注意</el-button>
-      <p v-if="phoneStatus" style="color:#67C23A;">保持手机常亮</p>
-      <p style="color:#F56C6C;" v-else>请打开app连接</p>
-    </div>
-  </div> -->
     <div class="today">
       <p style="text-align:center;">交易额数据</p>
       <el-table
@@ -131,20 +120,6 @@ export default {
               this.$message.error(res.data.msg)
               return false
           }
-          if (res.data.data.all_fee && this.uid==='10001') {
-            this.tod_yes_data[0].ali = `${res.data.data.tod_ali}(${res.data.data.tod_ali_fee})`
-            this.tod_yes_data[0].wx = `${res.data.data.tod_wx}(${res.data.data.tod_wx_fee})`
-            this.tod_yes_data[0].all = `${res.data.data.tod_all}(${res.data.data.tod_all_fee})`
-            this.yes_tod_data[0].pay_all = res.data.data.tod_all
-            this.tod_yes_data[1].ali = `${res.data.data.yes_ali}(${res.data.data.yes_ali_fee})`
-            this.tod_yes_data[1].wx = `${res.data.data.yes_wx}(${res.data.data.yes_wx_fee})`
-            this.tod_yes_data[1].all = `${res.data.data.yes_all}(${res.data.data.yes_all_fee})`
-            this.yes_tod_data[1].pay_all = res.data.data.yes_all
-            this.tod_yes_data[2].ali = `${res.data.data.all_ali}(${res.data.data.all_ali_fee})`
-            this.tod_yes_data[2].wx = `${res.data.data.all_wx}(${res.data.data.all_wx_fee})`
-            this.tod_yes_data[2].all = `${res.data.data.all_all}(${res.data.data.all_all_fee})`
-            this.yes_tod_data[2].pay_all = res.data.data.all_all
-          } else {
             this.tod_yes_data[0].ali = res.data.data.tod_ali
             this.tod_yes_data[0].wx = res.data.data.tod_wx
             this.tod_yes_data[0].all = res.data.data.tod_all
@@ -157,7 +132,6 @@ export default {
             this.tod_yes_data[2].wx = res.data.data.all_wx
             this.tod_yes_data[2].all = res.data.data.all_all
             this.yes_tod_data[2].pay_all = res.data.data.all_all
-          }
       })
     },
     getOrderNumber() {

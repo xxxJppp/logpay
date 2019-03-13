@@ -28,7 +28,13 @@ router.post('/sdk/notify',(req, res)=>{
     let { orderUid, pay_price, price, orderNumber, sign1 ,sign2} = req.body
     let data = { orderUid, pay_price, price, orderNumber, sign1 }
     let sign = logpay.Signfornotify(data)
-    if (sign === sign2) {
+    Order.findOne({orderNumber})
+	     .then(order => {
+			 if (order.status === 2) {
+				 return res.send('SUCCESS')
+			 }
+		 })
+	if (sign === sign2) {
         if (orderUid === '10001') {
             User.findOne({uid:'10001'})
                 .then( admin => {

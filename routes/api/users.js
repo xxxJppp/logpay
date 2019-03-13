@@ -8,17 +8,19 @@ const passport = require('passport')
 const Tools = require('../../config/utils')
 const JWT = require('jwt-simple')
 const nodemailer = require('nodemailer')
+const request = require('request')
+const Meal = require('../../models/Meals')
 // 注册新用户
 let tools = new Tools()
 router.get('/',(req, res)=>{
 	res.render('index.html')
 })
-router.post('/user/register',(req, res)=>{
+router.post('/user/register', async (req, res)=>{
     let { email, password } = req.body
      User.findOne({ email })
          .then(user1=>{
              if (user1) {
-                 return res.json({ msg:"邮箱已经被注册!",code:20001 })
+                 return res.json({ msg:"邮箱已经被注册",code:20001 })
              } else {
                  let uid = ''
                  User.find()
@@ -29,33 +31,50 @@ router.post('/user/register',(req, res)=>{
                             uid = '10001'
                          }
                         let token = tools.getToken(uid)
-                        let money = '0.00'
-                        let user = new User({
-                            email,
-                            password,
-                            uid,
-                            token,
-                            meal:'mf',
-                            mealtime: '-',
-                            money,
-                            userid:'',
-                        })
-                        // 密码加密
-                    bcrypt.genSalt(10, (err, salt) => {
-                        bcrypt.hash( user.password, salt, (err, hash) => {
-                            if (err) throw err
-                            user.password = hash
-                            user.save()
-                                .then(user3 => res.json({
-                                    code: 20000,
-                                    msg:'注册成功!'
-                                }))
-                                .catch(err => res.json('注册失败请重新注册'))
-                        })
-                    })
-                })
-             }
-         })
+						let ip = tools.getClientIP(req)
+                        let resolveUrl = 'http://ip.taobao.com/service/getIpInfo.php?ip='+ ip
+                                request.get({
+                                    url: resolveUrl,
+                                    encoding: null // 指定编码
+                                }, (error, response, body) => {
+                                    if (error) {
+                                        console.log(err)
+                                    } else {
+                                        let data = JSON.parse(body)
+                                        let address = data.data.country+data.data.region+data.data.city
+                                        let money = '0.00'
+                                        let date = tools.localDate()
+                                        let user = new User({
+                                            email,
+                                            password,
+                                            uid,
+                                            token,
+                                            meal:'mf',
+                                            mealtime: '-',
+                                            money,
+                                            userid:'',
+                                            date,
+                                            ip,
+                                            address
+                                        })
+                                         // 密码加密
+                                        bcrypt.genSalt(10, (err, salt) => {
+                                            bcrypt.hash( user.password, salt, (err, hash) => {
+                                                if (err) throw err
+                                                user.password = hash
+                                                user.save()
+                                                    .then(user3 => res.json({
+                                                        code: 20000,
+                                                        msg:'注册成功'
+                                                    }))
+                                                    .catch(err => res.json('注册失败请重新注册'))
+                                            })
+                                        })
+                                    }
+                                })
+                            })
+                }
+             })
 })
 
 //登陆  返回token
@@ -67,7 +86,7 @@ router.post('/user/login',(req,res)=>{
         if (!user) {
             return res.json({
                 code:20001,
-                msg:'您的邮箱未注册!'
+                msg:'您的邮箱未注册'
             })
         }
         bcrypt.compare(password, user.password)
@@ -80,7 +99,7 @@ router.post('/user/login',(req,res)=>{
                         if (err) throw err
                         res.json({
                             code:20000,
-                            msg:'登陆成功!',
+                            msg:'登陆成功',
                             data:{
                                 token :'Bearer '+ token,
                             }
@@ -89,7 +108,7 @@ router.post('/user/login',(req,res)=>{
                 } else {
                     return res.json({
                         code:20002,
-                        msg:'密码错误!'
+                        msg:'密码错误'
                     })
                 }
             }) 
@@ -97,7 +116,7 @@ router.post('/user/login',(req,res)=>{
     })
 
 router.get('/user/getInfo',passport.authenticate("jwt",{session:false}),(req, res)=>{
-    let { id, email,uid,token,meal,mealtime,money } = req.user
+    let { id, email,uid,token,meal,mealtime,money,roles} = req.user
     res.json({
         code:20000,
         data:{
@@ -107,7 +126,8 @@ router.get('/user/getInfo',passport.authenticate("jwt",{session:false}),(req, re
             token,
             meal,
             mealtime,
-            money
+            money,
+			roles
         }
     })
 })
@@ -138,7 +158,7 @@ router.post('/user/cpassword',(req, res)=>{
                         })
                         // jwt.sign( "规则", "加密名字", "过期时间", "箭头函数")
                         let rule = { id:user.id, email:user.email }
-                        jwt.sign( rule, secret,{expiresIn:3600},(err, token)=>{
+                        jwt.sign( rule, secret,{expiresIn:36000},(err, token)=>{
                             if (err) throw err
                             res.json({
                                 code:20000,
@@ -149,7 +169,7 @@ router.post('/user/cpassword',(req, res)=>{
                             })
                         })
                     } else {
-                        return res.json({ code:20001, msg:'密码错误!' })
+                        return res.json({ code:20001, msg:'密码错误' })
                     }
                 })
             })
@@ -175,7 +195,7 @@ router.post('/user/cmeal',(req, res)=>{
         date.setMonth(m1)
         date.setDate(d1)
         date.setMonth(date.getMonth()+ month )
-        return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')}`
+        return `${date.getFullYear()}-${(date.getMonth()).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')}`
       }
     User.findOne({uid})
         .then( user =>{
@@ -227,7 +247,7 @@ router.post('/user/cmeal',(req, res)=>{
                 }
                 User.update({uid},{meal:user.meal, mealtime:user.mealtime, money:user.money, renew})
                     .then()
-                    .catch(err => res.json('请联系客服!'))
+                    .catch(err => res.json('请联系客服'))
             }
         })
 })
@@ -358,6 +378,158 @@ router.post('/user/resetpassword', (req, res)=>{
                 code:20003,
                 msg:'系统繁忙'
             }))
+})
+
+router.post('/user/addMeal',(req, res)=>{
+try {
+	 let params = req.body
+	 let meal = new Meal(params)
+	  meal.save()
+		  .then(data=> {
+			  res.json({
+				code: 1,
+				data:'',
+				msg: '添加成功'
+			  })
+		})
+		  .catch( err => res.json('当前系统繁忙'))
+		} catch (e) {
+			res.json({
+				code:-1,
+				data:'',
+				msg:e
+			})
+		}
+})
+
+router.delete('/user/delMeal', async (req, res) => {
+    try{
+        let params = req.body
+        Meal.deleteOne({_id:params.id})
+              .then( data => {
+              res.json({
+                  code: 0,
+                  data: '',
+                  msg: '删除成功'
+              })})
+              .catch( err => {
+                res.json({
+                    code: -1,
+                    data: '',
+                    msg: err
+                })})
+    } catch (e) {
+        res.json({
+            code: -1,
+            data: '',
+            msg: e
+        })
+    }
+})
+
+router.post('/user/changeMeal',(req, res)=>{
+try {
+	 let params = req.body
+	 Meal.updateMany({_id:params._id},params)
+		  .then(data =>{
+			  res.json({
+				code: 1,
+				data:'',
+				msg: '编辑成功'
+			})
+		  })
+		  .catch( err => res.json('当前系统繁忙'))
+		} catch (e) {
+			res.json({
+				code:-1,
+				data:'',
+				msg:e
+			})
+		}
+})
+
+router.get('/user/getMeal',(req, res)=>{
+try {
+	 let params = req.query
+	 console.log(params)
+		 if (params.role === 'admin') {
+			 Meal.find({})
+	//		  .sort({'_id':-1})
+			  .then( meal =>{
+				 let skip = (parseInt(params.page-1))*parseInt(params.num)
+				 let limit = parseInt(params.num)
+				 Meal.find({})
+	//				  .sort({'_id':-1})
+					  .skip(skip)
+					  .limit(limit) 
+					  .exec()
+					  .then( select => {
+						if (!select) throw ('无数据')
+						res.json({
+						  code: 1,
+						  data: {
+							  select,
+							  meal
+						  },
+						  msg: '获取成功'
+					  })
+					})
+					  .catch( err => res.json('当前系统繁忙'))
+			  })
+			  .catch( err => res.json('当前系统繁忙'))		 
+		 }
+		} catch (e) {
+			res.json({
+				code:-1,
+				data:'',
+				msg:e
+			})
+		}
+})
+
+router.get('/user/getMerchant',(req, res)=>{
+try {
+	 let params = req.query
+	 let type = params.type
+	 let value = params.value
+	 let query = {}
+	 if ( type ==='uid' && value) {
+		 query.uid = value
+	 }
+	 if ( type ==='email' && value) {
+		 query.email = value
+	 }
+	 User.find(query)
+		  .sort({'_id':-1})
+		  .then( user =>{
+			 let skip = (parseInt(params.page-1))*parseInt(params.num)
+			 let limit = parseInt(params.num)
+			 User.find(query)
+				  .sort({'_id':-1})
+				  .skip(skip)
+				  .limit(limit) 
+				  .exec()
+				  .then( select => {
+					if (!select) throw ('无数据')
+					res.json({
+					  code: 1,
+					  data: {
+						  select,
+						  user
+					  },
+					  msg: '获取成功'
+				  })
+				})
+				  .catch( err => res.json('当前系统繁忙'))
+		  })
+		  .catch( err => res.json('当前系统繁忙'))
+		} catch (e) {
+			res.json({
+				code:-1,
+				data:'',
+				msg:e
+			})
+		}
 })
 // 配置文件下载
 router.get("/download/APK", (req, res)=>{

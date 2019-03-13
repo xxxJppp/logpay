@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
-const Qrcode = require('../../models/Qrcode')
+const Qrcode = require('../../models/Qrcodes')
+var qr_image = require('qr-image');
 // 照片文字识别
 const client = require('../../config/baiduOcr')
 const request = require('request')
@@ -199,78 +200,17 @@ router.delete('/qrcode/del', async (req, res) => {
     }
 })
 
+// 转二维码
+router.get('/qrcode/image', (req, res)=>{
+	let data = req.query
+	let imageText = data.text
+	if (data.actionType) {
+		imageText = imageText + '&actionType=' +data.actionType
+	}
+	if (data.biz_data) {
+		imageText = imageText + '&biz_data=' + data.biz_data
+	}
+	let codeImage = qr_image.image(imageText,{type: 'png',margin: 1});
+	codeImage.pipe(res)
+})
 module.exports = router;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// const readTxt = (url) => {
-//     return new Promise((res, rej) => {
-//         client.generalBasicUrl(url)
-//               .then(data => {
-//            res(JSON.stringify(data))
-//         }).catch(err => {
-//             // 如果发生网络错误
-//             rej(err);
-//         })
-// function readTxt( url, callback ) {
-//     client.generalBasicUrl(url, (err, data) =>{
-//         if (err) {
-//             return callback(err,null)
-//         }
-//        return callback(null,data)
-//     })
-// }
-// function codeUrl( url, callback ) {
-//     client.generalBasicUrl(url, (err, data) =>{
-//         if (err) {
-//             return callback(err,null)
-//         }
-//        return callback(null,data)
-//     })
-// }
-
-// router.get('/add',(req, res)=>{
-//     let data = req.body
-//     if (data.url == '') throw ('参数丢失!')
-//     readTxt( data.url,( err,data )=>{
-//         if (err) return err
-//         let payData = {type: 'wechat', price: 0, pay_url: '',}
-//         data.words_result.forEach(e => { // 识别付款码文字信息
-//             if (e.words.indexOf('支付就用支付宝') != -1) {
-//                 payData.type = 'alipay'
-//             }
-//             if (e.words.indexOf('￥') != -1) {
-//                 console.log(e.words)
-//                 payData.price = e.words.substring(1)
-//             }
-//         })
-//         if (payData.price <=0 ) {
-//             throw ('二维码有误，请上传支付宝或微信收款二维码!')
-//         }
-//     })
-//     // 识别支付二维码
-// })
-
-// module.exports = router
