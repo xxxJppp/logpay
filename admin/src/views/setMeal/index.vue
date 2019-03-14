@@ -83,7 +83,7 @@ export default {
           num: 10,
       },
       dialogFormVisible: false,
-      formLabelWidth: '68px',
+      formLabelWidth: '78px',
       mealForm:{
           _id:'',
           mealName:'',

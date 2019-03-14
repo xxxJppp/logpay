@@ -5,6 +5,7 @@ const Tools = require('../../config/utils')
 const Order = require('../../models/Orders')
 const Qrcode = require('../../models/Qrcodes')
 const User = require('../../models/Users')
+const Meal = require('../../models/Meals')
 const request = require('request')
 // 引用工具
 let tools = new Tools()
@@ -184,53 +185,102 @@ router.post('/server/api/pay', async (req,res)=>{
 					User.findOne({uid})
 						.then(merchant =>{
 							if (merchant.meal == 'mf') {
-								fee = price*0.01
+								Meal.findOne({mealName:'mf'})
+								    .then(meal=>{
+										if (meal) {
+                                          fee = price*meal.mealFee											
+										}
+									})
+									.catch(err => res.json('meal-find-error'))
 							} else if (merchant.meal == 'bz') {
-								let money = parseFloat(merchant.money) - parseFloat(20)
-								if(mealTime(merchant.mealtime)) {
-									fee = price*0.008
-								} else if (!mealTime(merchant.mealtime) && merchant.renew && money > 0) {
-									User.update({uid},{money,mealtime:getTime(merchant.mealtime,1)})
-										.then( merchant =>{
-											fee = price*0.008
-										})
-										.catch(err=> { return res.json('renew-failed')})
-								} else if (!mealTime(merchant.mealtime) && merchant.renew && money < 0) {
-									User.update({uid},{mealtime:'-',meal:'mf'})
-										.then( user =>{
-											fee = price*0.01
-										})
-										.catch(err=> { return res.json('renew-failed-for-lack-money') })
-								} else if (!mealTime(merchant.mealtime) && !merchant.renew) {
-									User.update({uid},{mealtime:'-',meal:'mf'})
-										.then( user =>{
-											fee = price*0.01
-										})
-										.catch(err=> { return res.json('renew-failed-for-norenew') })
-								}
+								Meal.findOne({mealName:'bz'})
+								    .then(meal=>{
+										if (meal) {
+											let money = parseFloat(merchant.money) - parseFloat(meal.mealPrice)
+											if(mealTime(merchant.mealtime)) {
+												fee = price*meal.mealFee
+											} else if (!mealTime(merchant.mealtime) && merchant.renew && money > 0) {
+												User.update({uid},{money,mealtime:getTime(merchant.mealtime,1)})
+													.then( merchant =>{
+														fee = price*meal.mealFee
+													})
+													.catch(err=> { return res.json('renew-failed')})
+											} else if (!mealTime(merchant.mealtime) && merchant.renew && money < 0) {
+												User.update({uid},{mealtime:'-',meal:'mf'})
+													.then( user =>{
+															Meal.findOne({mealName:'mf'})
+															.then(meal=>{
+																if (meal) {
+																  fee = price*meal.mealFee											
+																}
+															})
+															.catch(err => res.json('meal-find-error'))
+													})
+													.catch(err=> { return res.json('renew-failed-for-lack-money') })
+											} else if (!mealTime(merchant.mealtime) && !merchant.renew) {
+												User.update({uid},{mealtime:'-',meal:'mf'})
+													.then( user =>{
+													    Meal.findOne({mealName:'mf'})
+															.then(meal=>{
+																if (meal) {
+																  fee = price*meal.mealFee											
+																}
+															})
+															.catch(err => res.json('meal-find-error'))
+													})
+													.catch(err=> { return res.json('renew-failed-for-norenew') })
+											}										
+										}
+									})
+									.catch(err => res.json('meal-find-error'))
 							} else if (merchant.meal == 'gj') {
-								let money = parseFloat(merchant.money) - parseFloat(50)
-								if(mealTime(merchant.mealtime)) {
-									fee = price*0.006
-								} else if (!mealTime(merchant.mealtime) && merchant.renew && money > 0) {
-									User.update({uid},{money,mealtime:getTime(merchant.mealtime,1)})
-										.then( user =>{
-											fee = price*0.006
-										})
-										.catch(err=> { return res.json('renew-failed')})
-								} else if (!mealTime(merchant.mealtime) && merchant.renew && money < 0) {
-									User.update({uid},{mealtime:'-',meal:'mf'})
-										.then( user =>{
-											fee = price*0.01
-										})
-										.catch(err=> { return res.json('renew-failed-for-lack-money') })
-								} else if (!mealTime(merchant.mealtime) && !merchant.renew) {
-									User.update({uid},{mealtime:'-',meal:'mf'})
-										.then( user =>{
-											fee = price*0.01
-										})
-										.catch(err=> { return res.json('renew-failed-for-norenew') })
-								}
+								Meal.findOne({mealName:'gj'})
+								    .then(meal=>{
+										if (meal) {
+											let money = parseFloat(merchant.money) - parseFloat(meal.mealPrice)
+											if(mealTime(merchant.mealtime)) {
+												fee = price*meal.mealFee
+											} else if (!mealTime(merchant.mealtime) && merchant.renew && money > 0) {
+												User.update({uid},{money,mealtime:getTime(merchant.mealtime,1)})
+													.then( user =>{
+														fee = price*meal.mealFee
+													})
+													.catch(err=> { return res.json('renew-failed')})
+											} else if (!mealTime(merchant.mealtime) && merchant.renew && money < 0) {
+												User.update({uid},{mealtime:'-',meal:'mf'})
+													.then( user =>{
+														Meal.findOne({mealName:'mf'})
+															.then(meal=>{
+																if (meal) {
+																  fee = price*meal.mealFee											
+																}
+															})
+															.catch(err => res.json('meal-find-error'))
+													})
+													.catch(err=> { return res.json('renew-failed-for-lack-money') })
+											} else if (!mealTime(merchant.mealtime) && !merchant.renew) {
+												User.update({uid},{mealtime:'-',meal:'mf'})
+													.then( user =>{
+														Meal.findOne({mealName:'mf'})
+															.then(meal=>{
+																if (meal) {
+																  fee = price*meal.mealFee											
+																}
+															})
+															.catch(err => res.json('meal-find-error'))
+													})
+													.catch(err=> { return res.json('renew-failed-for-norenew') })
+											}
+										}
+									})
+									.catch(err => res.json('meal-find-error'))
+							} else {
+								Meal.findOne({mealName:merchant.meal})
+								    .then(meal =>{
+										console.log(meal.mealFee)
+										fee = price*meal.mealFee
+									})
+									.catch(err => res.json('meal-find-error'))
 							}
 						    // 判断商户余额是否足够
 							if (parseFloat(merchant.money)-parseFloat(fee) < 0) {

@@ -1,6 +1,7 @@
   <template>
   <div class="container">
     <div class="header">
+      <el-input style="width:49%;" v-model="merchantUid" placeholder="商户号" v-if="this.roles[0] === 'admin'"></el-input>
       <el-input style="width:49%;" v-model="money" placeholder="未匹配金额"></el-input>
       <el-select style="margin:5px 0;width:49%;" v-model="type" placeholder="请选择">
       <el-option
@@ -31,7 +32,7 @@
       border
       fit
       >
-      <el-table-column prop="uid" label="商户号" align="center" v-if="this.uid === '10001'">
+      <el-table-column prop="uid" label="商户号" align="center" v-if="this.roles[0] === 'admin'">
       </el-table-column>
       <el-table-column prop="pay_price" label="未匹配价格" align="center">
       </el-table-column>
@@ -126,7 +127,8 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'uid'
+      'uid',
+      'roles'
     ])
   },
   created() {
@@ -166,7 +168,9 @@ export default {
             uid: this.uid,
             page: this.page.page,
             num: this.page.num,
-            missOrderDate:this.missOrderDate
+            missOrderDate:this.missOrderDate,
+            merchantUid:this.merchantUid,
+            role:this.roles[0]
         }
     }).then(res => {
         if (res.data.code == -1) {
@@ -226,7 +230,9 @@ export default {
                 uid: this.uid,
                 page: this.page.page,
                 num: this.page.num,
-                missOrderDate:this.missOrderDate
+                missOrderDate:this.missOrderDate,
+                merchantUid:this.merchantUid,
+                role:this.roles[0]
             }
         }).then(res => {
             if (res.data.code == -1) {

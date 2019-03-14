@@ -30,6 +30,7 @@
             <span v-if="scope.row.meal == 'mf'" style="color:#37B328;">免费版</span>
             <span v-else-if="scope.row.meal == 'bz'" style="color:#37B328;">标准版</span>
             <span v-else-if="scope.row.meal == 'gj'" style="color:#37B328;">高级版</span>
+            <span v-else style="color:#37B328;">{{ scope.row.meal }}</span>
         </template>
       </el-table-column>
       <el-table-column prop="mealtime" label="到期时间" align="center">
@@ -37,6 +38,13 @@
       <el-table-column prop="date" label="注册时间" align="center">
       </el-table-column>
       <el-table-column prop="address" label="注册地址" align="center">
+      </el-table-column>
+      <el-table-column label="操作" align="center">
+        <template slot-scope="scope">
+          <el-button type="primary" size="mini" @click="handleEdit(scope.row)">编辑</el-button>
+          <span style="height:5px;"></span>
+          <el-button size="mini" type="success" @click="handleMerchant(scope.row)">统计</el-button>
+        </template>
       </el-table-column>
     </el-table>
     <el-pagination
@@ -48,6 +56,112 @@
       layout="total, sizes, prev, pager, next, jumper"
       :total="page.total">
     </el-pagination>
+
+    <el-dialog title="编辑商户" :visible.sync="merchantEdit">
+    <el-form :model="merchantForm">
+        <el-form-item label="商户号" :label-width="formLabelWidth">
+            <el-input v-model="merchantForm.uid" autocomplete="off" placeholder="" :disabled="true"></el-input>
+        </el-form-item>
+        <el-form-item label="商户邮箱" :label-width="formLabelWidth">
+            <el-input v-model="merchantForm.email" autocomplete="off" placeholder="" :disabled="true"></el-input>
+        </el-form-item>
+        <el-form-item label="商户余额" :label-width="formLabelWidth">
+            <el-input v-model="merchantForm.money" autocomplete="off" placeholder="" ></el-input>
+        </el-form-item>
+        <el-form-item label="商户套餐" :label-width="formLabelWidth">
+            <template>
+              <el-select v-model="merchantMeal" placeholder="请选择">
+                <el-option
+                  v-for="item in mealOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+            </template>
+        </el-form-item>
+        <el-form-item label="到期时间" :label-width="formLabelWidth">
+            <el-input v-model="merchantForm.mealtime" autocomplete="off" placeholder="" ></el-input>
+        </el-form-item>
+        <el-form-item label="备注" :label-width="formLabelWidth">
+            <el-input v-model="merchantForm.remark" autocomplete="off" placeholder="请输入该商户的备注" ></el-input>
+        </el-form-item>
+    </el-form>
+    <div slot="footer" class="dialog-footer">
+        <el-button @click="cancel()">取 消</el-button>
+        <el-button type="primary" @click="submitChange()">确 定</el-button>
+    </div>
+    </el-dialog>
+
+    <el-dialog title="商户统计" :visible.sync="merchantCount">
+      <div class="today">
+        <p style="text-align:center;">交易额数据</p>
+        <el-table
+        :data="tod_yes_data"
+        border
+        style="width: 100%">
+        <el-table-column
+          align="center"
+          prop="tod_yes"
+          label="">
+        </el-table-column>
+        <el-table-column
+          align="center"      
+          prop="ali"
+          label="支付宝">
+          </el-table-column>
+        <el-table-column
+          align="center"
+          prop="wx"
+          label="微信支付">
+        </el-table-column>
+        <el-table-column
+          align="center"      
+          prop="all"
+          label="总收款">
+        </el-table-column>
+      </el-table>
+      <div class="yes_tod_data">
+        <p style="text-align:center;">订单数据</p>
+          <el-table
+        :data="yes_tod_data"
+        border
+        style="width:100%;">
+        <el-table-column
+          align="center"      
+          prop="yes_tod"
+          label="">
+        </el-table-column>
+        <el-table-column
+          align="center"      
+          prop="all_orderNumber"
+          label="总订单数">
+        </el-table-column>
+        <el-table-column
+          align="center"      
+          prop="no_orderNumber"
+          label="未回调订单数">
+          <template slot-scope="scope">
+                <span style="color:red;">{{ scope.row.no_orderNumber }}</span>
+            </template>
+        </el-table-column>
+        <el-table-column
+          align="center"      
+          prop="pay_orderNumber"
+          label="付款订单数">
+        </el-table-column>
+        <el-table-column
+          align="center"      
+          prop="pay_all"
+          label="总收入">
+        </el-table-column>
+      </el-table>
+      </div>
+    </div>
+    <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="merchantCount=false">确 定</el-button>
+    </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -57,6 +171,22 @@ import { mapGetters } from 'vuex'
 export default {
   data() {
     return {
+        tod_yes_data: [
+          {tod_yes: '今日',ali:'加载中...',wx:'加载中...',all:'加载中...'},
+          {tod_yes: '昨日',ali:'加载中...',wx:'加载中...',all:'加载中...'},
+          {tod_yes: '总',ali:'加载中...',wx:'加载中...',all:'加载中...'}
+          ],
+        yes_tod_data: [
+          { yes_tod:'今日', all_orderNumber:'加载中...', no_orderNumber:'加载中...', pay_orderNumber:'加载中...',pay_all: '加载中...' },
+          { yes_tod:'昨日', all_orderNumber:'加载中...', no_orderNumber:'加载中...', pay_orderNumber:'加载中...',pay_all: '加载中...' },
+          { yes_tod:'总', all_orderNumber:'加载中...', no_orderNumber:'加载中...', pay_orderNumber:'加载中...',pay_all: '加载中...' }
+        ],
+      formLabelWidth:'72px',
+      merchantMeal:'',
+      mealOptions:'',
+      merchantEdit:false,
+      merchantCount:false,
+      merchantForm:{},
         type: [
           {
             value1: 'uid',
@@ -79,10 +209,121 @@ export default {
         listLoading:false
     }
   },
+  computed: {
+    ...mapGetters([
+      'roles'
+    ])
+  },
   created() {
     this.getMerchant()
+    this.getMealOptions()
   },
   methods: {
+    getDayMoney(uid) {
+      axios.get('http://logpay.paywz.cn/order/getDayMoney',{
+        params:{
+        uid
+        }
+      })
+      .then(res => {
+          if (res.data.code == -1) {
+              this.$message.error(res.data.msg)
+              return false
+          }
+            this.tod_yes_data[0].ali = res.data.data.tod_ali
+            this.tod_yes_data[0].wx = res.data.data.tod_wx
+            this.tod_yes_data[0].all = res.data.data.tod_all
+            this.yes_tod_data[0].pay_all = res.data.data.tod_all
+            this.tod_yes_data[1].ali = res.data.data.yes_ali
+            this.tod_yes_data[1].wx = res.data.data.yes_wx
+            this.tod_yes_data[1].all = res.data.data.yes_all
+            this.yes_tod_data[1].pay_all = res.data.data.yes_all
+            this.tod_yes_data[2].ali = res.data.data.all_ali
+            this.tod_yes_data[2].wx = res.data.data.all_wx
+            this.tod_yes_data[2].all = res.data.data.all_all
+            this.yes_tod_data[2].pay_all = res.data.data.all_all
+      })
+    },
+    getOrderNumber(uid) {
+      axios.get('http://logpay.paywz.cn/order/getOrderNumber',{
+        params:{
+        uid
+        }
+      })
+      .then(res => {
+          if (res.data.code == -1) {
+              this.$message.error(res.data.msg)
+              return false
+          }
+          this.yes_tod_data[0].pay_orderNumber = res.data.data.today_success_order.length
+          this.yes_tod_data[0].no_orderNumber = res.data.data.today_no_order.length
+          this.yes_tod_data[0].all_orderNumber = res.data.data.today_all_order.length
+          this.yes_tod_data[1].pay_orderNumber = res.data.data.yes_success_order.length
+          this.yes_tod_data[1].no_orderNumber = res.data.data.yes_no_order.length
+          this.yes_tod_data[1].all_orderNumber = res.data.data.yes_all_order.length
+          this.yes_tod_data[2].pay_orderNumber = res.data.data.all_success_order.length
+          this.yes_tod_data[2].no_orderNumber = res.data.data.all_no_order.length
+          this.yes_tod_data[2].all_orderNumber = res.data.data.all_order.length
+      })
+    },
+    getMealOptions() {
+      let List = []
+      axios({
+        url: 'http://logpay.paywz.cn/user/getMeal',
+        method: 'get',
+        params: {
+            role:this.roles[0]
+        }
+    }).then(res => {
+        if (res.data.code == -1) {
+            this.$message.error(res.data.msg)
+            return false
+        }
+        res.data.data.meal.forEach(v=>{
+          if (v.mealName === 'mf') {
+            List.push({value:'mf',label:'免费版'})
+          }
+          else if (v.mealName === 'bz') {
+            List.push({value:'bz',label:'标准版'})
+          }
+          else if (v.mealName === 'gj') {
+            List.push({value:'gj',label:'高级版'})
+          } else {
+            List.push({value:v.mealName,label:v.mealName})
+          }
+        })
+        this.mealOptions = List
+    })
+    .catch(err => this.$message.error('系统繁忙'))
+    },
+    cancel() {
+      this.merchantEdit = false
+      this.getMerchant()
+    },
+    handleEdit(row) {
+      this.merchantEdit = true
+      this.merchantMeal = row.meal
+      this.merchantForm = row
+    },
+    submitChange() {
+        this.merchantEdit = false
+        axios.post('http://logpay.paywz.cn/user/changeMerchantMeal', {  _id:this.merchantForm._id,meal:this.merchantMeal,money:this.merchantForm.money,mealtime:this.merchantForm.mealtime,remark:this.merchantForm.remark} )
+           .then(res => {
+             if (res.data.code == -1) {
+                        this.$message.error(res.data.msg)
+                        return false
+                    } else {
+                        this.$message.success(res.data.msg)
+                        this.getMerchant()
+                }
+             })
+           .catch(err => this.$message.error(err))
+    },
+    handleMerchant(row) {
+      this.merchantCount = true
+      this.getDayMoney(row.uid)
+      this.getOrderNumber(row.uid)
+    },
     // 过滤订单列表
     selectMerchant() {
       this.getMerchant()
@@ -115,7 +356,6 @@ export default {
             return false
         }
         this.list = res.data.data.select
-        console.log(this.list)
         this.list.map(v=>{
           v.date = `${v.date.substring(0,10)} ${v.date.substring(11,19)}`
         })

@@ -427,6 +427,27 @@ router.delete('/user/delMeal', async (req, res) => {
     }
 })
 
+router.post('/user/changeMerchantMeal',(req, res)=>{
+try {
+	 let params = req.body
+	 User.updateMany({_id:params._id},params)
+		  .then(data =>{
+			  res.json({
+				code: 1,
+				data:'',
+				msg: '编辑成功'
+			})
+		  })
+		  .catch( err => res.json('当前系统繁忙'))
+		} catch (e) {
+			res.json({
+				code:-1,
+				data:'',
+				msg:e
+			})
+		}
+})
+
 router.post('/user/changeMeal',(req, res)=>{
 try {
 	 let params = req.body
@@ -451,13 +472,19 @@ try {
 router.get('/user/getMeal',(req, res)=>{
 try {
 	 let params = req.query
+	 let skip,limit
+	 if(params.page && params.num) {
+		 skip = (parseInt(params.page-1))*parseInt(params.num)
+		 limit = parseInt(params.num) 
+	 } else {
+		  skip = null
+		  limit = null
+	 }
 	 console.log(params)
 		 if (params.role === 'admin') {
 			 Meal.find({})
 	//		  .sort({'_id':-1})
 			  .then( meal =>{
-				 let skip = (parseInt(params.page-1))*parseInt(params.num)
-				 let limit = parseInt(params.num)
 				 Meal.find({})
 	//				  .sort({'_id':-1})
 					  .skip(skip)

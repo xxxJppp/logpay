@@ -86,6 +86,9 @@ router.get('/order/getMissOrder',(req, res)=>{
         let payType = params.payType
 		let missOrderDate = params.missOrderDate
 		let pay_price = params.pay_price
+		let merchantUid = params.merchantUid
+		let role = params.role
+		let uid = params.uid
 		let query = {}
 		if (pay_price) {
             query.pay_price = pay_price           
@@ -103,8 +106,13 @@ router.get('/order/getMissOrder',(req, res)=>{
         if (payType) {
             query.payType = payType           
         }
-		if (params.uid !== '10001') {
-            query.uid = params.uid		
+		if (role === 'admin') {
+			if (merchantUid) {
+            query.uid = merchantUid
+			}			
+		}
+		if (role === 'merchant'){
+			query.uid = uid
 		}
         MissOrder.find(query)
 		         .sort({'_id':-1})

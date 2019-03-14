@@ -5,7 +5,7 @@ mongoose.connect('mongodb://localhost/mqpay', { useNewUrlParser:true })
 let Schema = mongoose.Schema
 let mealSchema = new Schema({
     mealFee: {
-        type: Math,
+        type: Number,
         required: true
     },
     mealName: {
@@ -17,7 +17,7 @@ let mealSchema = new Schema({
 		required: true
 	},
 	mealUid:{
-		type: Math,
+		type: String,
 		default: '-'
 	}
 })

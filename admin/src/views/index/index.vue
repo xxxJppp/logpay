@@ -6,6 +6,7 @@
       <p v-if="mf">免费版</p>
       <p v-else-if="bz">标准版</p>
       <p v-else-if="gj">高级版</p>
+      <p v-else>{{ otherMeal }}</p>
     </div>
     <div class="hright">
       <el-button type="success" size="mini"><a href="http://logpay.paywz.cn/#/user/recharge">账户充值</a></el-button>
@@ -96,6 +97,7 @@ export default {
         mf:'',
         bz:'',
         gj:'',
+        otherMeal:'',
         tod_yes_data: [
           {tod_yes: '今日',ali:'加载中...',wx:'加载中...',all:'加载中...'},
           {tod_yes: '昨日',ali:'加载中...',wx:'加载中...',all:'加载中...'},
@@ -163,6 +165,8 @@ export default {
         this.bz = true
       } else if (this.meal == 'gj') {
         this.gj = true
+      } else {
+        this.otherMeal = this.meal
       }
     }
   },
