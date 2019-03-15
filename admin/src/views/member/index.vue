@@ -57,16 +57,16 @@
       :total="page.total">
     </el-pagination>
 
-    <el-dialog title="编辑商户" :visible.sync="merchantEdit">
+    <el-dialog title="编辑商户" :visible.sync="merchantEdit"  :width="dialogWidth">
     <el-form :model="merchantForm">
         <el-form-item label="商户号" :label-width="formLabelWidth">
-            <el-input v-model="merchantForm.uid" autocomplete="off" placeholder="" :disabled="true"></el-input>
+            <el-input v-model="merchantForm.uid" auto-complete="off" placeholder="" :disabled="true"></el-input>
         </el-form-item>
         <el-form-item label="商户邮箱" :label-width="formLabelWidth">
-            <el-input v-model="merchantForm.email" autocomplete="off" placeholder="" :disabled="true"></el-input>
+            <el-input v-model="merchantForm.email" auto-complete="off" placeholder="" :disabled="true"></el-input>
         </el-form-item>
         <el-form-item label="商户余额" :label-width="formLabelWidth">
-            <el-input v-model="merchantForm.money" autocomplete="off" placeholder="" ></el-input>
+            <el-input v-model="merchantForm.money" auto-complete="off" placeholder="" ></el-input>
         </el-form-item>
         <el-form-item label="商户套餐" :label-width="formLabelWidth">
             <template>
@@ -81,10 +81,10 @@
             </template>
         </el-form-item>
         <el-form-item label="到期时间" :label-width="formLabelWidth">
-            <el-input v-model="merchantForm.mealtime" autocomplete="off" placeholder="" ></el-input>
+            <el-input v-model="merchantForm.mealtime" auto-complete="off" placeholder="" ></el-input>
         </el-form-item>
         <el-form-item label="备注" :label-width="formLabelWidth">
-            <el-input v-model="merchantForm.remark" autocomplete="off" placeholder="请输入该商户的备注" ></el-input>
+            <el-input v-model="merchantForm.remark" auto-complete="off" placeholder="请输入该商户的备注" ></el-input>
         </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
@@ -93,8 +93,7 @@
     </div>
     </el-dialog>
 
-    <el-dialog title="商户统计" :visible.sync="merchantCount">
-      <div class="today">
+    <el-dialog title="商户统计" :visible.sync="merchantCount" :width="dialogWidth">
         <p style="text-align:center;">交易额数据</p>
         <el-table
         :data="tod_yes_data"
@@ -157,12 +156,11 @@
         </el-table-column>
       </el-table>
       </div>
-    </div>
     <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="merchantCount=false">确 定</el-button>
     </div>
     </el-dialog>
-  </div>
+</div>
 </template>
 
 <script>
@@ -171,17 +169,21 @@ import { mapGetters } from 'vuex'
 export default {
   data() {
     return {
+        dialogWidth:'92%',
         tod_yes_data: [
-          {tod_yes: '今日',ali:'加载中...',wx:'加载中...',all:'加载中...'},
-          {tod_yes: '昨日',ali:'加载中...',wx:'加载中...',all:'加载中...'},
-          {tod_yes: '总',ali:'加载中...',wx:'加载中...',all:'加载中...'}
+          {tod_yes: '今交易额',all:'加载中...',ali:'加载中...',wx:'加载中...'},
+          {tod_yes: '今手续费',all:'加载中...',ali:'加载中...',wx:'加载中...'},
+          {tod_yes: '昨交易额',all:'加载中...',ali:'加载中...',wx:'加载中...'},
+          {tod_yes: '昨手续费',all:'加载中...',ali:'加载中...',wx:'加载中...'},
+          {tod_yes: '总交易额',all:'加载中...',ali:'加载中...',wx:'加载中...'},
+          {tod_yes: '总手续费',all:'加载中...',ali:'加载中...',wx:'加载中...'}
           ],
         yes_tod_data: [
           { yes_tod:'今日', all_orderNumber:'加载中...', no_orderNumber:'加载中...', pay_orderNumber:'加载中...',pay_all: '加载中...' },
           { yes_tod:'昨日', all_orderNumber:'加载中...', no_orderNumber:'加载中...', pay_orderNumber:'加载中...',pay_all: '加载中...' },
           { yes_tod:'总', all_orderNumber:'加载中...', no_orderNumber:'加载中...', pay_orderNumber:'加载中...',pay_all: '加载中...' }
         ],
-      formLabelWidth:'72px',
+      formLabelWidth:'70px',
       merchantMeal:'',
       mealOptions:'',
       merchantEdit:false,
@@ -206,7 +208,8 @@ export default {
           num: 10,
           total: 0
         },
-        listLoading:false
+        listLoading:false,
+        screenWidth: document.body.clientWidth,  //设置的监听屏幕的变化
     }
   },
   computed: {
@@ -214,11 +217,27 @@ export default {
       'roles'
     ])
   },
-  created() {
+  mounted() {
     this.getMerchant()
     this.getMealOptions()
+    this.getScreenWidth()
+    // 获取实时监听
+    // const that = this
+    // window.onresize = () => {
+    //     return (() => {
+    //         window.screenWidth = document.body.clientWidth
+    //         that.screenWidth = window.screenWidth
+    //     })()
+    // }
   },
   methods: {
+    getScreenWidth() {
+      if (this.screenWidth < 990) {
+        this.dialogWidth = '98%'
+      } else {
+        this.dialogWidth = '42%'
+      }
+    },
     getDayMoney(uid) {
       axios.get('http://logpay.paywz.cn/order/getDayMoney',{
         params:{
@@ -230,18 +249,29 @@ export default {
               this.$message.error(res.data.msg)
               return false
           }
-            this.tod_yes_data[0].ali = res.data.data.tod_ali
-            this.tod_yes_data[0].wx = res.data.data.tod_wx
-            this.tod_yes_data[0].all = res.data.data.tod_all
-            this.yes_tod_data[0].pay_all = res.data.data.tod_all
-            this.tod_yes_data[1].ali = res.data.data.yes_ali
-            this.tod_yes_data[1].wx = res.data.data.yes_wx
-            this.tod_yes_data[1].all = res.data.data.yes_all
-            this.yes_tod_data[1].pay_all = res.data.data.yes_all
-            this.tod_yes_data[2].ali = res.data.data.all_ali
-            this.tod_yes_data[2].wx = res.data.data.all_wx
-            this.tod_yes_data[2].all = res.data.data.all_all
-            this.yes_tod_data[2].pay_all = res.data.data.all_all
+          this.tod_yes_data[0].ali = res.data.data.tod_ali
+          this.tod_yes_data[1].ali = res.data.data.tod_ali_fee
+          this.tod_yes_data[0].wx = res.data.data.tod_wx
+          this.tod_yes_data[1].wx = res.data.data.tod_wx_fee
+          this.tod_yes_data[0].all = res.data.data.tod_all
+          this.tod_yes_data[1].all = res.data.data.tod_all_fee
+          this.yes_tod_data[0].pay_all = res.data.data.tod_all
+
+          this.tod_yes_data[2].ali = res.data.data.yes_ali
+          this.tod_yes_data[3].ali = res.data.data.yes_ali_fee
+          this.tod_yes_data[2].wx = res.data.data.yes_wx
+          this.tod_yes_data[3].wx = res.data.data.yes_wx_fee
+          this.tod_yes_data[2].all = res.data.data.yes_all
+          this.tod_yes_data[3].all = res.data.data.yes_all_fee
+          this.yes_tod_data[1].pay_all = res.data.data.yes_all
+
+          this.tod_yes_data[4].ali = res.data.data.all_ali
+          this.tod_yes_data[5].ali = res.data.data.all_ali_fee
+          this.tod_yes_data[4].wx = res.data.data.all_wx
+          this.tod_yes_data[5].wx = res.data.data.all_wx_fee
+          this.tod_yes_data[4].all = res.data.data.all_all
+          this.tod_yes_data[5].all = res.data.data.all_all_fee
+          this.yes_tod_data[2].pay_all = res.data.data.all_all
       })
     },
     getOrderNumber(uid) {
@@ -365,6 +395,18 @@ export default {
     .catch(err => this.$message.error('系统繁忙'))
     }
   }
+    // watch: {
+    // screenWidth: {
+    //   handler(val) {
+    //     if(val < 990){
+    //     this.dialogWidth = '100%'
+    //     }else{
+    //     this.dialogWidth = '50%'
+    //     }
+    // },
+    // deep:true
+    // }
+    // },
 }
 </script>
 <style>
@@ -373,11 +415,18 @@ export default {
   margin: 0 auto;
   margin-top: 1%;
 }
-  .el-table .warning-row {
-    background: oldlace;
-  }
+.el-table .warning-row {
+  background: oldlace;
+}
 
-  .el-table .success-row {
-    background: #f0f9eb;
-  }
+.el-table .success-row {
+  background: #f0f9eb;
+}
+.el-dialog__body {
+  padding: 0 5px;
+}
+/*media dialog*/
+.el-select {
+    width: 100%;
+}
 </style>

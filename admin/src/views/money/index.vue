@@ -13,6 +13,11 @@
     </el-table-column>
     <el-table-column
       align="center"      
+      prop="all"
+      label="总收款">
+    </el-table-column>
+    <el-table-column
+      align="center"      
       prop="ali"
       label="支付宝">
       </el-table-column>
@@ -20,11 +25,6 @@
       align="center"
       prop="wx"
       label="微信支付">
-    </el-table-column>
-    <el-table-column
-      align="center"      
-      prop="all"
-      label="总收款">
     </el-table-column>
   </el-table>
   <div class="yes_tod_data">
@@ -59,7 +59,7 @@
     <el-table-column
       align="center"      
       prop="pay_all"
-      label="总收入">
+      label="总收款">
     </el-table-column>
   </el-table>
   </div>
@@ -79,12 +79,12 @@ export default {
    data() {
       return {
         tod_yes_data: [
-          {tod_yes: '今交易额',ali:'加载中...',wx:'加载中...',all:'加载中...'},
-          {tod_yes: '今手续费',ali:'加载中...',wx:'加载中...',all:'加载中...'},
-          {tod_yes: '昨交易额',ali:'加载中...',wx:'加载中...',all:'加载中...'},
-          {tod_yes: '昨手续费',ali:'加载中...',wx:'加载中...',all:'加载中...'},
-          {tod_yes: '总交易额',ali:'加载中...',wx:'加载中...',all:'加载中...'},
-          {tod_yes: '总手续费',ali:'加载中...',wx:'加载中...',all:'加载中...'}
+          {tod_yes: '今交易额',all:'加载中...',ali:'加载中...',wx:'加载中...'},
+          {tod_yes: '今手续费',all:'加载中...',ali:'加载中...',wx:'加载中...'},
+          {tod_yes: '昨交易额',all:'加载中...',ali:'加载中...',wx:'加载中...'},
+          {tod_yes: '昨手续费',all:'加载中...',ali:'加载中...',wx:'加载中...'},
+          {tod_yes: '总交易额',all:'加载中...',ali:'加载中...',wx:'加载中...'},
+          {tod_yes: '总手续费',all:'加载中...',ali:'加载中...',wx:'加载中...'}
           ],
         yes_tod_data: [
           { yes_tod:'今日', all_orderNumber:'加载中...', no_orderNumber:'加载中...', pay_orderNumber:'加载中...',pay_all: '加载中...' },
@@ -133,7 +133,7 @@ export default {
     getOrderNumber() {
       axios.get('http://logpay.paywz.cn/order/getOrderNumber',{
         params:{
-        uid:this.uid
+        role:this.roles[0]
         }
       })
       .then(res => {
@@ -195,11 +195,11 @@ export default {
       }
     }
   }
-  .today {
-    padding-top: 18px;
-  }
-  .yes_tod_data {
-    padding-top: 18px;
-  }
+  // .today {
+  //   padding-top: 0px;
+  // }
+  // .yes_tod_data {
+  //   padding-top: 6px;
+  // }
 }
 </style>

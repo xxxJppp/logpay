@@ -238,34 +238,51 @@ try {
     }       
             let tod_ali_success_order = await getDayMoney('alipay',uid,{$gte:now})
             let tod_ali = sum('pay_price',tod_ali_success_order).toFixed(2,'0')
+			let tod_ali_fee = sum('fee',tod_ali_success_order).toFixed(3,'0')
             let tod_wx_success_order = await getDayMoney('wxpay',uid,{$gte:now})
             let tod_wx = sum('pay_price',tod_wx_success_order).toFixed(2,'0')
+			let tod_wx_fee = sum('fee',tod_wx_success_order).toFixed(3,'0')
             let tod_all = (parseFloat(tod_ali) + parseFloat(tod_wx)).toFixed(2, '0')
+			let tod_all_fee = (parseFloat(tod_ali_fee) + parseFloat(tod_wx_fee)).toFixed(3, '0')
 
             let yes_ali_success_order = await getDayMoney('alipay',uid,{$gte:yes,$lt:now})
             let yes_ali = sum('pay_price', yes_ali_success_order).toFixed(2,'0')
+			let yes_ali_fee = sum('fee',yes_ali_success_order).toFixed(3,'0')
             let yes_wx_success_order = await getDayMoney('wxpay',uid,{$gte:yes,$lt:now})
             let yes_wx = sum('pay_price',yes_wx_success_order).toFixed(2,'0')
+			let yes_wx_fee = sum('fee',yes_wx_success_order).toFixed(3,'0')
             let yes_all = (parseFloat(yes_ali) + parseFloat(yes_wx)).toFixed(2, '0')
+			let yes_all_fee = (parseFloat(yes_ali_fee) + parseFloat(yes_wx_fee)).toFixed(3, '0')
 
             let all_ali_success_order = await getDayMoney('alipay',uid,'')
             let all_ali = sum('pay_price', all_ali_success_order).toFixed(2,'0')
+			let all_ali_fee = sum('fee',all_ali_success_order).toFixed(3,'0')
             let all_wx_success_order = await getDayMoney('wxpay',uid,'')
             let all_wx = sum('pay_price',all_wx_success_order).toFixed(2,'0')
             let all_wx_fee = sum('fee',all_wx_success_order).toFixed(3,'0')
             let all_all = (parseFloat(all_ali) + parseFloat(all_wx)).toFixed(2, '0')
+			let all_all_fee = (parseFloat(all_ali_fee) + parseFloat(all_wx_fee)).toFixed(3, '0')
             res.json({
                 code:1,
                 data:{
-                    tod_wx,
+					tod_wx,
                     tod_ali,
                     tod_all,
+                    tod_wx_fee,
+                    tod_all_fee,
+                    tod_ali_fee,
                     yes_wx,
                     yes_ali,
                     yes_all,
+                    yes_wx_fee,
+                    yes_all_fee,
+                    yes_ali_fee,
                     all_wx,
                     all_ali,
-                    all_all
+                    all_all,
+                    all_wx_fee,
+                    all_all_fee,
+                    all_ali_fee
                 }
             })
 } catch (e) {
@@ -279,7 +296,7 @@ try {
 
 router.get('/order/getOrderNumber', async (req, res)=>{
 try {
-    let { uid } = req.query
+    let { uid,role } = req.query
     let date = new Date()
 	    date.setHours(0)
 		date.setSeconds(0)
@@ -306,7 +323,7 @@ try {
              .catch( err => reject(err))
         })
         }
-    if (uid === '10001') {
+    if (role === 'admin') {
         let today_success_order = await getOrderNumber(2,'',{$gte:now})
         let today_no_order = await getOrderNumber(1,'',{$gte:now})
         let today_all_order = await getOrderNumber('','',{$gte:now})

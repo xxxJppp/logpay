@@ -47,7 +47,7 @@
       :total="page.total">
     </el-pagination>
 
-    <el-dialog title="编辑套餐" :visible.sync="dialogFormVisible" @before-close="cancel">
+    <el-dialog title="编辑套餐" :visible.sync="dialogFormVisible" :width="dialogWidth">
     <el-form :model="mealForm">
         <el-form-item label="套餐费率" :label-width="formLabelWidth">
             <el-input v-model="mealForm.mealFee" autocomplete="off" placeholder="例:0.008"></el-input>
@@ -75,6 +75,8 @@ import { mapGetters } from 'vuex'
 export default {
   data() {
     return {
+      dialogWidth:'92%',
+      screenWidth: document.body.clientWidth,  //设置的监听屏幕的变化
       list: null,
       listLoading: true,
       page: {
@@ -99,8 +101,16 @@ export default {
   },
   created() {
     this.getMealList()
+    this.getScreenWidth()
   },
   methods: {
+    getScreenWidth() {
+      if (this.screenWidth < 990) {
+        this.dialogWidth = '98%'
+      } else {
+        this.dialogWidth = '42%'
+      }
+    },
     cancel() {
         this.dialogFormVisible = false
         this.getMealList()

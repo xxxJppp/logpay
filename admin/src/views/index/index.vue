@@ -26,18 +26,18 @@
     </el-table-column>
     <el-table-column
       align="center"      
+      prop="all"
+      label="总收入">
+      </el-table-column>
+    <el-table-column
+      align="center"      
       prop="ali"
       label="支付宝">
-      </el-table-column>
+    </el-table-column>
     <el-table-column
       align="center"
       prop="wx"
       label="微信支付">
-    </el-table-column>
-    <el-table-column
-      align="center"      
-      prop="all"
-      label="总收款">
     </el-table-column>
   </el-table>
   <div class="yes_tod_data">
@@ -99,9 +99,12 @@ export default {
         gj:'',
         otherMeal:'',
         tod_yes_data: [
-          {tod_yes: '今日',ali:'加载中...',wx:'加载中...',all:'加载中...'},
-          {tod_yes: '昨日',ali:'加载中...',wx:'加载中...',all:'加载中...'},
-          {tod_yes: '总',ali:'加载中...',wx:'加载中...',all:'加载中...'}
+          {tod_yes: '今交易额',all:'加载中...',ali:'加载中...',wx:'加载中...'},
+          {tod_yes: '今手续费',all:'加载中...',ali:'加载中...',wx:'加载中...'},
+          {tod_yes: '昨交易额',all:'加载中...',ali:'加载中...',wx:'加载中...'},
+          {tod_yes: '昨手续费',all:'加载中...',ali:'加载中...',wx:'加载中...'},
+          {tod_yes: '总交易额',all:'加载中...',ali:'加载中...',wx:'加载中...'},
+          {tod_yes: '总手续费',all:'加载中...',ali:'加载中...',wx:'加载中...'}
           ],
         yes_tod_data: [
           { yes_tod:'今日', all_orderNumber:'加载中...', no_orderNumber:'加载中...', pay_orderNumber:'加载中...',pay_all: '加载中...' },
@@ -123,16 +126,27 @@ export default {
               return false
           }
             this.tod_yes_data[0].ali = res.data.data.tod_ali
+            this.tod_yes_data[1].ali = res.data.data.tod_ali_fee
             this.tod_yes_data[0].wx = res.data.data.tod_wx
+            this.tod_yes_data[1].wx = res.data.data.tod_wx_fee
             this.tod_yes_data[0].all = res.data.data.tod_all
+            this.tod_yes_data[1].all = res.data.data.tod_all_fee
             this.yes_tod_data[0].pay_all = res.data.data.tod_all
-            this.tod_yes_data[1].ali = res.data.data.yes_ali
-            this.tod_yes_data[1].wx = res.data.data.yes_wx
-            this.tod_yes_data[1].all = res.data.data.yes_all
+
+            this.tod_yes_data[2].ali = res.data.data.yes_ali
+            this.tod_yes_data[3].ali = res.data.data.yes_ali_fee
+            this.tod_yes_data[2].wx = res.data.data.yes_wx
+            this.tod_yes_data[3].wx = res.data.data.yes_wx_fee
+            this.tod_yes_data[2].all = res.data.data.yes_all
+            this.tod_yes_data[3].all = res.data.data.yes_all_fee
             this.yes_tod_data[1].pay_all = res.data.data.yes_all
-            this.tod_yes_data[2].ali = res.data.data.all_ali
-            this.tod_yes_data[2].wx = res.data.data.all_wx
-            this.tod_yes_data[2].all = res.data.data.all_all
+
+            this.tod_yes_data[4].ali = res.data.data.all_ali
+            this.tod_yes_data[5].ali = res.data.data.all_ali_fee
+            this.tod_yes_data[4].wx = res.data.data.all_wx
+            this.tod_yes_data[5].wx = res.data.data.all_wx_fee
+            this.tod_yes_data[4].all = res.data.data.all_all
+            this.tod_yes_data[5].all = res.data.data.all_all_fee
             this.yes_tod_data[2].pay_all = res.data.data.all_all
       })
     },
@@ -213,11 +227,11 @@ export default {
       }
     }
   }
-  .today {
-    padding-top: 18px;
-  }
-  .yes_tod_data {
-    padding-top: 18px;
-  }
+  // .today {
+  //   padding-top: 18px;
+  // }
+  // .yes_tod_data {
+  //   padding-top: 18px;
+  // }
 }
 </style>
