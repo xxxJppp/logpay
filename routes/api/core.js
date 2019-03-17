@@ -1,4 +1,4 @@
-const express = require('express')
+﻿const express = require('express')
 const router = express.Router()
 const Tools = require('../../config/utils')
 //引用 mongodb
@@ -51,7 +51,6 @@ function mealTime(mealtime) {
   }
 router.post('/server/api/pay', async (req,res)=>{
     let { uid, price, orderNumber, payType, notify_url, return_url, sign, orderUid, orderName, ip } = req.body
-	console.log(req.body)
     // 获取指定用户的token
     let token = tools.getToken(uid)
     // 首次加密

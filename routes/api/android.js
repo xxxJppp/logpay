@@ -1,4 +1,4 @@
-const express = require('express')
+﻿const express = require('express')
 const router = express.Router()
 const Tools = require('../../config/utils')
 const Order = require('../../models/Orders')
@@ -29,7 +29,6 @@ router.get('/server/api/updateOrder',(req, res)=>{
                                     }
                                     Order.find({ uid:user.uid, pay_price: price, payType: type, status: -1 ,expire: { $gt: 0, $lt: 300 }})
                                          .then(order=> {
-											 console.log(order)
 											    let { pay_price, price ,payType,orderName, orderUid , orderNumber, sign1, sign2, notify_url,status, return_url, uid, expire,fee, pid} = order[0]
                                                 Order.updateOne({orderNumber,uid,pay_price,payType }, { status : 1 })
                                                      .then(successOrder=>{		 

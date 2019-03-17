@@ -29,7 +29,7 @@
           </span>
         </el-form-item>
         <el-checkbox v-model="checked" style="margin-bottom:3px;">注册一个新用户</el-checkbox>
-        <a href="http://logpay.paywz.cn/#/user/argeement" v-if="checked" style="color:#409EFF;display:block;text-align:center;margin:5px 0;font-size:15px;">注册即代表同意《LogPay 用户协议》</a>
+        <a href="https://www.logpay.cn/account/#/user/argeement" v-if="checked" style="color:#409EFF;display:block;text-align:center;margin:5px 0;font-size:15px;">注册即代表同意《LogPay 用户协议》</a>
         <el-form-item>
           <el-button :loading="loading" type="success" style="width:100%;" @click.native.prevent="handleLogin" v-if="!checked">
             登陆
@@ -125,7 +125,7 @@ export default {
       })
     },
     handleFpassword() {
-      location.href = 'http://logpay.paywz.cn/#/user/fpassword'
+      location.href = 'https://www.logpay.cn/account/#/user/fpassword'
     }
   }
 }
@@ -181,6 +181,7 @@ $light_gray:#454545;
   background-color: #fff;
   background-repeat: no-repeat;
   .login-form {
+    border-radius:10px;
     background-color: #fff;
     position: absolute;
     left: 0;

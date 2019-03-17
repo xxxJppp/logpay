@@ -160,7 +160,7 @@ export default {
         }
         this.listLoading = true
         axios({
-        url: 'http://logpay.paywz.cn/order/getMissOrder',
+        url: 'https://api.logpay.cn/order/getMissOrder',
         method: 'get',
         params: {
             pay_price: money,
@@ -222,7 +222,7 @@ export default {
         }
         this.listLoading = true
         axios({
-            url: 'http://logpay.paywz.cn/order/getMissOrder',
+            url: 'https://api.logpay.cn/order/getMissOrder',
             method: 'get',
             params: {
                 pay_price:money,

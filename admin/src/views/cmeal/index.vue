@@ -31,7 +31,7 @@
     <p style="color:#67C23A;font-size:15px;">总费用￥{{ all_price }}, 原套餐抵扣￥{{ d_price }}, 补差价￥{{ price }}</p>
 </div>
     <el-button type="success" style="margin-top:20px;" v-if="enough" @click="submit">确定</el-button>
-    <el-button type="success" style="margin-top:20px;" v-else><a href="http://logpay.paywz.cn/#/user/recharge">余额不足请先充值</a></el-button>
+    <el-button type="success" style="margin-top:20px;" v-else><a href="https://www.logpay.cn/account/#/user/recharge">余额不足请先充值</a></el-button>
     <el-checkbox v-model="checked" style="margin-bottom:3px;">开启自动套餐续费</el-checkbox>
 </div>
 </template>
@@ -216,7 +216,7 @@ export default {
       },
       submit() {
         if (this.value1 == 'mf' && this.meal == 'mf') {
-          location.href = '/#/user/cmeal'
+          location.href = 'https://www.logpay.cn/account/#/user/cmeal'
           return
         }
         // bz升级gj过程中防止客户损失
@@ -224,7 +224,7 @@ export default {
           alert('充值参数有误!')
           return false
         }
-        axios.post('/user/cmeal',{ uid:this.uid, meal:this.value1,mealtime:this.value2,cmoney:this.price,renew:this.checked })
+        axios.post('https://api.logpay.cn/user/cmeal',{ uid:this.uid, meal:this.value1,mealtime:this.value2,cmoney:this.price,renew:this.checked })
              .then()
              .catch(err => console.log(err))
         location.href = '/'

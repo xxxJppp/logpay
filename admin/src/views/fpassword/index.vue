@@ -51,7 +51,7 @@ export default {
   },
   methods: {
     handleForget() {
-    axios.post('http://logpay.paywz.cn/user/passwordreset',{ email:this.FpasswordForm.email })
+    axios.post('https://api.logpay.cn/user/passwordreset',{ email:this.FpasswordForm.email })
          .then( res => {
            if (res.data.code === -1) {
              this.$message.error(res.data.msg)

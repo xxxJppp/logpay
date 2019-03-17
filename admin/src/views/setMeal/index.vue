@@ -124,7 +124,7 @@ export default {
     },
     submitAdd() {
         this.dialogFormVisible = false
-        axios.post('http://logpay.paywz.cn/user/addMeal', this.mealForm )
+        axios.post('https://api.logpay.cn/user/addMeal', this.mealForm )
            .then(res => {
                 if (res.data.code == -1) {
                         this.$message.error(res.data.msg)
@@ -138,7 +138,7 @@ export default {
     },
     submitChange() {
         this.dialogFormVisible = false
-        axios.post('http://logpay.paywz.cn/user/changeMeal', this.mealForm )
+        axios.post('https://api.logpay.cn/user/changeMeal', this.mealForm )
            .then(res => {
              if (res.data.code == -1) {
                         this.$message.error(res.data.msg)
@@ -163,7 +163,7 @@ export default {
     getMealList() {
       this.listLoading = true
       axios({
-        url: 'http://logpay.paywz.cn/user/getMeal',
+        url: 'https://api.logpay.cn/user/getMeal',
         method: 'get',
         params: {
             page: this.page.page,
@@ -219,7 +219,7 @@ export default {
     delMeal (id) {
                 return new Promise(async (res, rej) => {
                     axios({
-                        url: 'http://logpay.paywz.cn/user/delMeal',
+                        url: 'https://api.logpay.cn/user/delMeal',
                         method: 'delete',
                         data: {
                             id: id

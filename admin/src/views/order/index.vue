@@ -203,7 +203,7 @@ export default {
   methods: {
     // 处理未通知的
     handleNotify(orderNumber,Pid) {
-      axios.post('http://logpay.paywz.cn/server/api/query',{orderNumber,Pid,uid:this.uid,checked:'notify',})
+      axios.post('https://api.logpay.cn/server/api/query',{orderNumber,Pid,uid:this.uid,checked:'notify',})
            .then(data => {
              this.getOrder()
              })
@@ -238,7 +238,7 @@ export default {
         }
         this.listLoading = true
         axios({
-        url: 'http://logpay.paywz.cn/order/getOrder',
+        url: 'https://api.logpay.cn/order/getOrder',
         method: 'get',
         params: {
             orderNumber:this.number,
@@ -304,7 +304,7 @@ export default {
         }
       this.listLoading = true
       axios({
-        url: 'http://logpay.paywz.cn/order/getOrder',
+        url: 'https://api.logpay.cn/order/getOrder',
         method: 'get',
         params: {
             orderNumber:this.number,

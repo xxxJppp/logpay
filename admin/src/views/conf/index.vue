@@ -129,7 +129,7 @@ export default {
                 this.$message.error('请认真配置支付宝收款userid')
                 return
             }
-            axios.post('http://logpay.paywz.cn/user/userid',{ uid:this.uid ,userid:this.userid})
+            axios.post('https://api.logpay.cn/user/userid',{ uid:this.uid ,userid:this.userid})
                  .then( data =>{
                      if(data = 'success') {
                          this.$message.success('配置成功')
@@ -172,7 +172,7 @@ export default {
             delQrCode (id) {
                 return new Promise(async (res, rej) => {
                     axios({
-                        url: 'http://logpay.paywz.cn/qrcode/del',
+                        url: 'https://api.logpay.cn/qrcode/del',
                         method: 'delete',
                         data: {
                             id: id
@@ -201,7 +201,7 @@ export default {
             upqiniu (e) {
                 let self = this
                 axios({
-                    url: 'http://logpay.paywz.cn/qrcode/updata',
+                    url: 'https://api.logpay.cn/qrcode/updata',
                     method: 'post',
                 }).then(res  => {
                     if (res.data.code == -1) {
@@ -214,7 +214,7 @@ export default {
             },
             getQrList () {
                 axios({
-                    url: 'http://logpay.paywz.cn/qrcode/all',
+                    url: 'https://api.logpay.cn/qrcode/all',
                     method: 'get',
                     params: {
                         uid: this.uid,
@@ -249,7 +249,7 @@ export default {
             getQrContent (url) {
                 let self = this
                 axios({
-                    url: 'http://logpay.paywz.cn/qrcode/add',
+                    url: 'https://api.logpay.cn/qrcode/add',
                     method: 'post',
                     data: {url: url,uid:self.uid}
                 }).then(res => {

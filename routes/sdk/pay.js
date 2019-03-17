@@ -1,4 +1,4 @@
-let express = require('express')
+﻿let express = require('express')
 let app = express()
 let router = express.Router()
 let config = require('../sdk/config')
@@ -82,6 +82,6 @@ router.post('/sdk/notify',(req, res)=>{
     }
 })
 router.get('/sdk/return',(req,res)=>{
-    res.redirect('http://logpay.paywz.cn/#/index')
+    res.redirect('https://www.logpay.cn/account/#/index')
 })
 module.exports = router

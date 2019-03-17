@@ -239,7 +239,7 @@ export default {
       }
     },
     getDayMoney(uid) {
-      axios.get('http://logpay.paywz.cn/order/getDayMoney',{
+      axios.get('https://api.logpay.cn/order/getDayMoney',{
         params:{
         uid
         }
@@ -275,7 +275,7 @@ export default {
       })
     },
     getOrderNumber(uid) {
-      axios.get('http://logpay.paywz.cn/order/getOrderNumber',{
+      axios.get('https://api.logpay.cn/order/getOrderNumber',{
         params:{
         uid
         }
@@ -299,7 +299,7 @@ export default {
     getMealOptions() {
       let List = []
       axios({
-        url: 'http://logpay.paywz.cn/user/getMeal',
+        url: 'https://api.logpay.cn/user/getMeal',
         method: 'get',
         params: {
             role:this.roles[0]
@@ -337,7 +337,7 @@ export default {
     },
     submitChange() {
         this.merchantEdit = false
-        axios.post('http://logpay.paywz.cn/user/changeMerchantMeal', {  _id:this.merchantForm._id,meal:this.merchantMeal,money:this.merchantForm.money,mealtime:this.merchantForm.mealtime,remark:this.merchantForm.remark} )
+        axios.post('https://api.logpay.cn/user/changeMerchantMeal', {  _id:this.merchantForm._id,meal:this.merchantMeal,money:this.merchantForm.money,mealtime:this.merchantForm.mealtime,remark:this.merchantForm.remark} )
            .then(res => {
              if (res.data.code == -1) {
                         this.$message.error(res.data.msg)
@@ -372,7 +372,7 @@ export default {
     getMerchant() {
       this.listLoading = true
       axios({
-        url: 'http://logpay.paywz.cn/user/getMerchant',
+        url: 'https://api.logpay.cn/user/getMerchant',
         method: 'get',
         params: {
             type:this.value1,

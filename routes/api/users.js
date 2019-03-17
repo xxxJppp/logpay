@@ -1,4 +1,4 @@
-const express = require('express')
+﻿const express = require('express')
 const router = express.Router()
 const User = require('../../models/Users')
 const bcrypt = require('bcrypt')
@@ -12,8 +12,8 @@ const request = require('request')
 const Meal = require('../../models/Meals')
 // 注册新用户
 let tools = new Tools()
-router.get('/',(req, res)=>{
-	res.render('index.html')
+router.get('/.well-known/pki-validation/fileauth.txt',(req, res)=>{
+	res.send('2019031500000068mlkjuogxnlriknmmdupngx05b05h5rvpni9de3uvr310orpw')
 })
 router.post('/user/register', async (req, res)=>{
     let { email, password } = req.body
@@ -31,7 +31,7 @@ router.post('/user/register', async (req, res)=>{
                             uid = '10001'
                          }
                         let token = tools.getToken(uid)
-						let ip = tools.getClientIP(req)
+			let ip = tools.getClientIP(req)
                         let resolveUrl = 'http://ip.taobao.com/service/getIpInfo.php?ip='+ ip
                                 request.get({
                                     url: resolveUrl,

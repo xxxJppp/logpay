@@ -1,5 +1,5 @@
 'use strict'
 module.exports = {
   NODE_ENV: '"production"',
-  BASE_API: '"http://logpay.paywz.cn/"'
+  BASE_API: '"https://api.logpay.cn/"'
 }

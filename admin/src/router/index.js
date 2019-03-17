@@ -114,13 +114,13 @@ export const constantRouterMap = [
         meta: { title: '接口文档' }
       },
       {
-        path: 'http://logpay.paywz.cn/download/SDK',
+        path: 'https://api.logpay.cn/download/SDK',
         name: 'SDK',
         component: () => import('@/views/sdk/index'),
         meta: { title: 'SDK下载' }
       },
       {
-        path: 'http://logpay.paywz.cn/download/APK',
+        path: 'https://api.logpay.cn/download/APK',
         name: 'APK',
         component: () => import('@/views/apk/index'),
         meta: { title: 'APK下载' }

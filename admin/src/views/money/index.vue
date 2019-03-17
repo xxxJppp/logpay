@@ -95,7 +95,7 @@ export default {
     },
   methods: {
     getDayMoney() {
-      axios.get('http://logpay.paywz.cn/order/getDayMoney',{
+      axios.get('https://api.logpay.cn/order/getDayMoney',{
         params:{
         role:this.roles[0]
         }
@@ -131,7 +131,7 @@ export default {
       })
     },
     getOrderNumber() {
-      axios.get('http://logpay.paywz.cn/order/getOrderNumber',{
+      axios.get('https://api.logpay.cn/order/getOrderNumber',{
         params:{
         role:this.roles[0]
         }

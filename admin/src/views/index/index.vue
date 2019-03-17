@@ -115,7 +115,7 @@ export default {
     },
   methods: {
     getDayMoney() {
-      axios.get('http://logpay.paywz.cn/order/getDayMoney',{
+      axios.get('https://api.logpay.cn/order/getDayMoney',{
         params:{
         uid:this.uid
         }
@@ -151,7 +151,7 @@ export default {
       })
     },
     getOrderNumber() {
-      axios.get('http://logpay.paywz.cn/order/getOrderNumber',{
+      axios.get('https://api.logpay.cn/order/getOrderNumber',{
         params:{
         uid:this.uid
         }
@@ -200,7 +200,7 @@ export default {
   .header {
     height: 66px;
     font-size: 16px;
-    margin-top: 1%;
+    margin-top: 5px;
     border-radius: 10px;
     background-color: #eeeeee;
     width: 100%;
