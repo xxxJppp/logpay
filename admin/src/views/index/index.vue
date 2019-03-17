@@ -2,14 +2,14 @@
 <div class="wrapper">
   <div class="header">
     <div class="hleft">
-      <el-button type="primary" size="mini"><a href="http://logpay.paywz.cn/#/user/cmeal">修改套餐</a></el-button>
+      <el-button type="primary" size="mini"><a href="https://www.logpay.cn/account/#/user/cmeal">修改套餐</a></el-button>
       <p v-if="mf">免费版</p>
       <p v-else-if="bz">标准版</p>
       <p v-else-if="gj">高级版</p>
       <p v-else>{{ otherMeal }}</p>
     </div>
     <div class="hright">
-      <el-button type="success" size="mini"><a href="http://logpay.paywz.cn/#/user/recharge">账户充值</a></el-button>
+      <el-button type="success" size="mini"><a href="https://www.logpay.cn/account/#/user/recharge">账户充值</a></el-button>
       <p>{{ money }}</p>
     </div>
   </div>

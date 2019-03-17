@@ -46,7 +46,7 @@ export default {
       })
     },
     toCpassword() {
-      location.href = 'http://logpay.paywz.cn/#/user/cpassword'
+      location.href = 'https://www.logpay.cn/account/#/user/cpassword'
     }
   }
 }
