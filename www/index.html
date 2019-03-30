@@ -4,18 +4,20 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="LogPay.cn 是一款免签约及时到账的收款系统, 支持支付宝微信, 超稳定不掉单, 高并发收款">
-    <meta name="keywords" content="logpay, 免签约支付, 网站支付接口, 个人二维码, 微信支付接口, 支付宝支付接口, 即时到账支付, 固定码支付, 实时到账支付, 无需认证支付, 支付宝监控, 微信支付监控, 收款接口, 超稳定不掉单, 高并发收款">
+    <meta name="description" content="LogPay 免签支付,让支付接口对接前所未有的简单,无需后端开发,一个SDK即可接入一套完整的支付系统,高速集成主流支付接口,即时到账,无需等候,以更稳定,更安全的支付接口解决您的收款问题。">
+    <meta name="keywords" content="logpay, 免签约支付, 免签支付, 网站支付接口, 微信支付接口, 支付宝支付接口, 即时到账接口, 固定码支付接口, 实时到账接口, 收款接口, 个人码支付接口">
     <meta name="author" content="logpay.cn">
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
-    <title>LogPay 免签约收款系统-支付宝 微信支付免签约即时到账接口</title>
+    <title>LogPay 免签支付-支付宝 微信支付免签约即时到账接口</title>
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">
     <link href="/static/css/creative.css" rel="stylesheet">
+	<link rel="stylesheet" href="/static/css/lanrenzhijia.css" type="text/css"/>
+	<link rel="stylesheet" href="/static/css/animate.min.css" type="text/css"/>
   </head>
 
   <body id="page-top">
-    <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav"  style="display: block;">
       <div class="container">
         <a class="navbar-brand js-scroll-trigger" href="#page-top">
           <img src="/static/img/logo.png">
@@ -26,7 +28,7 @@
         <div class="collapse navbar-collapse" id="navbarResponsive">
           <ul class="navbar-nav ml-auto">
               <li class="nav-item">
-                  <a class="nav-link js-scroll-trigger" href="/sdk">DEMO</a>
+                  <a class="nav-link js-scroll-trigger" href="/sdk">测试支付</a>
                 </li>
             <li class="nav-item">
               <a class="nav-link js-scroll-trigger" href="#about">开始收款</a>
@@ -47,22 +49,29 @@
         </div>
       </div>
     </nav>
-  
-    <header class="masthead text-center text-white d-flex">
+	
+    <header class="masthead text-center text-white d-flex" style="clear: both;">
       <div class="container my-auto">
         <div class="row">
-          <div class="col-lg-10 mx-auto">
+
+          <div class="col-lg-10 mx-auto animated bounceInLeft">
             <h1 class="text-uppercase">
-              <h1>LogPay免签约支付/Payment
-              </h1>
+              <h1 class="">LogPay免签约支付/Payment</h1>
             <hr>
+			<br>
+            </h1>
           </div>
-        </h1>
-          <div class="col-lg-9 mx-auto">
-              <h5>让支付接口对接前所未有的简单，无需后端开发，一个SDK即可接入一套完整的支付系统</h5>
+
+          <div class="col-lg-9 mx-auto animated bounceInRight">
+            <h5>让支付接口对接前所未有的简单，无需后端开发，一个SDK即可接入一套完整的支付系统</h5>
             <p class="text-faded mb-5">个人免签约，即时到账，即开即用，高并发，超稳定不掉单</p>
-            <a class="btn btn-primary btn-xl" href="https://www.logpay.cn/account/#/login" style="margin-top: 68px;">注册使用</a>
           </div>
+		  
+		  <div class="col-lg-9 mx-auto animated bounceInUp delay-1s">
+		    <a class="btn btn-primary btn-xl " href="https://www.logpay.cn/account/#/login" style="display:inline-block;">注册使用</a>
+			<a class="btn btn-success btn-xl " href="https://www.logpay.cn/sdk" style="display:inline-block;">测试支付</a>
+		  </div>
+
         </div>
       </div>
     </header>
@@ -101,7 +110,7 @@
                     </div>
                     <div class="card-body">
                       <h4 class="card-title">￥0 <small class="text-mute">/月</small></h4>
-                      <p class="card-text">建议测试用<br><br></p>
+                      <p class="card-text">测试时使用，快速对接<br><br></p>
                       <a href="https://www.logpay.cn/account/#/login" class="btn btn-block btn-info" style="color: black;letter-spacing: 2px;background-color: rgba(0,0,0,.03);">立即开户</a>
                     </div>
                   </div>
@@ -110,11 +119,11 @@
                 <div class="col-lg-3 col-md-6 mb-4">
                   <div class="card pricing">
                     <div class="card-header" style="background-color: #007bff;color:white;">
-                        <h4 class="my-0 font-weight-normal">高级版</h4>
+                        <h4 class="my-0 font-weight-normal">标准版</h4>
                     </div>
                     <div class="card-body">
-                      <h4 class="card-title">￥10 <small class="text-mute">/月</small></h4>
-                      <p class="card-text">0.6% 手续费<br>支持多账号收款<br>客服协助对接<br>一对一客服<br>7x24 小时技术支持</p>
+                      <h4 class="card-title">￥20 <small class="text-mute">/月</small></h4>
+                      <p class="card-text">0.4% 手续费<br>支持多账号收款<br>客服协助对接<br>一对一客服<br>7x24 小时技术支持</p>
                       <a href="https://www.logpay.cn/account/#/login" class="btn btn-block btn-primary">立即开户</a>
                     </div>
                   </div>
@@ -127,9 +136,9 @@
                           <h4 class="my-0 font-weight-normal">高级版</h4>
                       </div>
                       <div class="card-body">
-                        <h4 class="card-title">￥20 <small class="text-mute">/月</small></h4>
-                        <p class="card-text">0.8% 手续费<br>支持多账号收款<br>客服协助对接<br>一对一客服<br>7x24 小时技术支持</p>
-                        <a href="https://www.logpay.cn/account/#/login" class="btn btn-block btn-success">立即开户</a>
+                        <h4 class="card-title">￥50 <small class="text-mute">/月</small></h4>
+                        <p class="card-text">0.1% 手续费<br>支持多账号收款<br>客服协助对接<br>一对一客服<br>7x24 小时技术支持</p>
+                        <a href="https://www.logpay.cn/account/#/login" class="btn btn-block btn-info">立即开户</a>
                       </div>
                     </div>
                   </div>
@@ -142,7 +151,7 @@
                     <div class="card-body">
                       <h4 class="card-title">为您定制合适您的支付套餐</small></h4>
                       <p class="card-text">请联系客服</p>
-                      <a href="https://www.logpay.cn/account/#/login" class="btn btn-block btn-info" style="letter-spacing: 2px;">立即开户</a>
+                      <a href="https://www.logpay.cn/account/#/login" class="btn btn-block btn-success" style="letter-spacing: 2px;">立即开户</a>
                     </div>
                   </div>
                 </div>
@@ -152,7 +161,32 @@
       </div>
     </section>
 
-    <section id="contact">
+    <section id="contact"> 
+	<div id='qq_icon' style="z-index:2;"></div>
+	<div id='cs_online' style="z-index:2;">
+		<ul class='qq_context'>
+			<li>
+				<span class='span_t'>在线客服01：</span>
+				<span class='qq_num'></span>
+			</li>
+			<li>
+				<span class='span_t'>在线客服02：</span>
+				<span class='qq_num'></span>
+			</li>
+			<li>
+				<span class='span_t'>在线客服03：</span>
+				<span class='qq_num'></span>
+			</li>
+			<li>
+				<span class='span_t'>在线客服04：</span>
+				<span class='qq_num'></span>
+			</li>
+			<li>
+				<span class='span_t'>在线客服05：</span>
+				<span class='qq_num'></span>
+			</li>
+		</ul>
+	</div>
       <div class="container">
         <div class="row">
           <div class="col-lg-8 mx-auto text-center">
@@ -177,14 +211,14 @@
         </div>
       </div>
     </section>
-
    <footer>
-      <p style="line-height: 50px;color:gray;text-align:center;font-size:14px;">Copyright © LogPay&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<a href="http://www.miibeian.gov.cn/" rel="nofollow" target="_blank" style="color:gray;">皖ICP备18047748号</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;友情链接:&nbsp;<a href="https://www.paywz.cn" target="_blank" style="color:gray;">WzPay聚合支付</a>&nbsp;&nbsp;&nbsp;
+      <p style="line-height: 50px;color:gray;text-align:center;font-size:14px;">Copyright © LogPay&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;<a href="http://www.miibeian.gov.cn/" rel="nofollow" target="_blank" style="color:gray;">皖ICP备19000343号-2</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;友情链接:&nbsp;<a href="https://www.paywz.cn" target="_blank" style="color:gray;">WzPay聚合支付</a>&nbsp;&nbsp;&nbsp;
       </p>
     </footer>
 
     <script src="/static/js/jquery.min.js"></script>
     <script src="/static/js/bootstrap.min.js"></script>
+	<script src="/static/js/lanrenzhijia.js"></script>
     <script>
         $(document).ready(function () {
             $(".js-scroll-trigger").click(function (){
@@ -208,6 +242,7 @@
             navbarCollapse();
             $(window).scroll(navbarCollapse);
         });
+		// 百度统计
         var _hmt = _hmt || [];
         (function() {
           var hm = document.createElement("script");
@@ -215,6 +250,19 @@
           var s = document.getElementsByTagName("script")[0]; 
           s.parentNode.insertBefore(hm, s);
         })();
+		// 360 收录
+		(function(){
+		var src = (document.location.protocol == "http:") ? "http://js.passport.qihucdn.com/11.0.1.js?d659363372b124c9766fd9e6a4cf8fa8":"https://jspassport.ssl.qhimg.com/11.0.1.js?d659363372b124c9766fd9e6a4cf8fa8";
+		document.write('<script src="' + src + '" id="sozz"><\/script>');
+		})();
+		//qq 客服
+		myEvent(window,'load',function(){
+		dealy('qq_icon',0.8);						//2秒后显示QQ图标，默认为2秒，可自行设置
+		settop('qq_icon','cs_online',150);		//设置在线客服的高度，默认150，可自行设置
+		var span_q = getbyClass('cs_online','qq_num');
+		setqq(span_q,['59187993','59187993','59187993','59187993','59187993']);		//填写5个QQ号码
+		click_fn('qq_icon','cs_online');
+	});
     </script>
   </body>
 </html>

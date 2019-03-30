@@ -8,15 +8,26 @@ $logpay = new logpay($config['uid'], $config['token']);
 $Data['price'] = $_GET['price'];
 $Data['orderUid'] = $_GET['orderUid'];
 $Data['orderName'] = $_GET['orderName'];
-$Data['payType'] = $_GET['payType'];
-
 $Data['orderNumber'] = date("YmdHis") . rand(100000, 999999);
-$Data['uid'] = $config['uid'];
-$Data['token'] = $config['token'];
 $Data['return_url'] = $config['return_url'];
 $Data['notify_url'] = $config['notify_url'];
-// md5加密
-$sign = $logpay -> Sign($Data);
+if($_GET['payType'] == 'alipayH5') {
+	function Sign($Array) {
+		$Sign = md5($Array['price']. $Array['payType']. $Array['orderUid']. $Array['orderName']. $Array['orderNumber']. $Array['notify_url']. $Array['return_url']. $Array['uid']. $Array['token']);
+		return $Sign;
+	}
+	$Data['payType'] = 'alipay';
+	$Data['uid'] = '10006';
+    $Data['token'] = '84752af3c7347ab77b98244d1fc4e973';
+	// md5加密
+	$sign = Sign($Data);
+} else {
+	$Data['payType'] = $_GET['payType'];
+	$Data['uid'] = $config['uid'];
+    $Data['token'] = $config['token'];
+	// md5加密
+    $sign = $logpay -> Sign($Data);
+}
 function GetIP(){
 if(!empty($_SERVER["HTTP_CLIENT_IP"])){
   $cip = $_SERVER["HTTP_CLIENT_IP"];

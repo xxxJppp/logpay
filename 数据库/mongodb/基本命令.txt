@@ -1,0 +1,21 @@
+mongod启动服务
+mongo进入服务
+
+1，show dbs
+查看显示所有数据库
+2，db
+查看当前的数据库
+3，use 数据库名称
+切换到指定数据库
+4，插入数据
+
+show collections 展示集合
+
+db.students.insertOne()   存储
+db.students.find()   展示
+db.users.remove({})
+
+
+数据库
+   集合
+      文档（文档很自由）

@@ -54,6 +54,7 @@ router.post('/server/api/pay', async (req,res)=>{
     // 获取指定用户的token
     let token = tools.getToken(uid)
     // 首次加密
+	console.log(req.body)
     let sign1 =  tools.md5( price + payType + orderUid + orderName + orderNumber + notify_url + return_url + uid + token)
     price = parseFloat(price).toFixed(2)
     let pay_price
@@ -740,14 +741,19 @@ router.post('/server/api/query', (req,res)=>{
 						body: requestData
 					}, (error, response, body) => {
 						if (!error && response.statusCode == 200) {
-							
 							//异步回调成功
-							if (body === 'SUCCESS') {
+							console.log(body)
+							if (body == 'SUCCESS') {
 								let date = new Date()
 								let YearMD = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')} `
 								let HoursMS = `${date.getHours().toString().padStart(2,'0')}:${date.getMinutes().toString().padStart(2,'0')}:${date.getSeconds().toString().padStart(2,'0')}`
 								let pay_time = YearMD + HoursMS
 								//fee扣除 和fee计算
+								try {
+									process.kill(pid,'SIGTERM')
+								} catch(e) {
+									console.log(e)
+								}
 								if (uid !== '10001') {
 									User.findOne({uid})
 									.then(merchant =>{

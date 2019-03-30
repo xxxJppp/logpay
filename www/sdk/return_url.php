@@ -37,7 +37,7 @@ if($sign == !$_GET['sign2']) {
 						<div class="weui_text_area">
 							<h2 class="weui_msg_title">付款成功</h2>
 							<p class="weui_msg_desc">
-								<p style="color:#67C23A;display: inline;"> <?php echo $Array['orderUid']; ?></p> 成功支付 <span style="color:#67C23A;display: inline;"><?php echo $Array['price']; ?> 元</span></p>
+								<p style="color:#67C23A;display: inline;"> 订单<?php echo $Array['orderNumber']; ?></p> 成功支付 <span style="color:#67C23A;display: inline;"><?php echo $Array['price']; ?> 元，感谢测试</span></p>
 						</div>
 					</div>
 				</div>

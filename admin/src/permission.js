@@ -46,13 +46,9 @@ router.beforeEach((to, from, next) => {
       }
     }
   } else {
-    if (whiteList.includes(to.path)) {
+    if (whiteList.indexOf(to.path) !== -1) {
       next()
     // 如果/fpassword 跳/fpassword
-    } else if (whiteList.includes('fpassword')) {
-      next()
-    } else if (whiteList.includes('argeement')) {
-      next()
     } else {
       next(`/login`)
       NProgress.done()

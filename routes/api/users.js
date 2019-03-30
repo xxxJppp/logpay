@@ -13,7 +13,7 @@ const Meal = require('../../models/Meals')
 // 注册新用户
 let tools = new Tools()
 router.get('/.well-known/pki-validation/fileauth.txt',(req, res)=>{
-	res.send('2019031500000068mlkjuogxnlriknmmdupngx05b05h5rvpni9de3uvr310orpw')
+  res.send('2019031500000068mlkjuogxnlriknmmdupngx05b05h5rvpni9de3uvr310orpw')
 })
 router.post('/user/register', async (req, res)=>{
     let { email, password } = req.body
@@ -31,17 +31,17 @@ router.post('/user/register', async (req, res)=>{
                             uid = '10001'
                          }
                         let token = tools.getToken(uid)
-			let ip = tools.getClientIP(req)
-                        let resolveUrl = 'http://ip.taobao.com/service/getIpInfo.php?ip='+ ip
-                                request.get({
-                                    url: resolveUrl,
-                                    encoding: null // 指定编码
-                                }, (error, response, body) => {
-                                    if (error) {
-                                        console.log(err)
-                                    } else {
-                                        let data = JSON.parse(body)
-                                        let address = data.data.country+data.data.region+data.data.city
+                        let ip = tools.getClientIP(req)
+                        // let resolveUrl = 'http://ip.taobao.com/service/getIpInfo.php?ip='+ ip
+                                // request.get({
+                                    // url: resolveUrl,
+                                    // encoding: null // 指定编码
+                                // }, (error, response, body) => {
+                                        // let address = '未知地区'
+                                    // if (body) {
+                                        // let data = JSON.parse(body)
+                                        // address = data.data.country+data.data.region+data.data.city
+                                    // }
                                         let money = '0.00'
                                         let date = tools.localDate()
                                         let user = new User({
@@ -55,7 +55,7 @@ router.post('/user/register', async (req, res)=>{
                                             userid:'',
                                             date,
                                             ip,
-                                            address
+                                            address:ip
                                         })
                                          // 密码加密
                                         bcrypt.genSalt(10, (err, salt) => {
@@ -70,9 +70,9 @@ router.post('/user/register', async (req, res)=>{
                                                     .catch(err => res.json('注册失败请重新注册'))
                                             })
                                         })
-                                    }
+
                                 })
-                            })
+                            // })
                 }
              })
 })
@@ -95,7 +95,7 @@ router.post('/user/login',(req,res)=>{
                 if (isMatch) {
                     // jwt.sign( "规则", "加密名字", "过期时间", "箭头函数")
                     let rule = { id:user.id, email:user.email }
-                    jwt.sign( rule, secret,{expiresIn:3600},(err, token)=>{
+                    jwt.sign( rule, secret,{expiresIn:36000},(err, token)=>{
                         if (err) throw err
                         res.json({
                             code:20000,
@@ -127,7 +127,7 @@ router.get('/user/getInfo',passport.authenticate("jwt",{session:false}),(req, re
             meal,
             mealtime,
             money,
-			roles
+      roles
         }
     })
 })
@@ -202,7 +202,7 @@ router.post('/user/cmeal',(req, res)=>{
             if (user) {
                 if (user.meal == meal) {
                     if (meal == 'mf') {
-                        res.redirect('/#/user/cmeal')
+                        res.redirect('https://www.logpay.cn/account/#/user/cmeal')
                     }
                     if (mealtime == 'ygy') {
                         user.mealtime = getTime(user.mealtime ,1)
@@ -283,7 +283,7 @@ router.post('/user/passwordreset', (req, res)=>{
                         pass: 'tllmuanfzhzabdjd',
                     }
                     })
-                    let HTML = 'http://114.115.150.18/user/resetpassword/' + user.id+ '/'+token
+                    let HTML = 'https://api.logpay.cn/user/resetpassword/' + user.id+ '/'+token
                     let mailOptions = {
                     from: '"LogPay密码重置" <963359789@qq.com>', // sender address
                     to: emailAddress, // list of receivers
@@ -329,7 +329,7 @@ router.get('/user/resetpassword/:id/:token', (req, res)=>{
                     }
                     let resetsecret = user.password + secret + user.date.getTime()
                     let payload = JWT.decode(req.params.token, resetsecret)
-					 if (payload.expires < Date.now()) {
+           if (payload.expires < Date.now()) {
                         return res.send('该网址已过期')   
                     }
                     let token = req.params.token
@@ -346,9 +346,9 @@ router.get('/user/resetpassword/:id/:token', (req, res)=>{
 })
 
 router.post('/user/resetpassword', (req, res)=>{
-	if( req.body.password !== req.body.checkPassword ) {
-		return res.send('两次密码输入不一致')
-	}
+  if( req.body.password !== req.body.checkPassword ) {
+    return res.send('两次密码输入不一致')
+  }
     User.findOne({_id:req.body.id})
             .then( user =>{
                 if (!user) {
@@ -382,24 +382,24 @@ router.post('/user/resetpassword', (req, res)=>{
 
 router.post('/user/addMeal',(req, res)=>{
 try {
-	 let params = req.body
-	 let meal = new Meal(params)
-	  meal.save()
-		  .then(data=> {
-			  res.json({
-				code: 1,
-				data:'',
-				msg: '添加成功'
-			  })
-		})
-		  .catch( err => res.json('当前系统繁忙'))
-		} catch (e) {
-			res.json({
-				code:-1,
-				data:'',
-				msg:e
-			})
-		}
+   let params = req.body
+   let meal = new Meal(params)
+    meal.save()
+      .then(data=> {
+        res.json({
+        code: 1,
+        data:'',
+        msg: '添加成功'
+        })
+    })
+      .catch( err => res.json('当前系统繁忙'))
+    } catch (e) {
+      res.json({
+        code:-1,
+        data:'',
+        msg:e
+      })
+    }
 })
 
 router.delete('/user/delMeal', async (req, res) => {
@@ -429,134 +429,134 @@ router.delete('/user/delMeal', async (req, res) => {
 
 router.post('/user/changeMerchantMeal',(req, res)=>{
 try {
-	 let params = req.body
-	 User.updateMany({_id:params._id},params)
-		  .then(data =>{
-			  res.json({
-				code: 1,
-				data:'',
-				msg: '编辑成功'
-			})
-		  })
-		  .catch( err => res.json('当前系统繁忙'))
-		} catch (e) {
-			res.json({
-				code:-1,
-				data:'',
-				msg:e
-			})
-		}
+   let params = req.body
+   User.updateMany({_id:params._id},params)
+      .then(data =>{
+        res.json({
+        code: 1,
+        data:'',
+        msg: '编辑成功'
+      })
+      })
+      .catch( err => res.json('当前系统繁忙'))
+    } catch (e) {
+      res.json({
+        code:-1,
+        data:'',
+        msg:e
+      })
+    }
 })
 
 router.post('/user/changeMeal',(req, res)=>{
 try {
-	 let params = req.body
-	 Meal.updateMany({_id:params._id},params)
-		  .then(data =>{
-			  res.json({
-				code: 1,
-				data:'',
-				msg: '编辑成功'
-			})
-		  })
-		  .catch( err => res.json('当前系统繁忙'))
-		} catch (e) {
-			res.json({
-				code:-1,
-				data:'',
-				msg:e
-			})
-		}
+   let params = req.body
+   Meal.updateMany({_id:params._id},params)
+      .then(data =>{
+        res.json({
+        code: 1,
+        data:'',
+        msg: '编辑成功'
+      })
+      })
+      .catch( err => res.json('当前系统繁忙'))
+    } catch (e) {
+      res.json({
+        code:-1,
+        data:'',
+        msg:e
+      })
+    }
 })
 
 router.get('/user/getMeal',(req, res)=>{
 try {
-	 let params = req.query
-	 let skip,limit
-	 if(params.page && params.num) {
-		 skip = (parseInt(params.page-1))*parseInt(params.num)
-		 limit = parseInt(params.num) 
-	 } else {
-		  skip = null
-		  limit = null
-	 }
-	 console.log(params)
-		 if (params.role === 'admin') {
-			 Meal.find({})
-	//		  .sort({'_id':-1})
-			  .then( meal =>{
-				 Meal.find({})
-	//				  .sort({'_id':-1})
-					  .skip(skip)
-					  .limit(limit) 
-					  .exec()
-					  .then( select => {
-						if (!select) throw ('无数据')
-						res.json({
-						  code: 1,
-						  data: {
-							  select,
-							  meal
-						  },
-						  msg: '获取成功'
-					  })
-					})
-					  .catch( err => res.json('当前系统繁忙'))
-			  })
-			  .catch( err => res.json('当前系统繁忙'))		 
-		 }
-		} catch (e) {
-			res.json({
-				code:-1,
-				data:'',
-				msg:e
-			})
-		}
+   let params = req.query
+   let skip,limit
+   if(params.page && params.num) {
+     skip = (parseInt(params.page-1))*parseInt(params.num)
+     limit = parseInt(params.num) 
+   } else {
+      skip = null
+      limit = null
+   }
+   console.log(params)
+     if (params.role === 'admin') {
+       Meal.find({})
+  //      .sort({'_id':-1})
+        .then( meal =>{
+         Meal.find({})
+  //          .sort({'_id':-1})
+            .skip(skip)
+            .limit(limit) 
+            .exec()
+            .then( select => {
+            if (!select) throw ('无数据')
+            res.json({
+              code: 1,
+              data: {
+                select,
+                meal
+              },
+              msg: '获取成功'
+            })
+          })
+            .catch( err => res.json('当前系统繁忙'))
+        })
+        .catch( err => res.json('当前系统繁忙'))     
+     }
+    } catch (e) {
+      res.json({
+        code:-1,
+        data:'',
+        msg:e
+      })
+    }
 })
 
 router.get('/user/getMerchant',(req, res)=>{
 try {
-	 let params = req.query
-	 let type = params.type
-	 let value = params.value
-	 let query = {}
-	 if ( type ==='uid' && value) {
-		 query.uid = value
-	 }
-	 if ( type ==='email' && value) {
-		 query.email = value
-	 }
-	 User.find(query)
-		  .sort({'_id':-1})
-		  .then( user =>{
-			 let skip = (parseInt(params.page-1))*parseInt(params.num)
-			 let limit = parseInt(params.num)
-			 User.find(query)
-				  .sort({'_id':-1})
-				  .skip(skip)
-				  .limit(limit) 
-				  .exec()
-				  .then( select => {
-					if (!select) throw ('无数据')
-					res.json({
-					  code: 1,
-					  data: {
-						  select,
-						  user
-					  },
-					  msg: '获取成功'
-				  })
-				})
-				  .catch( err => res.json('当前系统繁忙'))
-		  })
-		  .catch( err => res.json('当前系统繁忙'))
-		} catch (e) {
-			res.json({
-				code:-1,
-				data:'',
-				msg:e
-			})
-		}
+   let params = req.query
+   let type = params.type
+   let value = params.value
+   let query = {}
+   if ( type ==='uid' && value) {
+     query.uid = value
+   }
+   if ( type ==='email' && value) {
+     query.email = value
+   }
+   User.find(query)
+      .sort({'_id':-1})
+      .then( user =>{
+       let skip = (parseInt(params.page-1))*parseInt(params.num)
+       let limit = parseInt(params.num)
+       User.find(query)
+          .sort({'_id':-1})
+          .skip(skip)
+          .limit(limit) 
+          .exec()
+          .then( select => {
+          if (!select) throw ('无数据')
+          res.json({
+            code: 1,
+            data: {
+              select,
+              user
+            },
+            msg: '获取成功'
+          })
+        })
+          .catch( err => res.json('当前系统繁忙'))
+      })
+      .catch( err => res.json('当前系统繁忙'))
+    } catch (e) {
+      res.json({
+        code:-1,
+        data:'',
+        msg:e
+      })
+    }
 })
 // 配置文件下载
 router.get("/download/APK", (req, res)=>{
@@ -565,5 +565,9 @@ router.get("/download/APK", (req, res)=>{
 
 router.get("/download/SDK", (req, res)=>{
     res.download("public/download/logpay-phpsdk.zip")
+})
+
+router.get("/download/VX", (req, res)=>{
+    res.download("public/download/vx.apk")
 })
 module.exports = router

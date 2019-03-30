@@ -61,7 +61,7 @@ export default {
          .catch(err=> this.$message.error(err))
     },
     back() {
-        location.href = '/'
+        location.href = 'https://www.logpay.cn/account/#/login'
     }
   }
 }

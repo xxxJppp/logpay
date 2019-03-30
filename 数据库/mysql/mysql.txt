@@ -1,0 +1,41 @@
+# wget http://dev.mysql.com/get/mysql-apt-config_0.2.1-1debian7_all.deb
+# 	dpkg -i mysql-apt-config_0.2.1-1debian7_all.deb   //安装时选1，使用5.6版本。
+# apt-get update
+# apt-get install mysql-server
+
+sudo passwd root
+
+
+选择数据库：use mysql;
+
+修改密码：UPDATE user SET password=PASSWORD('123456') WHERE user='root';
+
+刷新：flush privileges;
+
+退出：exit;
+
+这样就完成了
+
+
+CREATE TABLE `cSessionInfo` (
+	`open_id` VARCHAR(100) NOT NULL COLLATE 'utf8mb4_unicode_ci',
+	`uuid` VARCHAR(100) NOT NULL COLLATE 'utf8mb4_unicode_ci',
+	`skey` VARCHAR(100) NOT NULL COLLATE 'utf8mb4_unicode_ci',
+	`create_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	`last_visit_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	`session_key` VARCHAR(100) NOT NULL COLLATE 'utf8mb4_unicode_ci',
+	`user_info` VARCHAR(2048) NOT NULL COLLATE 'utf8mb4_unicode_ci',
+	PRIMARY KEY (`open_id`),
+	INDEX `openid` (`open_id`) USING BTREE,
+	INDEX `skey` (`skey`) USING BTREE
+)
+COMMENT='会话管理用户信息'
+COLLATE='utf8mb4_unicode_ci'
+ENGINE=InnoDB
+;
+
+truncate table xxx;
+net start mysql启动服务器
+mysqld -install 下载
+mysql -uroot -p
+create database cAuth;

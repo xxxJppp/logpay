@@ -168,7 +168,7 @@ img::-moz-selection {
 }
 
 header.masthead {
-  padding-top: 10rem;
+  padding-top: 6rem;
   padding-bottom: calc(10rem - 56px);
   background-image: url("../img/top.png");
   background-position: center center;
@@ -207,7 +207,6 @@ header.masthead p {
   header.masthead {
     height: 100vh;
     min-height: 650px;
-    padding-top: 0;
     padding-bottom: 0;
   }
   header.masthead h1 {
@@ -301,8 +300,8 @@ header.masthead p {
 }
 
 .btn-xl {
-  padding: 1rem 2rem;
-  margin: 10px 20px;
+  padding: 1rem 1.8rem;
+  margin: 10px 5px;
 }
 
 .btn-primary {

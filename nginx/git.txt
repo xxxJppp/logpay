@@ -1,0 +1,69 @@
+在要同步的文件夹下，注意“要在同步的文件夹下（进去）”操作，
+
+    1创建仓库：
+    右键 选择 “” GIT Bash here “” 进如 Git 界面 ，（显示路径是你文件夹的路径）
+
+    2 首次使用码云配置 输入：
+
+    `
+    git config --global user.email "you@example.com"
+
+    git config --global user.name “Your Name”
+    `
+    (注意，直接复制时，需检查 config 与 global ，中间是两个短号 )
+    注释：定义你的名称和email确定你的身份，就是注册码云时候记下来的。
+
+    3 （对文件夹首次链接使用）对目标仓库克隆，输入
+
+git clone https://gitee.com/码云名字/项目名称.git  
+
+    1
+
+注释：这里的 URL第一步找的URL，复制自己的URL
+文件夹首次链接会出现：
+
+Cloning into '项目名称'...
+remote: Counting objects: 22, done.
+remote: Compressing objects: 100% (18/18), done.
+remote: Total 22 (delta 2), reused 0 (delta 0)
+Unpacking objects: 100% (22/22), done.）
+
+    1
+    2
+    3
+    4
+    5
+
+首次使用的时候会跳出界面，让你输码云 用户名 和 密码 。输完就继续操作。
+
+    4 对当前目录进行初始化。输入：
+
+git init
+
+    5 更新本地存储库（首次链接不需要，但是以后使用需要先跟新本地，后同步码云）
+
+git pull 项目名 master --allow-unrelated-histories
+  master是项目的默认分支，
+“–allow-unrelated-histories”，是为了防止git pull 失败 ,提示：fatal: refusing to merge unrelated histories（拒绝合并无关的历史）
+
+    6 将当前文件夹中的所有文件都提交
+    git add .
+
+    7 对提交的动作进行说明
+    git commit -m ‘说明内容’
+
+    8 连接远程仓库
+
+    链接为的项目链接
+
+    git remote add yyyy https://gitee.com/** **/****.git
+
+其中yyyy是仓库地址的简短名字（自定义别名），链接是项目的URL。
+
+    9 上传
+    git push yyyy master
+--------------------- 
+作者：云南省高校数据化运营管理工程研究中心 
+来源：CSDN 
+原文：https://blog.csdn.net/m0_37788308/article/details/79032816 
+版权声明：本文为博主原创文章，转载请附上博文链接！

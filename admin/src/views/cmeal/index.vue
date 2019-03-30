@@ -90,7 +90,7 @@ export default {
                      }
                 } else if (this.meal == 'mf') {
                     let date = new Date()
-                    let now = `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')}`
+                    let now = `${date.getFullYear()}-${('0' + (date.getMonth()+1).toString()).slice(-2)}-${('0' + date.getDate().toString()).slice(-2)}`
                     if (this.value2 == 'bb') {
                        return this.time
                      }
@@ -108,7 +108,7 @@ export default {
                        return this.time
                      }
                     let date = new Date()
-                    let now = `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')}`
+                    let now = `${date.getFullYear()}-${('0' + (date.getMonth()+1).toString()).slice(-2)}-${('0' + date.getDate().toString()).slice(-2)}`
                     if (this.value2 == 'ygy') {
                         return this.getTime(now,1)
                      } else if (this.value2 == 'sgy') {
@@ -175,7 +175,7 @@ export default {
             let m1 = this.mealtime.substring(5,7)
             let d1 = this.mealtime.substring(8,10)
             let date = new Date()
-            let now = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')} ` 
+            let now = `${date.getFullYear()}-${('0' + (date.getMonth()+1).toString()).slice(-2)}-${('0' + date.getDate().toString()).slice(-2)}`
             let y2 = now.substring(0,4)
             let m2 = now.substring(5,7)
             let d2 = now.substring(8,10)
@@ -212,7 +212,7 @@ export default {
         date.setMonth(m1)
         date.setDate(d1)
         date.setMonth(date.getMonth()+ month -1 )
-        return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')}`
+        return `${date.getFullYear()}-${('0' + (date.getMonth()+1).toString()).slice(-2)}-${('0' + date.getDate().toString()).slice(-2)}`
       },
       submit() {
         if (this.value1 == 'mf' && this.meal == 'mf') {
@@ -232,7 +232,7 @@ export default {
       gettime() {
         if (this.value1 == 'mf') {
           let date = new Date()
-          this.time = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')} ` 
+          this.time = `${date.getFullYear()}-${('0' + (date.getMonth()+1).toString()).slice(-2)}-${('0' + date.getDate().toString()).slice(-2)}` 
         } else {
           this.time = this.mealtime
         }

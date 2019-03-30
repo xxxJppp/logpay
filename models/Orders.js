@@ -15,7 +15,7 @@ let orderSchema = new Schema({
     },
     orderUid: {
         type: String,
-        required: true
+        required: false
     },
     orderName: {
         type: String,

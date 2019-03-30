@@ -1,4 +1,4 @@
-@charset "UTF-8";
+﻿@charset "UTF-8";
 html {
     font-size: 62.5%;
     font-family: 'helvetica neue', tahoma, arial, 'hiragino sans gb', 'microsoft yahei', 'Simsun', sans-serif
@@ -235,10 +235,10 @@ body, .body {
 }
 
 .mod-ct .tip {
-    margin-top: 20px;    
+    padding:10px 0;
     border-top: 1px dashed #e5e5e5;
-    padding: 10px 0;
-    position: relative
+    position: relative;
+    height: 100%;
 }
 
 .mod-ct .tip .ico-scan {
@@ -283,9 +283,9 @@ body, .body {
 
 .foot {
     text-align: center;
-    margin: 30px auto;
-    color: #888888;
-    font-size: 12px;
+    margin: 0 auto;
+    color: red;
+    font-size: 14px;
     line-height: 20px;
     font-family: "simsun"
 }

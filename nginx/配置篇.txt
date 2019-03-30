@@ -1,0 +1,68 @@
+fdisk -f
+df -h
+adduser zhoulei 增加一个相对底权限的用户
+
+gpasswd -a zhoulei sudo增加权力
+sudo visudo
+
+安全设置
+ssh-keygen -t rsa -b 4096 -C "963359789@qq.com"
+
+eavl "$(ssh-agent -s)"
+
+cd .ssh
+ssh-add ~/.ssh/id_rsa
+vi authorized_keys
+然后取本地的id_rsa.pub到authorized_keys
+chmod 600 authorized_keys
+sudo service ssh restart
+
+sudo vi /etc/ssh/sshd_config
+修改port
+AllowUsers zhoulei123
+
+sudo apt-get update && sudo apt-get upgrade
+sudo iptables -F
+vi /etc/iptables.up.rules
+
+sudo iptables-restore < /etc/iptables.up.rules
+sudo ufw status
+sudo ufw enable
+sudo vi /etc/network/if-up.d/iptables
+在里面输入脚本
+#!/bin/sh
+iptables-restore /etc/iptables.up.rules
+
+
+
+sudo chmod +x /etc/network/if-up.d/iptables
+ip锁定
+sudo apt-get install fail2ban
+sudo vi /etc/fail2ban/jail.conf
+进入文件进行修改
+
+sudo service fail2ban status查看是否运行
+sudo service fail2ban stop
+sudo service fail2ban start
+
+在内网架设一台跳板机
+会更安全
+sudo apt-get install vim openssl build-essential libssl-dev wget curl git
+wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
+nvm install v8.12.0
+nvm use v8.12.0
+nvm alias default v8.12.0	
+
+
+npm --registry=https://registry.npm.taobao.org install -g npm
+echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+
+cnpm sync koa
+
+npm i pm2 webpack gulp grunt-cli -g
+
+sudo apt-get install nginx
+sudo nginx -t
+sudo nginx -s reload
+
+http://pm2.keymetrics.io

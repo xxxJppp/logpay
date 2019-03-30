@@ -1,0 +1,4 @@
+npm i pm2 -g
+npm i pm2-windows-service -g
+pm2-service-install -n myservice
+pm2-service-uninstall

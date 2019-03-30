@@ -11,6 +11,7 @@ const tools = new Tools()
 // 安卓客户端回调
 router.get('/server/api/updateOrder',(req, res)=>{
     let { price, sign, type, e ,p} = req.query
+	console.log(req.query)
     if(tools.md5(tools.md5(price + type) + p) === sign) {
         User.findOne( {email:e} )
             .then( user => {
@@ -31,7 +32,7 @@ router.get('/server/api/updateOrder',(req, res)=>{
                                          .then(order=> {
 											    let { pay_price, price ,payType,orderName, orderUid , orderNumber, sign1, sign2, notify_url,status, return_url, uid, expire,fee, pid} = order[0]
                                                 Order.updateOne({orderNumber,uid,pay_price,payType }, { status : 1 })
-                                                     .then(successOrder=>{		 
+                                                     .then(successOrder=>{	 
 														 // 异步通知
 													let requestData = {
 														orderUid,
@@ -51,8 +52,8 @@ router.get('/server/api/updateOrder',(req, res)=>{
 															body: requestData
 														}, (error, response, body) => {
 															if (!error && response.statusCode == 200) {
-																
 																//异步回调成功
+																console.log(body)
 																if (body === 'SUCCESS') {
 																	let date = new Date()
 																	let YearMD = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')} `
@@ -136,6 +137,7 @@ router.get('/server/api/updateOrder',(req, res)=>{
 // 安卓客户端登陆验证
 router.get('/server/api/setting',(req, res)=>{
     let { apiurl, secretkey, sign } = req.query
+	console.log(req.query)
     if (tools.md5(tools.md5(apiurl) + secretkey) == sign) {
         User.findOne( {email:apiurl} )
             .then( user => {

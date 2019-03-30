@@ -201,7 +201,7 @@ router.delete('/qrcode/del', async (req, res) => {
 })
 
 // 转二维码
-router.get('/qrcode/image', (req, res)=>{
+router.get('/qrcode/image',async (req, res)=>{
 	let data = req.query
 	let imageText = data.text
 	if (data.actionType) {
@@ -212,5 +212,24 @@ router.get('/qrcode/image', (req, res)=>{
 	}
 	let codeImage = qr_image.image(imageText,{type: 'png',margin: 1});
 	codeImage.pipe(res)
+})
+
+router.get('/qrcode/codeBase64', async(req, res)=>{
+	let imgData = (url) => {
+		return new Promise((resolve, reject) => {
+			request.get({
+				url: url,
+				encoding: null // 指定编码
+			}, (error, response, body) => {
+				if (error) {
+					reject('请求图片url失败')
+				} else {
+					resolve(body.toString('Base64'))
+				}
+			})
+		})
+	}
+	let imageDataBase64 = await imgData('https://api.logpay.cn/qrcode/image?text=' + req.query.text)
+	res.send(imageDataBase64)
 })
 module.exports = router;

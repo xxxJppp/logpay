@@ -9,13 +9,11 @@ import '@/styles/index.scss' // global css
 import App from './App'
 import store from './store'
 import router from './router'
-
 import '@/icons' // icon
 import '@/permission' // permission control
 
 Vue.prototype.$staticUrl = 'http://logpay.qdzhan.cn/'
 Vue.use(ElementUI)
-
 Vue.config.productionTip = false
 
 new Vue({

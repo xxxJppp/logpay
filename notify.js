@@ -52,15 +52,14 @@ process.on('message', (remoteData) => {
 						})
 						.catch('fee-no-user')
 					}
+				    try {
+						  return process.kill(remoteData.pid,'SIGTERM')		 
+						} catch (e) {
+							return console.log(e)
+					}
 					//升级status
 					Order.updateMany( { orderNumber:remoteData.orderNumber}, {status:2, pay_time,expire:0})
-						 .then( end =>{
-							try {
-								  return process.kill(remoteData.pid,'SIGTERM')		 
-								} catch (e) {
-									return console.log(e)
-							}
-						 })
+						 .then()
 						 .catch(err => res.send('请联系客服!'))
 				}
 			}

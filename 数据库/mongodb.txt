@@ -1,0 +1,2 @@
+mongoimport -h 127.0.0.1:port -u xxx -p xxx-d DataBaseName -c CollectionName XXX.dat
+mongoexport -d DataBaseName -c CollectionName -o XXX.dat
