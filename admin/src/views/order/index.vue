@@ -54,15 +54,16 @@
       </el-table-column>
       <el-table-column prop="createTime" label="创建时间" align="center">
       </el-table-column>
-      <el-table-column prop="pay_time" label="支付时间" align="center">
+      <el-table-column prop="payTime" label="支付时间" align="center">
       </el-table-column>
       <el-table-column prop="payType" label="支付渠道" align="center">
         <template slot-scope="scope">
-            <span v-if="scope.row.payType == 'alipay'">支付宝</span>
-            <span v-else>微信支付</span>
+            <span v-if="scope.row.payType == 'alipay'">支付宝(个人)</span>
+            <span v-if="scope.row.payType == 'alipayf2f'">支付宝(原生)</span>
+            <span v-if="scope.row.payType == 'wxpay'">微信(个人)</span>
         </template>
       </el-table-column>
-      <el-table-column prop="pay_price" label="支付金额" align="center">
+      <el-table-column prop="payPrice" label="支付金额" align="center">
       </el-table-column>
       <el-table-column prop="fee" label="服务费" align="center">
       </el-table-column>
@@ -154,10 +155,15 @@ export default {
           },
           {
             value1: 'alipay',
-            label: '支付宝'
-          }, {
+            label: '支付宝(个人)'
+          },
+          {
+            value1: 'alipayf2f',
+            label: '支付宝(原生)'
+          },
+          {
             value1: 'wxpay',
-            label: '微信'
+            label: '微信(个人)'
           }],
           value1: null,
         // 支付状态得选择
@@ -260,7 +266,7 @@ export default {
         this.listLoading = false
         import('@/vendor/Export2Excel').then(excel => {
         const tHeader = ['商品名称', '订单号','订单IP', '用户名', '支付渠道', '创建时间', '支付时间', '支付金额', '价格', '服务费', '状态']
-        const filterVal = ['orderName', 'orderNumber', 'ip', 'orderUid', 'payType', 'createTime', 'pay_time', 'pay_price','price', 'fee', 'status']
+        const filterVal = ['orderName', 'orderNumber', 'ip', 'orderUid', 'payType', 'createTime', 'payTime', 'payPrice','price', 'fee', 'status']
         this.exportList = res.data.data.order
         this.exportList.map(v=>{
           v.createTime = `${v.createTime.substring(0,10)} ${v.createTime.substring(11,19)}`
@@ -283,9 +289,11 @@ export default {
         if (j === 'timestamp') {
           return parseTime(v[j])
         } else if (v[j] === 'alipay') {
-          return '支付宝'
+          return '支付宝(个人)'
+        } else if (v[j] === 'alipayf2f') {
+          return '支付宝(原生)'
         } else if (v[j] === 'wxpay') {
-          return '微信支付'
+          return '微信支付(个人)'
         } else if (v[j] === -1) {
           return '未支付'
         } else if (v[j] === 1) {

@@ -168,9 +168,9 @@ img::-moz-selection {
 }
 
 header.masthead {
-  padding-top: 6rem;
+  padding-top: 12rem;
   padding-bottom: calc(10rem - 56px);
-  background-image: url("../img/top.png");
+  background-image: url("../img/top.jpg");
   background-position: center center;
   -webkit-background-size: cover;
   -moz-background-size: cover;
@@ -195,6 +195,16 @@ header.masthead p {
   .sp {
     display: block;
   }
+  header.masthead {
+  padding-top: 8rem;
+  padding-bottom: calc(10rem - 56px);
+  background-image: url("../img/top.jpg");
+  background-position: center center;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
 }
 
 @media (min-width: 768px) {

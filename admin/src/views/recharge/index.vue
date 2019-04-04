@@ -53,12 +53,12 @@ export default {
       },
     methods: {
         alipay() {
-                if(parseFloat(this.money)<=0) return false
-                location.href = `https://api.logpay.cn/sdk/pay?price=${this.money}&payType=alipay&orderUid=${this.uid}&orderName=LogPay账户充值`
+            if(parseFloat(this.money)<=0) return false
+            location.href = `https://api.logpay.cn/sdk/pay?price=${this.money}&payType=alipay&orderUid=${this.uid}&orderName=LogPayRecharge`
         },
         wxpay() {
              if(parseFloat(this.money)<=0) return false
-                location.href = `https://api.logpay.cn/sdk/pay?price=${this.money}&payType=wxpay&orderUid=${this.uid}&orderName=LogPay账户充值`
+             location.href = `https://api.logpay.cn/sdk/pay?price=${this.money}&payType=wxpay&orderUid=${this.uid}&orderName=LogPayRecharge`
         },
         select(item,moneyList) {
             this.money = moneyList.money

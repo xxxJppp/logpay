@@ -18,15 +18,15 @@ router.get('/sdk/pay', (req, res)=>{
     let HoursMS = `${date.getHours().toString().padStart(2,'0')}${date.getMinutes().toString().padStart(2,'0')}${date.getSeconds().toString().padStart(2,'0')}`
     let Random = `${Math.floor(Math.random()*(999999-100000+1)+100000)}`
     let orderNumber = YearMD + HoursMS + Random
-    let data = { payType, price, orderUid, orderName, orderNumber, return_url:config.return_url, notify_url:config.notify_url }
+    let data = { payType, price, orderUid, orderName, orderNumber, returnUrl:config.returnUrl, notifyUrl:config.notifyUrl }
     let sign = logpay.Sign(data)
     res.render('post.html',{
-        payType, price, orderUid, orderName, orderNumber, return_url:config.return_url, notify_url:config.notify_url,sign,uid:config.uid
+        payType, price, orderUid, orderName, orderNumber, returnUrl:config.returnUrl, notifyUrl:config.notifyUrl,sign,uid:config.uid
     })
 })
 router.post('/sdk/notify',(req, res)=>{
-    let { orderUid, pay_price, price, orderNumber, sign1 ,sign2} = req.body
-    let data = { orderUid, pay_price, price, orderNumber, sign1 }
+    let { orderUid, payPrice, price, orderNumber, signs ,callbackSign } = req.body
+    let data = { orderUid, payPrice, price, orderNumber, signs }
     let sign = logpay.Signfornotify(data)
     Order.findOne({orderNumber})
 	     .then(order => {
@@ -34,7 +34,7 @@ router.post('/sdk/notify',(req, res)=>{
 				 return res.send('SUCCESS')
 			 }
 		 })
-	if (sign === sign2) {
+	if (sign === callbackSign) {
         if (orderUid === '10001') {
             User.findOne({uid:'10001'})
                 .then( admin => {

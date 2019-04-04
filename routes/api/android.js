@@ -28,22 +28,23 @@ router.get('/server/api/updateOrder',(req, res)=>{
                                     if (type === 'wechat') {
                                         type = 'wxpay'
                                     }
-                                    Order.find({ uid:user.uid, pay_price: price, payType: type, status: -1 ,expire: { $gt: 0, $lt: 300 }})
+                                    Order.find({ uid:user.uid, payPrice: price, payType: type, status: -1 ,expire: { $gt: 0, $lt: 300 }})
                                          .then(order=> {
-											    let { pay_price, price ,payType,orderName, orderUid , orderNumber, sign1, sign2, notify_url,status, return_url, uid, expire,fee, pid} = order[0]
-                                                Order.updateOne({orderNumber,uid,pay_price,payType }, { status : 1 })
+											    let { payPrice, price ,payType,orderName, orderUid , orderNumber, signs, callbackSign, notifyUrl,status, returnUrl, uid, expire,fee, pid} = order[0]
+                                                Order.updateOne({orderNumber,uid,payPrice,payType }, { status : 1 })
                                                      .then(successOrder=>{	 
 														 // 异步通知
 													let requestData = {
 														orderUid,
-														pay_price,
+														payType,
+														payPrice,
 														orderNumber,
-														sign1,
+														sign:signs,
 														price,
-														sign2
+														callbackSign
 													}
 														request({
-															url: notify_url,
+															url: notifyUrl,
 															method: "POST",
 															json: true,
 															headers: {
@@ -51,6 +52,7 @@ router.get('/server/api/updateOrder',(req, res)=>{
 															},
 															body: requestData
 														}, (error, response, body) => {
+															console.log(body)
 															if (!error && response.statusCode == 200) {
 																//异步回调成功
 																console.log(body)
@@ -58,7 +60,7 @@ router.get('/server/api/updateOrder',(req, res)=>{
 																	let date = new Date()
 																	let YearMD = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')} `
 																	let HoursMS = `${date.getHours().toString().padStart(2,'0')}:${date.getMinutes().toString().padStart(2,'0')}:${date.getSeconds().toString().padStart(2,'0')}`
-																	let pay_time = YearMD + HoursMS
+																	let payTime = YearMD + HoursMS
 																	try {
 																		process.kill(pid,'SIGTERM')
 																	} catch(e) {
@@ -90,14 +92,14 @@ router.get('/server/api/updateOrder',(req, res)=>{
 																		.catch('fee-no-user')
 																	}
 																	//升级status
-																	Order.updateMany( { orderNumber}, {status:2, pay_time,expire:0})
+																	Order.updateMany( { orderNumber}, {status:2, payTime,expire:0})
 																		 .then()
 																		 .catch(err => res.send('请联系客服!'))
 																} else {
 																	const childProcess = require('child_process')
 										                            let childNotify = childProcess.fork('./notify.js')
 																	requestData.pid = childNotify.pid
-																	requestData.notify_url = notify_url
+																	requestData.notifyUrl = notifyUrl
 																	requestData.Pid = pid
 																    requestData.uid = uid
 																	requestData.fee = fee
@@ -115,7 +117,7 @@ router.get('/server/api/updateOrder',(req, res)=>{
                                          .catch( err => {
 											 let missOrder = new MissOrder({
 												 uid:user.uid,
-												 pay_price:price,
+												 payPrice:price,
 												 payType:type,
 												 createTime:tools.localDate()
 											 })

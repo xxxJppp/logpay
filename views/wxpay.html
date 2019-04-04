@@ -64,11 +64,11 @@
                 <div  class="tip-text">
                     <p id="showtext ico-scan">打开微信 [扫一扫]</p>
                 </div>
-				<!--<p style="font-size:22px;color:red;margin-top:10px;">请付款 <span style="font-size:20px;color:green;">{{ pay_price }}</span> 元 注意不要多付或者少付 防止充值不到帐</p>-->
+				<!--<p style="font-size:22px;color:red;margin-top:10px;">请付款 <span style="font-size:20px;color:green;">{{ payPrice }}</span> 元 注意不要多付或者少付 防止充值不到帐</p>-->
             </div>
             <div id="phone" class="foot" style="display:none;">
                 <div class="inner" >
-                    <p style="font-size:22px;">请付款 <span style="font-size:20px;color:green;">{{ pay_price }}</span> 元 注意不要多付或者少付</p>
+                    <p style="font-size:22px;">请付款 <span style="font-size:20px;color:green;">{{ payPrice }}</span> 元 注意不要多付或者少付</p>
                 </div>
             </div>
         </div>
@@ -78,7 +78,7 @@
     <div id="expire" style="display: none;">{{ expire }}</div>
     <div id="uid" style="display: none;">{{ uid }}</div>
     <div id="price" style="display:none">{{ price }}</div>
-    <div id="pay_price" style="display:none">{{ pay_price }}</div>
+    <div id="payPrice" style="display:none">{{ payPrice }}</div>
 </div>
 <script type="text/javascript">
     $(document).ready(function(){
@@ -96,9 +96,6 @@
 		$('#phonePay').css('display','none')
         $('#pc').css('display','inline')
 		}
-//       $.get('/qrcode/codeBase64?text=' + $('#codeUrl').html(),function(data){
-//          $("#qrcode").attr("src",'data:image/png;base64,' + data)
-//        })
      })
      var expires_in = $('#expire').html()
             var do_expire = function (h) {
@@ -119,8 +116,8 @@
     var orderNumber = $('#orderNumber').html()
     var uid = $('#uid').html()
 	var price = $('#price').html()
-	var pay_price = $('#pay_price').html()
-	var random_price = (parseFloat(price) - parseFloat(pay_price)).toFixed(2,'0')
+	var payPrice = $('#payPrice').html()
+	var random_price = (parseFloat(price) - parseFloat(payPrice)).toFixed(2,'0')
 	if ( parseFloat(random_price) !== 0.00 ) {
 	    $('#random_price').html('随机立减 ' + parseFloat(random_price).toFixed(2,'0') + ' 元')
 	}
@@ -140,11 +137,13 @@
                      $('#orderNumber').remove()
                      window.clearInterval(myTimer)
                      $("#money").text("支付成功")
-                     $("#msg").html("<h1>即将返回商家页</h1>")
-                     $("#msg").html("<h1>即将<a href= " + data.url + ">跳转</a>回商家页</h1>")
-                     setTimeout(function () {
-                         window.location = data.url
-                     }, 500);
+                     if (data.url) {
+					     $("#msg").html("<h1>即将返回商家页</h1>")
+                         $("#msg").html("<h1>即将<a href= " + data.url + ">跳转</a>回商家页</h1>")
+						 setTimeout(function () {
+							 window.location = data.url
+						 }, 500);
+					 }
                  }
              }
         )

@@ -88,7 +88,7 @@
     <div id="expire" style="display: none;">{{ expire }}</div>
     <div id="uid" style="display: none;">{{ uid }}</div>
     <div id="price" style="display:none">{{ price }}</div>
-    <div id="pay_price" style="display:none">{{ pay_price }}</div>
+    <div id="payPrice" style="display:none">{{ payPrice }}</div>
 	<div id="money" style="display:none">{{ money }}</div>
 </div>
 <script type="text/javascript">
@@ -123,8 +123,8 @@
     var orderNumber = $('#orderNumber').html()
     var uid = $('#uid').html()
 	var price = $('#price').html()
-	var pay_price = $('#pay_price').html()
-	var random_price = (parseFloat(price) - parseFloat(pay_price)).toFixed(2,'0')
+	var payPrice = $('#payPrice').html()
+	var random_price = (parseFloat(price) - parseFloat(payPrice)).toFixed(2,'0')
 	if ( parseFloat(random_price) !== 0.00 ) {
 	    $('#random_price').html('随机立减 ' + parseFloat(random_price).toFixed(2,'0') + ' 元')
 	}
@@ -144,11 +144,13 @@
                      $('#orderNumber').remove()
                      window.clearInterval(myTimer)
                      $("#money").text("支付成功")
-                     $("#msg").html("<h1>即将返回商家页</h1>")
-                     $("#msg").html("<h1>即将<a href= " + data.url + ">跳转</a>回商家页</h1>")
-                     setTimeout(function () {
-                         window.location = data.url
-                     }, 500);
+					 if (data.url) {
+					     $("#msg").html("<h1>即将返回商家页</h1>")
+                         $("#msg").html("<h1>即将<a href= " + data.url + ">跳转</a>回商家页</h1>")
+						 setTimeout(function () {
+							 window.location = data.url
+						 }, 500);
+					 }
                  }
              }
         )

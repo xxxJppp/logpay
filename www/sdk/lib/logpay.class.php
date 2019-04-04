@@ -18,7 +18,7 @@ class logpay {
 	}
 	
 	function Sign($Array) {
-		$Sign = md5($Array['price']. $Array['payType']. $Array['orderUid']. $Array['orderName']. $Array['orderNumber']. $Array['notify_url']. $Array['return_url']. $this -> uid. $this -> token);
+		$Sign = md5($Array['price']. $Array['payType']. $Array['orderUid']. $Array['orderName']. $Array['orderNumber']. $Array['notifyUrl']. $Array['returnUrl']. $this -> uid. $this -> token);
 		return $Sign;
 	}
 }

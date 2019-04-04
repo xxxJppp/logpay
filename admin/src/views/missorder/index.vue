@@ -34,7 +34,7 @@
       >
       <el-table-column prop="uid" label="商户号" align="center" v-if="this.roles[0] === 'admin'">
       </el-table-column>
-      <el-table-column prop="pay_price" label="未匹配价格" align="center">
+      <el-table-column prop="payPrice" label="未匹配价格" align="center">
       </el-table-column>
       <el-table-column prop="payType" label="支付渠道" align="center">
         <template slot-scope="scope">
@@ -163,7 +163,7 @@ export default {
         url: 'https://api.logpay.cn/order/getMissOrder',
         method: 'get',
         params: {
-            pay_price: money,
+            payPrice: money,
             payType:this.type,
             uid: this.uid,
             page: this.page.page,
@@ -180,7 +180,7 @@ export default {
         this.listLoading = false
         import('@/vendor/Export2Excel').then(excel => {
         const tHeader = ['未匹配金额', '支付渠道', '支付时间']
-        const filterVal = ['pay_price', 'payType', 'createTime']
+        const filterVal = ['payPrice', 'payType', 'createTime']
         this.exportMissList = res.data.data.missOrder
         this.exportMissList.map(v => {
             v.createTime = `${v.createTime.substring(0,10)} ${v.createTime.substring(11,19)}`
@@ -225,7 +225,7 @@ export default {
             url: 'https://api.logpay.cn/order/getMissOrder',
             method: 'get',
             params: {
-                pay_price:money,
+                payPrice:money,
                 payType:this.type,
                 uid: this.uid,
                 page: this.page.page,

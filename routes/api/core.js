@@ -1,4 +1,5 @@
 ﻿const express = require('express')
+const app = express()
 const router = express.Router()
 const Tools = require('../../config/utils')
 //引用 mongodb
@@ -50,18 +51,131 @@ function mealTime(mealtime) {
     }
   }
 router.post('/server/api/pay', async (req,res)=>{
-    let { uid, price, orderNumber, payType, notify_url, return_url, sign, orderUid, orderName, ip } = req.body
+	let { uid, price, orderNumber, payType, notifyUrl, returnUrl, sign, orderUid, orderName, ip } = req.body
     // 获取指定用户的token
     let token = tools.getToken(uid)
     // 首次加密
-	console.log(req.body)
-    let sign1 =  tools.md5( price + payType + orderUid + orderName + orderNumber + notify_url + return_url + uid + token)
-    price = parseFloat(price).toFixed(2)
-    let pay_price
-    if (!pay_price) {
-       pay_price = price        
+    let signs =  tools.md5( price + payType + orderUid + orderName + orderNumber + notifyUrl + returnUrl + uid + token)
+	price = parseFloat(price).toFixed(2)
+	if(isNaN(price) || price <= 0) {
+		return res.send("金额输入错误");
+	}
+	let fee
+	let payPrice
+    if (!payPrice) {
+       payPrice = price        
     }
-    let fee
+	if (payType === 'alipayf2f') {
+		// 16进制编码
+		function encodeUrl (data) {
+		let str = data.split('').map(v=>{
+			return v.charCodeAt().toString(16)
+		})
+		str = str.join('')
+		let arr = []
+		while (str.length > 0) {
+			arr.push(str.substring(0, 2))
+			str = str.substring(2, str.length)
+		}
+		return ('%' + arr.join('%')).toUpperCase()
+		}
+	 if (sign === signs) {
+		let urlencode = require('urlencode')
+		async function orderNumberFind (orderNumber) {
+        return new Promise((resolve, reject)=>{
+            Order.findOne({orderNumber})
+                 .then(order => resolve(order))
+                 .catch(err => reject(err))
+        })
+		}
+		let o = await orderNumberFind(orderNumber)
+		if (o) {
+			if (o.status === 2) {
+				return res.json('订单已支付')
+			}
+			if (o.status === 1) {
+				return res.json('回调通知失败,请联系客服')            
+			}
+			if(o.status === -1) {
+				if (o.expire === 0) {
+				return res.json('订单已过期!,请重新发起支付!')                
+				} else if (o.expire < 300 && o.expire > 0) {
+					let h5Url = 'https://render.alipay.com/p/s/i?scheme=' + urlencode.encode( 'alipays://platformapi/startapp?saId=10000007&qrcode=' + encodeUrl(o.qrCode + '?_s=web-other'))
+					let deviceAgent = req.headers["user-agent"].toLowerCase()
+					let agentID = deviceAgent.match(/(iphone|ipod|ipad|android)/)
+					if(agentID){
+						return res.redirect(h5Url)
+					}else{
+						return res.render('alipayf2f.html',{
+						codeUrl:o.qrCode,
+						orderNumber:o.orderNumber,
+						price:o.price,
+						orderName:o.orderName,
+						uid:o.uid
+					})
+					}
+				}
+		}
+		}
+		if (!o) {
+		req.alipayf2f.createQRPay({
+			tradeNo: orderNumber,
+			subject: orderName,
+			totalAmount: price,
+			body: orderName,
+			timeExpress: 5,
+		})
+		.then(result => {
+			console.log(result)
+			if(result.code != 10000) {
+				return res.send("支付宝网关返回错误, 请联系客服")
+			}
+			let { outTradeNo, qrCode, msg, code } = result
+            // 出码
+			if (code == 10000 && msg == 'Success' && orderNumber === outTradeNo) {
+				let h5Url = 'https://render.alipay.com/p/s/i?scheme=' + urlencode.encode( 'alipays://platformapi/startapp?saId=10000007&qrcode=' + encodeUrl(qrCode + '?_s=web-other'))
+				let payTime = '未支付'
+				let expire = 300
+				let status = -1 //未支付状态
+				let createTime = tools.localDate()
+				fee = parseFloat(0.018*price).toFixed(3,'0')
+				let merchantIp = tools.getClientIP(req)
+			    const childProcess = require('child_process')
+			    let childTimer = childProcess.fork('./timer.js')
+			    let pid = childTimer.pid
+				let f2fOrder = new Order({
+					payPrice,price,payType,orderUid,orderName,orderNumber,payTime,notifyUrl,returnUrl,uid,token,signs,status,fee,createTime,ip,merchantIp,pid,expire,qrCode
+				})
+				f2fOrder.save()
+					 .then(ordersave=>{
+							childTimer.send({
+								orderNumber,
+								expire,
+								pid
+							})
+					 })
+					 .catch(err =>{return res.json('f2f-save-error')})
+				let deviceAgent = req.headers["user-agent"].toLowerCase()
+				let agentID = deviceAgent.match(/(iphone|ipod|ipad|android)/)
+				if(agentID){
+					return res.redirect(h5Url)
+				}else{
+				    return res.render('alipayf2f.html',{
+					codeUrl:qrCode,
+					orderNumber:outTradeNo,
+					price,
+					orderName,
+					uid
+				})
+				}
+		}
+		})
+		.catch(error => {
+			res.send(error)
+		})
+		}
+		}
+	} else {
     async function orderNumberFind (orderNumber, uid, orderUid, payType, price) {
         return new Promise((resolve, reject)=>{
             Order.findOne({orderNumber, uid, orderUid, payType, price})
@@ -69,7 +183,7 @@ router.post('/server/api/pay', async (req,res)=>{
                  .catch(err => reject(err))
         })
     }
-    let o = await orderNumberFind(orderNumber, uid, orderUid, payType, price, pay_price)
+    let o = await orderNumberFind(orderNumber, uid, orderUid, payType, price, payPrice)
     if (o) {
         if (o.status === 2) {
             return res.json('订单已支付!')
@@ -89,28 +203,28 @@ router.post('/server/api/pay', async (req,res)=>{
                                 }
                                 // 如果没有useid
                                 if(user.userid) {
-                                    let alipayCodeUrl = 'alipays://platformapi/startapp?appId=20000123&actionType=scan&biz_data={"s":"money","u":"'+ user.userid +'","a":"'+o.pay_price+'","m":""}'
+                                    let alipayCodeUrl = 'alipays://platformapi/startapp?appId=20000123&actionType=scan&biz_data={"s":"money","u":"'+ user.userid +'","a":"'+o.payPrice+'","m":""}'
                                     return res.render('alipay.html',{
-										    money: o.pay_price,
+										    money: o.payPrice,
                                             price: o.price,
-											pay_price: o.pay_price,
+											payPrice: o.payPrice,
                                             orderNumber: o.orderNumber,
                                             codeUrl: alipayCodeUrl,
                                             expire: o.expire,
 											uid: o.uid
                                         })
                                     } else {
-                                    Qrcode.findOne({price:o.pay_price, uid, type:'支付宝'})
+                                    Qrcode.findOne({price:o.payPrice, uid, type:'支付宝'})
                                             .then( qrcode =>{
                                                 if (!qrcode) {
                                                 Qrcode.findOne({price:'不固定金额', uid, type:'支付宝'})
                                                         .then( qrcode =>{
                                                             return res.render('alipay.html',{
-																money: '请手动输入 '+o.pay_price,
+																money: '请手动输入 '+o.payPrice,
                                                                 price: o.price,
-											                    pay_price: o.pay_price,
+											                    payPrice: o.payPrice,
                                                                 orderNumber: o.orderNumber,
-                                                                codeUrl: qrcode.pay_url,
+                                                                codeUrl: qrcode.payUrl,
                                                                 expire: o.expire,
 																uid: o.uid
                                                             })
@@ -118,11 +232,11 @@ router.post('/server/api/pay', async (req,res)=>{
                                                         .catch(err => res.json('配置错误!请您配置支付宝不固定额收款码!'))
                                                 }
                                                 return res.render('alipay.html',{
-													money: o.pay_price,
+													money: o.payPrice,
                                                     price: o.price,
-											        pay_price: o.pay_price,
+											        payPrice: o.payPrice,
                                                     orderNumber: o.orderNumber,
-                                                    codeUrl: qrcode.pay_url,
+                                                    codeUrl: qrcode.payUrl,
                                                     expire: o.expire,
 													uid: o.uid
                                                 })
@@ -133,17 +247,17 @@ router.post('/server/api/pay', async (req,res)=>{
                             .catch( err=> res.json('ali-uid-find-error'))
                     }
                     if (payType === 'wxpay') {
-                        Qrcode.findOne({price:o.pay_price, uid, type:'微信'})
+                        Qrcode.findOne({price:o.payPrice, uid, type:'微信'})
                                 .then( qrcode =>{
                                     if (!qrcode) {
                                         Qrcode.findOne({price:'不固定金额', uid, type:'微信'})
                                             .then( code =>{
                                                 res.render('wxpay.html',{
-												money: '请手动输入 '+o.pay_price,
+												money: '请手动输入 '+o.payPrice,
 												price: o.price,
-                                                pay_price: o.pay_price,
+                                                payPrice: o.payPrice,
                                                 orderNumber: o.orderNumber,
-                                                codeUrl: code.pay_url,
+                                                codeUrl: code.payUrl,
                                                 expire: o.expire,
 												uid:o.uid
                                             })
@@ -151,11 +265,11 @@ router.post('/server/api/pay', async (req,res)=>{
                                             .catch(err => res.json('配置错误!请您配置微信不固定额收款码!'))
                                     } else {
                                     res.render('wxpay.html',{
-										money: o.pay_price,
+										money: o.payPrice,
 										price: o.price,
-                                        pay_price: o.pay_price,
+                                        payPrice: o.payPrice,
                                         orderNumber: o.orderNumber,
-                                        codeUrl: qrcode.pay_url,
+                                        codeUrl: qrcode.payUrl,
                                         expire: o.expire,
 										uid:o.uid
                                     })
@@ -275,6 +389,7 @@ router.post('/server/api/pay', async (req,res)=>{
 									})
 									.catch(err => res.json('meal-find-error'))
 							} else {
+								console.log(merchant.meal)
 								Meal.findOne({mealName:merchant.meal})
 								    .then(meal =>{
 										console.log(meal.mealFee)
@@ -287,12 +402,12 @@ router.post('/server/api/pay', async (req,res)=>{
 								return res.json('商户余额不足,请及时冲值!')
 							} else {
 								// 验证签名
-                                if ( sign === sign1 ) {
+                                if ( sign === signs ) {
 								   Order.find({ uid, price, payType, status: -1, expire: { $gt: 0, $lt: 300 } })
 										.then(order1 =>{
 										let expireArr1 = order1
 										if (order1.length === 0) {
-											pay_price = price
+											payPrice = price
 										} else {
 											// 价格排序算法
 										function compareMin(property){
@@ -310,37 +425,40 @@ router.post('/server/api/pay', async (req,res)=>{
 											}
 										}
 										let expireArr2 = expireArr1
-										expireArr1.sort(compareMin('pay_price'))
-										pay_price = expireArr1[0].pay_price - 0.01
+										expireArr1.sort(compareMin('payPrice'))
+										payPrice = expireArr1[0].payPrice - 0.01
 										// 处理算法
-										expireArr2.sort(compareMax("pay_price"))
+										expireArr2.sort(compareMax("payPrice"))
 										// 判断前面的订单排序
 										function mathTest (arr) {
 											for (let i = 0; i < arr.length; i++) {
-											if( arr[i].pay_price != (parseFloat(price) - i*0.01).toFixed(2,'0')) {
-											pay_price = parseFloat(price) - 0.01*i
-											return pay_price
+											if( arr[i].payPrice != (parseFloat(price) - i*0.01).toFixed(2,'0')) {
+											payPrice = parseFloat(price) - 0.01*i
+											return payPrice
 											}
 										}
 									}
 										if (mathTest(expireArr2)) {
-											pay_price = mathTest(expireArr2)
+											payPrice = mathTest(expireArr2)
 										}
 										}
-										pay_price = parseFloat(pay_price).toFixed(2)
+										payPrice = parseFloat(payPrice).toFixed(2)
+										if(isNaN(payPrice) || payPrice <= 0) {
+											return res.send("请稍后再试");
+										}
 										price = parseFloat(price).toFixed(2)
 										// 存数据库
-										let pay_time = '未支付'
+										let payTime = '未支付'
 										let status = -1 //未支付状态
 										let expire = 300 //支付时间排序
-										let sign2 = tools.md5( pay_price + price + orderNumber + orderUid + sign1 + token)
+										let callbackSign = tools.md5( payPrice + price + payType + orderNumber + orderUid + signs + token )
 										fee = parseFloat(fee).toFixed(3,'0')
 										const childProcess = require('child_process')
 										let childTimer = childProcess.fork('./timer.js')
 										let pid = childTimer.pid
 										let createTime = tools.localDate()
 										let order = new Order({
-											pay_price,price,payType,orderUid,orderName,orderNumber,pay_time,notify_url,return_url,uid,token,sign1,sign2,status,expire,fee,pid,createTime,ip,merchantIp
+											payPrice,price,payType,orderUid,orderName,orderNumber,payTime,notifyUrl,returnUrl,uid,token,signs,callbackSign,status,expire,fee,pid,createTime,ip,merchantIp
 										})
 										order.save()
 											 .then( ordersave=>{
@@ -354,28 +472,28 @@ router.post('/server/api/pay', async (req,res)=>{
 													.then( user =>{
 														// 如果有useid就用userid
 														if (user.userid) {
-															let alipayCodeUrl = 'alipays://platformapi/startapp?appId=20000123&actionType=scan&biz_data={"s":"money","u":"'+user.userid+'","a":"'+pay_price+'","m":""}'
+															let alipayCodeUrl = 'alipays://platformapi/startapp?appId=20000123&actionType=scan&biz_data={"s":"money","u":"'+user.userid+'","a":"'+payPrice+'","m":""}'
 															res.render('alipay.html',{
-																	money: pay_price,
+																	money: payPrice,
 																	price: price,
-																	pay_price: pay_price,
+																	payPrice: payPrice,
 																	orderNumber: orderNumber,
 																	codeUrl: alipayCodeUrl,
 																	expire: expire,
 																	uid
 																})
 														} else {
-														Qrcode.findOne({price:pay_price, uid, type:'支付宝'})
+														Qrcode.findOne({price:payPrice, uid, type:'支付宝'})
 																.then( qrcode =>{
 																	if (!qrcode) {
 																		Qrcode.findOne({price:'不固定金额', uid, type:'支付宝'})
 																			.then( qrcode =>{
 																					res.render('alipay.html',{
-																						money: '请手动输入 '+pay_price,
+																						money: '请手动输入 '+payPrice,
 																						price: price,
-																						pay_price: pay_price,
+																						payPrice: payPrice,
 																						orderNumber: orderNumber,
-																						codeUrl: qrcode.pay_url,
+																						codeUrl: qrcode.payUrl,
 																						expire: expire,
 																						uid
 																					})
@@ -383,11 +501,11 @@ router.post('/server/api/pay', async (req,res)=>{
 																			.catch(err => res.json('配置错误!请您配置支付宝不固定额收款码!'))
 																	} else {
 																		res.render('alipay.html',{
-																			money: pay_price,
+																			money: payPrice,
 																			price: price,
-																			pay_price: pay_price,
+																			payPrice: payPrice,
 																			orderNumber: orderNumber,
-																			codeUrl: qrcode.pay_url,
+																			codeUrl: qrcode.payUrl,
 																			expire: expire,
 																			uid
 																		})
@@ -399,17 +517,17 @@ router.post('/server/api/pay', async (req,res)=>{
 													.catch( err=> res.json('ali-uid-find-error'))
 											}
 											if (payType === 'wxpay') {
-												Qrcode.findOne({price:pay_price, uid, type:'微信'})
+												Qrcode.findOne({price:payPrice, uid, type:'微信'})
 													   .then( qrcode =>{
 															if (!qrcode) {
 															Qrcode.findOne({price:'不固定金额', uid, type:'微信'})
 																	.then( qrcode =>{
 																		res.render('wxpay.html',{
-																			money: '请手动输入 '+pay_price,
+																			money: '请手动输入 '+payPrice,
 																			price: price,
-																			pay_price: pay_price,
+																			payPrice: payPrice,
 																			orderNumber: orderNumber,
-																			codeUrl: qrcode.pay_url,
+																			codeUrl: qrcode.payUrl,
 																			expire: expire,
 																			uid
 																		})
@@ -417,11 +535,11 @@ router.post('/server/api/pay', async (req,res)=>{
 																	.catch(err => res.json('配置错误!请您配置微信不固定额收款码!'))
 															} else {
 															res.render('wxpay.html',{
-																money: pay_price,
+																money: payPrice,
 																price: price,
-																pay_price: pay_price,
+																payPrice: payPrice,
 																orderNumber: orderNumber,
-																codeUrl: qrcode.pay_url,
+																codeUrl: qrcode.payUrl,
 																expire: expire,
 																uid
 															})
@@ -441,13 +559,13 @@ router.post('/server/api/pay', async (req,res)=>{
 						.catch(err=>res.json('uid-meal-find-error'))
 					 } else {
 						 // 验证签名
-                        if ( sign === sign1 ) {
+                        if ( sign === signs ) {
 						fee = '0.000'
 						   Order.find({ uid, price, payType, status: -1, expire: { $gt: 0, $lt: 300 } })
 								.then(order1 =>{
 								let expireArr1 = order1
 								if (order1.length === 0) {
-									pay_price = price
+									payPrice = price
 								} else {
 									// 价格排序算法
 								function compareMin(property){
@@ -465,37 +583,37 @@ router.post('/server/api/pay', async (req,res)=>{
 									}
 								}
 								let expireArr2 = expireArr1
-								expireArr1.sort(compareMin('pay_price'))
-								pay_price = expireArr1[0].pay_price - 0.01
+								expireArr1.sort(compareMin('payPrice'))
+								payPrice = expireArr1[0].payPrice - 0.01
 								// 处理算法
-								expireArr2.sort(compareMax("pay_price"))
+								expireArr2.sort(compareMax("payPrice"))
 								// 判断前面的订单排序
 								function mathTest (arr) {
 									for (let i = 0; i < arr.length; i++) {
-									if( arr[i].pay_price != (parseFloat(price) - i*0.01).toFixed(2,'0')) {
-									pay_price = parseFloat(price) - 0.01*i
-									return pay_price
+									if( arr[i].payPrice != (parseFloat(price) - i*0.01).toFixed(2,'0')) {
+									payPrice = parseFloat(price) - 0.01*i
+									return payPrice
 									}
 								}
 							}
 								if (mathTest(expireArr2)) {
-									pay_price = mathTest(expireArr2)
+									payPrice = mathTest(expireArr2)
 								}
 								}
-								pay_price = parseFloat(pay_price).toFixed(2)
+								payPrice = parseFloat(payPrice).toFixed(2)
 								price = parseFloat(price).toFixed(2)
 								// 存数据库
-								let pay_time = '未支付'
+								let payTime = '未支付'
 								let status = -1 //未支付状态
 								let expire = 300 //支付时间排序
-								let sign2 = tools.md5( pay_price + price + orderNumber + orderUid + sign1 + token)
+								let callbackSign = tools.md5( payPrice + price + payType + orderNumber + orderUid + signs + token)
 								fee = parseFloat(fee).toFixed(3,'0')
 								const childProcess = require('child_process')
 								let childTimer = childProcess.fork('./timer.js')
 								let pid = childTimer.pid
 								let createTime = tools.localDate()
 								let order = new Order({
-									pay_price,price,payType,orderUid,orderName,orderNumber,pay_time,notify_url,return_url,uid,token,sign1,sign2,status,expire,fee,pid,createTime,ip,merchantIp
+									payPrice,price,payType,orderUid,orderName,orderNumber,payTime,notifyUrl,returnUrl,uid,token,signs,callbackSign,status,expire,fee,pid,createTime,ip,merchantIp
 								})
 								order.save()
 									 .then( ordersave=>{
@@ -509,28 +627,28 @@ router.post('/server/api/pay', async (req,res)=>{
 											.then( user =>{
 												// 如果有useid就用userid
 												if (user.userid) {
-													let alipayCodeUrl = 'alipays://platformapi/startapp?appId=20000123&actionType=scan&biz_data={"s":"money","u":"'+user.userid+'","a":"'+pay_price+'","m":""}'
+													let alipayCodeUrl = 'alipays://platformapi/startapp?appId=20000123&actionType=scan&biz_data={"s":"money","u":"'+user.userid+'","a":"'+payPrice+'","m":""}'
 													res.render('alipay.html',{
-															money: pay_price,
+															money: payPrice,
 															price: price,
-															pay_price: pay_price,
+															payPrice: payPrice,
 															orderNumber: orderNumber,
 															codeUrl: alipayCodeUrl,
 															expire: expire,
 															uid
 														})
 												} else {
-												Qrcode.findOne({price:pay_price, uid, type:'支付宝'})
+												Qrcode.findOne({price:payPrice, uid, type:'支付宝'})
 														.then( qrcode =>{
 															if (!qrcode) {
 																Qrcode.findOne({price:'不固定金额', uid, type:'支付宝'})
 																	.then( qrcode =>{
 																			res.render('alipay.html',{
-																				money: '请手动输入 '+pay_price,
+																				money: '请手动输入 '+payPrice,
 																				price: price,
-																				pay_price: pay_price,
+																				payPrice: payPrice,
 																				orderNumber: orderNumber,
-																				codeUrl: qrcode.pay_url,
+																				codeUrl: qrcode.payUrl,
 																				expire: expire,
 																				uid
 																			})
@@ -538,11 +656,11 @@ router.post('/server/api/pay', async (req,res)=>{
 																	.catch(err => res.json('配置错误!请您配置支付宝不固定额收款码!'))
 															} else {
 																res.render('alipay.html',{
-																	money: pay_price,
+																	money: payPrice,
 																	price: price,
-																	pay_price: pay_price,
+																	payPrice: payPrice,
 																	orderNumber: orderNumber,
-																	codeUrl: qrcode.pay_url,
+																	codeUrl: qrcode.payUrl,
 																	expire: expire,
 																	uid
 																})
@@ -554,17 +672,17 @@ router.post('/server/api/pay', async (req,res)=>{
 											.catch( err=> res.json('ali-uid-find-error'))
 									}
 									if (payType === 'wxpay') {
-										Qrcode.findOne({price:pay_price, uid, type:'微信'})
+										Qrcode.findOne({price:payPrice, uid, type:'微信'})
 											   .then( qrcode =>{
 													if (!qrcode) {
 													Qrcode.findOne({price:'不固定金额', uid, type:'微信'})
 															.then( qrcode =>{
 																res.render('wxpay.html',{
-																	money: '请手动输入 '+pay_price,
+																	money: '请手动输入 '+payPrice,
 																	price: price,
-																	pay_price: pay_price,
+																	payPrice: payPrice,
 																	orderNumber: orderNumber,
-																	codeUrl: qrcode.pay_url,
+																	codeUrl: qrcode.payUrl,
 																	expire: expire,
 																	uid
 																})
@@ -572,11 +690,11 @@ router.post('/server/api/pay', async (req,res)=>{
 															.catch(err => res.json('配置错误!请您配置微信不固定额收款码!'))
 													} else {
 													res.render('wxpay.html',{
-														money: pay_price,
+														money: payPrice,
 														price: price,
-														pay_price: pay_price,
+														payPrice: payPrice,
 														orderNumber: orderNumber,
-														codeUrl: qrcode.pay_url,
+														codeUrl: qrcode.payUrl,
 														expire: expire,
 														uid
 													})
@@ -601,28 +719,28 @@ router.post('/server/api/pay', async (req,res)=>{
                             }
                             // 如果没有useid
                             if(user.userid) {
-                                let alipayCodeUrl = 'alipays://platformapi/startapp?appId=20000123&actionType=scan&biz_data={"s":"money","u":"'+ user.userid +'","a":"'+order.pay_price+'","m":""}'
+                                let alipayCodeUrl = 'alipays://platformapi/startapp?appId=20000123&actionType=scan&biz_data={"s":"money","u":"'+ user.userid +'","a":"'+order.payPrice+'","m":""}'
                                 res.render('alipay.html',{
-									    money: order.pay_price,
+									    money: order.payPrice,
 									    price: order.price,
-                                        pay_price: order.pay_price,
+                                        payPrice: order.payPrice,
                                         orderNumber: order.orderNumber,
                                         codeUrl: alipayCodeUrl,
                                         expire: order.expire,
 										uid:order.uid
                                     })
                                 } else {
-                                  Qrcode.findOne({price:order.pay_price, uid, type:'支付宝'})
+                                  Qrcode.findOne({price:order.payPrice, uid, type:'支付宝'})
 										.then( qrcode =>{
 											if (!qrcode) {
 												Qrcode.findOne({price:'不固定金额', uid, type:'支付宝'})
 													.then( code =>{
 														res.render('alipay.html',{
-														money: '请手动输入 '+order.pay_price,
+														money: '请手动输入 '+order.payPrice,
 														price: order.price,
-														pay_price: order.pay_price,
+														payPrice: order.payPrice,
 														orderNumber: order.orderNumber,
-														codeUrl: code.pay_url,
+														codeUrl: code.payUrl,
 														expire: order.expire,
 														uid:order.uid
 													})
@@ -630,11 +748,11 @@ router.post('/server/api/pay', async (req,res)=>{
 													.catch(err => res.json('配置错误!请您配置支付宝不固定额收款码!'))
 											} else {
 											res.render('alipay.html',{
-												money: order.pay_price,
+												money: order.payPrice,
 												price: order.price,
-												pay_price: order.pay_price,
+												payPrice: order.payPrice,
 												orderNumber: order.orderNumber,
-												codeUrl: qrcode.pay_url,
+												codeUrl: qrcode.payUrl,
 												expire: order.expire,
 												uid:order.uid
 											})
@@ -646,17 +764,17 @@ router.post('/server/api/pay', async (req,res)=>{
                         .catch( err=> res.json('ali-uid-find-error'))
                 }
                 if (payType === 'wxpay') {
-                    Qrcode.findOne({price:order.pay_price, uid, type:'微信'})
+                    Qrcode.findOne({price:order.payPrice, uid, type:'微信'})
                             .then( qrcode =>{
                                 if (!qrcode) {
                                     Qrcode.findOne({price:'不固定金额', uid, type:'微信'})
                                         .then( code =>{
                                             res.render('wxpay.html',{
-										    money: '请手动输入 '+order.pay_price,
+										    money: '请手动输入 '+order.payPrice,
 											price: order.price,
-                                            pay_price: order.pay_price,
+                                            payPrice: order.payPrice,
                                             orderNumber: order.orderNumber,
-                                            codeUrl: code.pay_url,
+                                            codeUrl: code.payUrl,
                                             expire: order.expire,
 											uid:order.uid
                                         })
@@ -664,11 +782,11 @@ router.post('/server/api/pay', async (req,res)=>{
                                         .catch(err => res.json('配置错误!请您配置微信不固定额收款码!'))
                                 } else {
                                 res.render('wxpay.html',{
-									money: order.pay_price,
+									money: order.payPrice,
 									price: order.price,
-                                    pay_price: order.pay_price,
+                                    payPrice: order.payPrice,
                                     orderNumber: order.orderNumber,
-                                    codeUrl: qrcode.pay_url,
+                                    codeUrl: qrcode.payUrl,
                                     expire: order.expire,
 									uid:order.uid
                                 })
@@ -679,6 +797,7 @@ router.post('/server/api/pay', async (req,res)=>{
             }
     })
 	}
+	}
 })
 
 router.get('/server/api/pay', (req, res)=>{
@@ -687,7 +806,8 @@ router.get('/server/api/pay', (req, res)=>{
 
 router.post('/server/api/query', (req,res)=>{
     let { orderNumber,uid,checked }= req.body
-    // 订单查询
+    console.log(orderNumber, uid)
+	// 订单查询
     Order.findOne({ orderNumber,uid })
          .then(order=>{
 			if (!order) {
@@ -696,7 +816,7 @@ router.post('/server/api/query', (req,res)=>{
 					msg: '订单不存在'
 				})
 			}
-			let { pay_price, price ,payType,orderName, orderUid , orderNumber, sign1, sign2, notify_url,status, return_url, uid, expire,fee, pid, Pid} = order
+			let { payPrice, price ,payType,orderName, orderUid , orderNumber, signs, callbackSign, notifyUrl,status, returnUrl, uid, expire,fee, pid, Pid} = order
             if (status === -1) {
 				res.send({
                     code : -1,
@@ -704,11 +824,20 @@ router.post('/server/api/query', (req,res)=>{
                 })
             }
             else if (status === 2) {
-			    let returnUrl = return_url + '?sign1=' + sign1 + '&sign2=' + sign2 + '&orderUid=' + orderUid + '&orderNumber=' + orderNumber +'&pay_price='+pay_price +'&price=' + price + '&ip=' + tools.getClientIP(req)
+				// 本身的10001同步地址我选择不用
+				if (uid === '10001') {
+					return res.json({
+						code:2,
+						msg:'订单交易成功',
+						url: returnUrl
+					})
+				}
+				// 同步地址加参数验证更安全
+			    let returnUrls = returnUrl + '?sign=' + signs + '&callbackSign=' + callbackSign + '&orderUid=' + orderUid + '&orderNumber=' + orderNumber +'&payPrice='+payPrice +'&price=' + price + '&ip=' + tools.getClientIP(req)
 				res.json({
                     code : 2,
                     msg : '订单交易成功',
-                    url : returnUrl // return_url
+                    url : returnUrls // returnUrls
                 })
             } 
 			else if (status === 1) { //回调通知失败
@@ -723,16 +852,30 @@ router.post('/server/api/query', (req,res)=>{
 				} catch(e) {
 					console.log(e)
 				}
-				let requestData = {
-					orderUid,
-					pay_price,
+				let requestData = {}
+				if (payType === 'alipayf2f') {
+			    requestData = {
 					orderNumber,
-					sign1,
+					callbackSign:signs,
 					price,
-					sign2
+					trade_no:'手动回调不提供流水号',
+					orderName,
+					orderUid,
+					payType
+				}
+				} else {
+				requestData = {
+					orderUid,
+					payType,
+					payPrice,
+					orderNumber,
+					sign:signs,
+					price,
+					callbackSign
+				}
 				}
 					request({
-						url: notify_url,
+						url: notifyUrl,
 						method: "POST",
 						json: true,
 						headers: {
@@ -747,7 +890,7 @@ router.post('/server/api/query', (req,res)=>{
 								let date = new Date()
 								let YearMD = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')} `
 								let HoursMS = `${date.getHours().toString().padStart(2,'0')}:${date.getMinutes().toString().padStart(2,'0')}:${date.getSeconds().toString().padStart(2,'0')}`
-								let pay_time = YearMD + HoursMS
+								let payTime = YearMD + HoursMS
 								//fee扣除 和fee计算
 								try {
 									process.kill(pid,'SIGTERM')
@@ -779,7 +922,7 @@ router.post('/server/api/query', (req,res)=>{
 									.catch('fee-no-user')
 								}
 								//升级status
-								Order.updateMany( { orderNumber}, {status:2, pay_time,expire:0})
+								Order.updateMany( { orderNumber}, {status:2, payTime,expire:0})
 									 .then()
 									 .catch(err => res.send('请联系客服!'))
 							}

@@ -25,27 +25,27 @@ let orderSchema = new Schema({
         type: String,
         required: true
     },
-    pay_price: {
+    payPrice: {
         type:String,
-        required: true
+        required: false
     },
-    pay_time:{
+    payTime:{
         type:String,
         default: '未支付'
     },
-    notify_url: {
+    notifyUrl: {
         type: String,
         required: true
     },
-    return_url: {
+    returnUrl: {
+        type: String,
+        required: false
+    },
+    signs: {
         type: String,
         required: true
     },
-    sign1: {
-        type: String,
-        required: true
-    },
-    sign2: {
+    callbackSign: {
         type: String,
         required: false
     },
@@ -63,7 +63,7 @@ let orderSchema = new Schema({
     },
     expire: {
         type: Number,
-        required: true
+        required: false
     },
     fee: {
         type: String,
@@ -71,7 +71,7 @@ let orderSchema = new Schema({
     },
     pid:{
         type:Number,
-        required:true
+        required:false
     },
     createTime:{
         type:Date,
@@ -88,6 +88,10 @@ let orderSchema = new Schema({
 	merchantIp: {
 		type:String,
 		require: true
+	},
+	qrCode: {
+		type:String,
+		require: false
 	}
 })
 

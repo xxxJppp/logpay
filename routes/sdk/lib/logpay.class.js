@@ -12,14 +12,14 @@ module.exports =  class logpay {
         }
     }
     Sign(data) {
-        let { price, orderNumber, payType, notify_url, return_url, orderUid, orderName } = data
-        let signData = price + payType + orderUid + orderName + orderNumber + notify_url + return_url + this.uid + this.token
+        let { price, orderNumber, payType, notifyUrl, returnUrl, orderUid, orderName } = data
+        let signData = price + payType + orderUid + orderName + orderNumber + notifyUrl + returnUrl + this.uid + this.token
         let Sign = crypto.createHash('md5').update(signData).digest('hex')
         return Sign
     }
     Signfornotify(data) {
-        let { pay_price, price, orderNumber, orderUid, sign1} = data
-        let signData =  pay_price + price + orderNumber + orderUid + sign1 + this.token
+        let { payPrice, price, orderNumber, orderUid, sign1} = data
+        let signData =  payPrice + price + orderNumber + orderUid + sign1 + this.token
         let Sign = crypto.createHash('md5').update(signData).digest('hex')
         return Sign
     }

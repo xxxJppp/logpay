@@ -46,7 +46,7 @@ router.post('/qrcode/add', async (req, res) => {
             throw ('参数丢失!')
         }
         let data = JSON.parse(await readTxt(params.url))
-        let payData = { type: '', price: '不固定金额', pay_url: '',}
+        let payData = { type: '', price: '不固定金额', payUrl: '',}
         data.words_result.forEach(element => { // 识别付款码文字信息
             if (element.words.includes('支付就用支付宝')) {
                 payData.type = '支付宝'
@@ -101,7 +101,7 @@ router.post('/qrcode/add', async (req, res) => {
             })
         }
         let url = await qrdecode(imageDataBase64)
-            payData.pay_url = url
+            payData.payUrl = url
         Qrcode.findOne( { uid:params.uid, type:payData.type, price:payData.price } )
               .then( data => {
                   if (data) {
@@ -115,7 +115,7 @@ router.post('/qrcode/add', async (req, res) => {
                     uid:params.uid,
                     type:payData.type,
                     price:payData.price,
-                    pay_url:payData.pay_url
+                    payUrl:payData.payUrl
                 })
                 qrcode.save()
                       .then( data => {

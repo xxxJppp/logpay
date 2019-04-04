@@ -21,6 +21,7 @@ module.exports =  class Tools {
 	  // let reg =  /(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
 	  // ip = reg.exec(target)
 	  // return ip[0]
-    return req.get("X-Real-IP") || req.get("X-Forwarded-For") || req.ip;  
+    return req.get("X-Real-IP") || req.get("X-Forwarded-For") || req.ip;
+//      return req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 	}
 }

@@ -202,8 +202,8 @@ router.post('/user/cmeal',(req, res)=>{
             if (user) {
                 if (user.meal == meal) {
                     if (meal == 'mf') {
-                        res.redirect('https://www.logpay.cn/account/#/user/cmeal')
-                    }
+                        return res.redirect('https://www.logpay.cn/account/#/user/cmeal')
+                    } else {
                     if (mealtime == 'ygy') {
                         user.mealtime = getTime(user.mealtime ,1)
                      } else if (mealtime == 'sgy') {
@@ -212,12 +212,17 @@ router.post('/user/cmeal',(req, res)=>{
                         user.mealtime = getTime(user.mealtime, 6)
                      } else if (mealtime == 'yn') {
                         user.mealtime = getTime(user.mealtime, 12)
-                     }
+					}}
                 } else if (user.meal == 'mf') {
                     if (meal == 'gj' || meal == 'bz') {
                     let date = new Date()
                     let now = `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')}`
-                    if (mealtime == 'ygy') {
+                    if (mealtime === 'bb') {
+						return res.json({
+						code:1,
+						msg:'续费成功'
+					})
+					} else if (mealtime == 'ygy') {
                         user.mealtime = getTime(now,1)
                      } else if (mealtime == 'sgy') {
                         user.mealtime = getTime(now, 3)
@@ -230,7 +235,12 @@ router.post('/user/cmeal',(req, res)=>{
                 } else if (user.meal == 'bz' && meal == 'gj') {
                     let date = new Date()
                     let now = `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')}`
-                    if (mealtime == 'ygy') {
+                    if (mealtime === 'bb') {
+						return res.json({
+						code:1,
+						msg:'续费成功'
+					 })
+					 } else if (mealtime == 'ygy') {
                         user.mealtime = getTime(now,1)
                      } else if (mealtime == 'sgy') {
                         user.mealtime = getTime(now, 3)
@@ -246,7 +256,10 @@ router.post('/user/cmeal',(req, res)=>{
                     return false
                 }
                 User.update({uid},{meal:user.meal, mealtime:user.mealtime, money:user.money, renew})
-                    .then()
+                    .then(user => res.json({
+						code:1,
+						msg:'续费成功'
+					}))
                     .catch(err => res.json('请联系客服'))
             }
         })

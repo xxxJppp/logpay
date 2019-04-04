@@ -12,7 +12,7 @@ let missOrderSchema = new Schema({
         type: String,
         required: true
     },
-    pay_price: {
+    payPrice: {
         type: String,
 		required: true
 	},

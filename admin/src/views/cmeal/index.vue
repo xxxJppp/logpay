@@ -38,6 +38,7 @@
 <script>
 import axios from 'axios'
 import { mapGetters } from 'vuex'
+import { constants } from 'fs';
 export default {
    data() {
     return {
@@ -80,12 +81,12 @@ export default {
                        return this.time
                      }
                      else if (this.value2 == 'ygy') {
-                        return this.getTime(this.mealtime ,1)
+                        return this.getTime(this.mealtime, 1)
                      } else if (this.value2 == 'sgy') {
                         return this.getTime(this.mealtime, 3)
-                     } else if (mealtime == 'bn') {
+                     } else if (this.value2 == 'bn') {
                         return this.getTime(this.mealtime, 6)
-                     } else if (mealtime == 'yn') {
+                     } else if (this.value2 == 'yn') {
                         return this.getTime(this.mealtime, 12)
                      }
                 } else if (this.meal == 'mf') {
@@ -164,7 +165,7 @@ export default {
             return '0.00'
           } else if (this.meal == 'bz') {
             if (this.value1 == 'mf') {
-              alert('不能降低套餐!')
+              this.$message.error('请在该套餐到期后降低套餐')
               this.value1 = 'bz'
               return '0.00'
             }
@@ -185,7 +186,7 @@ export default {
             return parseFloat(y*365*0.5+m*30*0.5+d*0.5).toFixed(2,'0')
           } else if (this.meal == 'gj') {
             if (this.value1 == 'bz' || this.value1 == 'mf') {
-              alert('不能降低套餐!')
+              this.$message.error('请在该套餐到期后降低套餐')
               this.value1 = 'gj'
               return '0.00'
             }
@@ -216,18 +217,15 @@ export default {
       },
       submit() {
         if (this.value1 == 'mf' && this.meal == 'mf') {
-          location.href = 'https://www.logpay.cn/account/#/user/cmeal'
-          return
+          return this.$message.success('套餐续费成功')
         }
         // bz升级gj过程中防止客户损失
         if (parseFloat(this.all_price-this.d_price) < 0) {
-          alert('充值参数有误!')
-          return false
+          return this.$message.error('充值参数有误')
         }
         axios.post('https://api.logpay.cn/user/cmeal',{ uid:this.uid, meal:this.value1,mealtime:this.value2,cmoney:this.price,renew:this.checked })
-             .then()
-             .catch(err => console.log(err))
-        location.href = '/'
+             .then(res => this.$message.success('套餐续费成功'))
+             .catch(err => this.$message.error('系统繁忙请联系客服'))
       },
       gettime() {
         if (this.value1 == 'mf') {

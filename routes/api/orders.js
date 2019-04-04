@@ -8,6 +8,7 @@ let tools = new Tools()
 router.get('/order/getOrder',(req, res)=>{
   try {
         let params = req.query
+		console.log(params)
         let orderNumber = params.orderNumber
         let orderUid = params.orderUid
         let status = params.status
@@ -85,13 +86,13 @@ router.get('/order/getMissOrder',(req, res)=>{
         let params = req.query
         let payType = params.payType
 		let missOrderDate = params.missOrderDate
-		let pay_price = params.pay_price
+		let payPrice = params.payPrice
 		let merchantUid = params.merchantUid
 		let role = params.role
 		let uid = params.uid
 		let query = {}
-		if (pay_price) {
-            query.pay_price = pay_price           
+		if (payPrice) {
+            query.payPrice = payPrice           
         }
 		if (missOrderDate) {
 			let trueMissDate = missOrderDate.map(v=>{
@@ -186,29 +187,29 @@ try {
         if (role === 'admin') {
             // 今日交易额数据
             let tod_ali_success_order = await getDayMoney('alipay','',{$gte:now})
-            let tod_ali = sum('pay_price',tod_ali_success_order).toFixed(2,'0')
+            let tod_ali = sum('payPrice',tod_ali_success_order).toFixed(2,'0')
             let tod_ali_fee = sum('fee',tod_ali_success_order).toFixed(3,'0')
             let tod_wx_success_order = await getDayMoney('wxpay','',{$gte:now})
             let tod_wx_fee = sum('fee',tod_wx_success_order).toFixed(3,'0')
-            let tod_wx = sum('pay_price',tod_wx_success_order).toFixed(2,'0')
+            let tod_wx = sum('payPrice',tod_wx_success_order).toFixed(2,'0')
             let tod_all = (parseFloat(tod_ali) + parseFloat(tod_wx)).toFixed(2, '0')
             let tod_all_fee = (parseFloat(tod_ali_fee) + parseFloat(tod_wx_fee)).toFixed(3, '0')
             // 昨日交易额数据
             let yes_ali_success_order = await getDayMoney('alipay','',{$gte:yes,$lt:now})
-            let yes_ali = sum('pay_price',yes_ali_success_order).toFixed(2,'0')
+            let yes_ali = sum('payPrice',yes_ali_success_order).toFixed(2,'0')
             let yes_ali_fee = sum('fee',yes_ali_success_order).toFixed(3,'0')
             let yes_wx_success_order = await getDayMoney('wxpay','',{$gte:yes,$lt:now})
-            let yes_wx = sum('pay_price',yes_wx_success_order).toFixed(2,'0')
+            let yes_wx = sum('payPrice',yes_wx_success_order).toFixed(2,'0')
             let yes_wx_fee = sum('fee',yes_wx_success_order).toFixed(3,'0')
             let yes_all = (parseFloat(yes_ali) + parseFloat(yes_wx)).toFixed(2, '0')
             let yes_all_fee = (parseFloat(yes_ali_fee) + parseFloat(yes_wx_fee)).toFixed(3, '0')
 
             // 平台总交易额
             let all_ali_success_order = await getDayMoney('alipay','','')
-            let all_ali = sum('pay_price', all_ali_success_order).toFixed(2,'0')
+            let all_ali = sum('payPrice', all_ali_success_order).toFixed(2,'0')
             let all_ali_fee = sum('fee',all_ali_success_order).toFixed(3,'0')
             let all_wx_success_order = await getDayMoney('wxpay','','')
-            let all_wx = sum('pay_price',all_wx_success_order).toFixed(2,'0')
+            let all_wx = sum('payPrice',all_wx_success_order).toFixed(2,'0')
             let all_wx_fee = sum('fee',all_wx_success_order).toFixed(3,'0')
             let all_all = (parseFloat(all_ali) + parseFloat(all_wx)).toFixed(2, '0')
             let all_all_fee = (parseFloat(all_ali_fee) + parseFloat(all_wx_fee)).toFixed(3, '0')
@@ -237,28 +238,28 @@ try {
             })
     }       
             let tod_ali_success_order = await getDayMoney('alipay',uid,{$gte:now})
-            let tod_ali = sum('pay_price',tod_ali_success_order).toFixed(2,'0')
+            let tod_ali = sum('payPrice',tod_ali_success_order).toFixed(2,'0')
 			let tod_ali_fee = sum('fee',tod_ali_success_order).toFixed(3,'0')
             let tod_wx_success_order = await getDayMoney('wxpay',uid,{$gte:now})
-            let tod_wx = sum('pay_price',tod_wx_success_order).toFixed(2,'0')
+            let tod_wx = sum('payPrice',tod_wx_success_order).toFixed(2,'0')
 			let tod_wx_fee = sum('fee',tod_wx_success_order).toFixed(3,'0')
             let tod_all = (parseFloat(tod_ali) + parseFloat(tod_wx)).toFixed(2, '0')
 			let tod_all_fee = (parseFloat(tod_ali_fee) + parseFloat(tod_wx_fee)).toFixed(3, '0')
 
             let yes_ali_success_order = await getDayMoney('alipay',uid,{$gte:yes,$lt:now})
-            let yes_ali = sum('pay_price', yes_ali_success_order).toFixed(2,'0')
+            let yes_ali = sum('payPrice', yes_ali_success_order).toFixed(2,'0')
 			let yes_ali_fee = sum('fee',yes_ali_success_order).toFixed(3,'0')
             let yes_wx_success_order = await getDayMoney('wxpay',uid,{$gte:yes,$lt:now})
-            let yes_wx = sum('pay_price',yes_wx_success_order).toFixed(2,'0')
+            let yes_wx = sum('payPrice',yes_wx_success_order).toFixed(2,'0')
 			let yes_wx_fee = sum('fee',yes_wx_success_order).toFixed(3,'0')
             let yes_all = (parseFloat(yes_ali) + parseFloat(yes_wx)).toFixed(2, '0')
 			let yes_all_fee = (parseFloat(yes_ali_fee) + parseFloat(yes_wx_fee)).toFixed(3, '0')
 
             let all_ali_success_order = await getDayMoney('alipay',uid,'')
-            let all_ali = sum('pay_price', all_ali_success_order).toFixed(2,'0')
+            let all_ali = sum('payPrice', all_ali_success_order).toFixed(2,'0')
 			let all_ali_fee = sum('fee',all_ali_success_order).toFixed(3,'0')
             let all_wx_success_order = await getDayMoney('wxpay',uid,'')
-            let all_wx = sum('pay_price',all_wx_success_order).toFixed(2,'0')
+            let all_wx = sum('payPrice',all_wx_success_order).toFixed(2,'0')
             let all_wx_fee = sum('fee',all_wx_success_order).toFixed(3,'0')
             let all_all = (parseFloat(all_ali) + parseFloat(all_wx)).toFixed(2, '0')
 			let all_all_fee = (parseFloat(all_ali_fee) + parseFloat(all_wx_fee)).toFixed(3, '0')

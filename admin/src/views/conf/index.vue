@@ -64,7 +64,7 @@
                     label="金额">
                     </el-table-column>
                     <el-table-column
-                    prop="pay_url"
+                    prop="payUrl"
                     align="center"
                     label="支付url">
                     </el-table-column>

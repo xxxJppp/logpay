@@ -17,7 +17,7 @@ let qrcodeSchema = new Schema({
         type: String,
         required: true
     },
-    pay_url: {
+    payUrl: {
         type: String,
         required: true
     }
