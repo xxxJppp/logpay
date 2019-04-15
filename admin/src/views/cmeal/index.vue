@@ -11,7 +11,8 @@
     </el-option>
     </el-select>
 </div>
-<div class="mealtime">
+<div v-if="otherMeal">
+  <div class="mealtime">
     <p>时间</p>
     <el-select v-model="value2" placeholder="请选择">
         <el-option
@@ -34,11 +35,11 @@
     <el-button type="success" style="margin-top:20px;" v-else><a href="https://www.logpay.cn/account/#/user/recharge">余额不足请先充值</a></el-button>
     <el-checkbox v-model="checked" style="margin-bottom:3px;">开启自动套餐续费</el-checkbox>
 </div>
+</div>
 </template>
 <script>
 import axios from 'axios'
 import { mapGetters } from 'vuex'
-import { constants } from 'fs';
 export default {
    data() {
     return {
@@ -75,6 +76,13 @@ export default {
     }
     },
     computed: {
+        otherMeal () {
+          if (this.meal === 'mf'||this.meal === 'gj'||this.meal === 'bz') {
+            return true
+          } else {
+            return false
+          }
+        },
         Time() {
           if (this.meal == this.value1 && this.meal !='mf' ) {
                      if (this.value2 == 'bb') {

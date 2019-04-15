@@ -25,8 +25,9 @@ router.get('/sdk/pay', (req, res)=>{
     })
 })
 router.post('/sdk/notify',(req, res)=>{
-    let { orderUid, payPrice, price, orderNumber, signs ,callbackSign } = req.body
-    let data = { orderUid, payPrice, price, orderNumber, signs }
+	console.log(req.body)
+    let { orderUid, payPrice, price, orderNumber, payType,callbackSign } = req.body
+    let data = { orderUid, payPrice, price, payType, orderNumber, signs:req.body.sign }
     let sign = logpay.Signfornotify(data)
     Order.findOne({orderNumber})
 	     .then(order => {
@@ -34,6 +35,7 @@ router.post('/sdk/notify',(req, res)=>{
 				 return res.send('SUCCESS')
 			 }
 		 })
+    console.log(sign, callbackSign)
 	if (sign === callbackSign) {
         if (orderUid === '10001') {
             User.findOne({uid:'10001'})

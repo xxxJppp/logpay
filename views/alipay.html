@@ -115,6 +115,7 @@
                 expires_in--
                 if(expires_in <= 0) {
                     do_expire(handler)
+					window.clearInterval(myTimer)
                 } else {
                     var min = parseInt(expires_in / 60)
                     $("#count_down").html( (min?(min+ " 分 "):"") + expires_in % 60 + " 秒后订单过期，请及时支付" )

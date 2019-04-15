@@ -9,6 +9,14 @@ let qrcodeSchema = new Schema({
         type:String,
         required: true
     },
+    phoneId: {
+        type: String,
+        required: true
+    },
+    open: {
+        type: Boolean,
+        default: true
+    },
     type: {
         type:String,
         required: true

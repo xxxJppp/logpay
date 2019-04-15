@@ -8,7 +8,6 @@ let tools = new Tools()
 router.get('/order/getOrder',(req, res)=>{
   try {
         let params = req.query
-		console.log(params)
         let orderNumber = params.orderNumber
         let orderUid = params.orderUid
         let status = params.status
@@ -17,6 +16,7 @@ router.get('/order/getOrder',(req, res)=>{
 		let merchantUid = params.merchantUid
 		let role = params.role
 		let uid = params.uid
+		let phoneId = params.phoneId
 		let query = {}
 		if (orderDate) {
 			let trueDate = orderDate.map(v=>{
@@ -40,6 +40,9 @@ router.get('/order/getOrder',(req, res)=>{
         if (payType) {
             query.payType = payType        
         }
+		if (phoneId) {
+			query.phoneId = phoneId
+		}
         if (role === 'admin') {
 			if (merchantUid) {
             query.uid = merchantUid

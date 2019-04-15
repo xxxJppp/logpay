@@ -379,6 +379,7 @@ export default {
             value:this.value2,
             page: this.page.page,
             num: this.page.num,
+            role:this.roles[0]
         }
     }).then(res => {
         if (res.data.code == -1) {

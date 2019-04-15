@@ -18,8 +18,8 @@ module.exports =  class logpay {
         return Sign
     }
     Signfornotify(data) {
-        let { payPrice, price, orderNumber, orderUid, sign1} = data
-        let signData =  payPrice + price + orderNumber + orderUid + sign1 + this.token
+        let { payPrice, price, payType, orderNumber, orderUid, signs} = data
+        let signData =  payPrice + price + payType + orderNumber + orderUid + signs + this.token
         let Sign = crypto.createHash('md5').update(signData).digest('hex')
         return Sign
     }

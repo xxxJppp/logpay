@@ -10,6 +10,8 @@ const JWT = require('jwt-simple')
 const nodemailer = require('nodemailer')
 const request = require('request')
 const Meal = require('../../models/Meals')
+// 引入手机数据库
+const PhoneId = require('../../models/PhoneIds')
 // 注册新用户
 let tools = new Tools()
 router.get('/.well-known/pki-validation/fileauth.txt',(req, res)=>{
@@ -177,10 +179,20 @@ router.post('/user/cpassword',(req, res)=>{
 })
 
 router.post('/user/userid',(req, res)=>{
-    let { uid, userid } = req.body
-    User.updateOne({uid},{userid})
-         .then( data => res.json('success'))     
-         .catch( err => res.json('error'))
+    let { uid, phoneId, userid } = req.body
+    PhoneId.updateOne({uid, id:phoneId},{userid})
+         .then( phone => {
+			 res.json({
+             code: 1,
+             msg: '配置成功'
+         })
+		 })
+         .catch( err => { 
+		 res.json({
+             code:-1,
+             msg:'系统繁忙请稍等' + err
+         })
+		 })
 })
 
 router.post('/user/cmeal',(req, res)=>{
@@ -455,7 +467,7 @@ try {
     } catch (e) {
       res.json({
         code:-1,
-        data:'',
+        data:'当前系统繁忙 请稍后重试',
         msg:e
       })
     }
@@ -529,9 +541,13 @@ try {
 
 router.get('/user/getMerchant',(req, res)=>{
 try {
+	console.log(req.query)
    let params = req.query
    let type = params.type
    let value = params.value
+   let page = params.page
+   let num = params.num
+   let role = params.role
    let query = {}
    if ( type ==='uid' && value) {
      query.uid = value
@@ -542,34 +558,247 @@ try {
    User.find(query)
       .sort({'_id':-1})
       .then( user =>{
-       let skip = (parseInt(params.page-1))*parseInt(params.num)
-       let limit = parseInt(params.num)
-       User.find(query)
-          .sort({'_id':-1})
-          .skip(skip)
-          .limit(limit) 
-          .exec()
-          .then( select => {
-          if (!select) throw ('无数据')
-          res.json({
-            code: 1,
-            data: {
-              select,
-              user
-            },
-            msg: '获取成功'
-          })
-        })
-          .catch( err => res.json('当前系统繁忙'))
+        if ( page && num && role ==='admin') {
+            let skip = (parseInt(page-1))*parseInt(num)
+            let limit = parseInt(num)
+        User.find(query)
+            .sort({'_id':-1})
+            .skip(skip)
+            .limit(limit) 
+            .exec()
+            .then( select => {
+            if (!select) throw ('无数据')
+            res.json({
+                code: 1,
+                data: {
+                select,
+                user
+                },
+                msg: '获取成功'
+            })
+            })
+            .catch( err => res.json({
+                code:-1,
+                errData:err,
+                msg:'当前系统繁忙 请稍会再试'
+              }))
+        } else {
+            res.json({
+                code: 1,
+                user:{
+                    email:user[0].email
+                },
+                msg: '获取成功'
+            })
+        }
       })
-      .catch( err => res.json('当前系统繁忙'))
+      .catch( err => res.json({
+        code:-1,
+        errData:err,
+        msg:'当前系统繁忙 请稍会再试'
+      }))
     } catch (e) {
       res.json({
         code:-1,
-        data:'',
-        msg:e
+        errData:e,
+        msg:'当前系统繁忙 请稍会再试'
       })
     }
+})
+
+// 增加手机
+router.post('/user/addPhone', (req, res)=>{
+    let { uid } = req.body
+    PhoneId.find({uid})
+           .then(phone=>{
+               let phoneId = new PhoneId({
+                   uid,
+                   id: phone.length + 1
+               })
+               phoneId.save()
+                      .then(phone1=>{
+                          res.send({
+                              code: 1,
+                              msg: phone.length + 1
+                          })
+                      })
+                      .catch(err => {
+                          res.send({
+                              code: -1,
+                              msg: '系统繁忙请稍等' + err,
+                              errData: err
+                          })
+                      })
+           })
+})
+router.get('/user/getPhone', (req, res)=>{
+    let { uid } = req.query
+    PhoneId.find({uid})
+           .then( phone =>{
+                   res.send({
+                       code: 1,
+                       data: phone,
+                       msg: '获取成功'
+                   })
+           })
+           .catch( err =>{
+               res.send({
+                   code: -1,
+                   errData: err,
+                   msg: '系统繁忙请稍等' + err
+               })
+           })
+})
+// 获取手机是否开启服务
+router.get('/user/getPhoneOpen', (req, res)=>{
+    let { uid, phoneId } = req.query
+    PhoneId.findOne({ uid, id:phoneId })
+           .then(phone=>{
+               if (phone) {
+                res.send({
+                    code: 1,
+                    data: phone.open,
+                    msg: '获取成功'
+                })   
+               } else {
+                   res.send({
+                       code: 0,
+                       msg: '无该手机'
+                   })
+               }
+           })
+           .catch(err=>{
+                res.send({ 
+                    code: -1,
+                    errData: err,
+                    msg: '系统繁忙请稍等' + err
+                })
+           })
+})
+// 修改手机收款开启情况
+router.post('/user/cPhoneOpen', async (req, res)=>{
+     let { uid, phoneId, openPhone } = req.body
+     const checkOpenPhone = (uid, phoneId) =>{
+         return new Promise((resolve, reject)=>{
+            PhoneId.findOne({uid, id:phoneId})
+            .then(phone=>{
+                if (phone) {
+                    if (phone.open === openPhone) {
+                        return resolve(false)
+                    } else {
+                        return resolve(true)
+                    }
+                } else {
+                    return resolve(false)
+                }
+            })
+            .catch(err=>reject(err))
+         })
+     }
+     let checked = await checkOpenPhone(uid, phoneId)
+     if (checked === true) {
+        PhoneId.updateOne({uid, id:phoneId}, {open:openPhone})
+        .then(phone1=>{
+            if (openPhone) {
+                res.send({
+                    code: 1,
+                    msg: '开启手机 ' + phoneId + ' 收款成功'
+                })
+            } else {
+                res.send({
+                    code: 1,
+                    msg: '关闭手机 ' + phoneId + ' 收款成功'
+                })
+            }
+        })
+        .catch(err=>{
+            res.send({
+                code: -1,
+                errData: err,
+                msg: '系统繁忙请稍等' + err
+            })
+    })
+    } else {
+        res.send({
+            code: 0,
+            msg:'Not Changed'
+        })
+    }
+})
+// 获取限额
+router.get('/user/getLimitMoney', (req, res)=>{
+    let { uid, phoneId } = req.query
+    PhoneId.findOne({ uid, id:phoneId })
+           .then(phone=>{
+               if (phone) {
+                res.send({
+                    code: 1,
+                    data: {
+                        wxpayLimit:phone.wxpayLimit,
+                        alipayLimit:phone.alipayLimit
+                    },
+                    msg: '获取成功'
+                })   
+               } else {
+                   res.send({
+                       code: 0,
+                       msg: '无该手机'
+                   })
+               }
+           })
+           .catch(err=>{
+                res.send({ 
+                    code: -1,
+                    errData: err,
+                    msg: '系统繁忙请稍等' + err
+                })
+           })
+})
+
+//设置限额
+router.post('/user/cLimitMoney', (req, res)=>{
+    let {wxpayLimit, alipayLimit, uid, phoneId} = req.body
+    PhoneId.updateMany({uid, id:phoneId}, {wxpayLimit, alipayLimit})
+        .then(phone=>{
+            res.send({
+                code: 1,
+                msg: '设置成功'
+            })
+        })
+        .catch(err=>{
+            res.send({
+                code: -1,
+                errData: err,
+                msg: '系统繁忙请稍等' + err
+            })
+    })
+})
+
+//获取userid
+router.get('/user/getUserid', (req, res)=>{
+    let { uid, phoneId } = req.query
+    PhoneId.findOne({ uid, id:phoneId })
+           .then(phone=>{
+               if (phone) {
+                res.send({
+                    code: 1,
+                    data: phone.userid,
+                    msg: '获取成功'
+                })   
+               } else {
+                   res.send({
+                       code: 0,
+                       msg: '无该手机'
+                   })
+               }
+           })
+           .catch(err=>{
+                res.send({ 
+                    code: -1,
+                    errData: err,
+                    msg: '系统繁忙请稍等' + err
+                })
+           })
 })
 // 配置文件下载
 router.get("/download/APK", (req, res)=>{

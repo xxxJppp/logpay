@@ -2,6 +2,7 @@
   <div class="container">
     <div class="header">
       <el-input style="width:49%;" v-model="merchantUid" placeholder="商户号" v-if="this.roles[0] === 'admin'"></el-input>
+      <el-input style="width:49%;margin:5px 0;" v-model="phoneid" placeholder="收款手机（例：8）"></el-input>
       <el-input style="width:49%;" v-model="number" placeholder="订单号"></el-input>
       <el-input style="width:49%;" v-model="name" placeholder="订单用户名"></el-input>
       <el-select style="margin:5px 0;width:49%;" v-model="value1" placeholder="请选择">
@@ -51,6 +52,11 @@
       <el-table-column prop="orderUid" label="用户名" align="center">
       </el-table-column>
       <el-table-column prop="ip" label="订单IP" align="center">
+      </el-table-column>
+      <el-table-column prop="phoneId" label="收款手机" align="center">
+        <template slot-scope="scope">
+            <span>手机 {{scope.row.phoneId}}</span>
+        </template>
       </el-table-column>
       <el-table-column prop="createTime" label="创建时间" align="center">
       </el-table-column>
@@ -140,6 +146,8 @@ export default {
           }
           }]
         },
+        // 收款手机id
+        phoneid:'',
         // 获取日期
         orderDate:'',
         // 获取订单号
@@ -256,7 +264,8 @@ export default {
             num: this.page.num,
             orderDate:this.orderDate,
             merchantUid:this.merchantUid,
-            role:this.roles[0]
+            role:this.roles[0],
+            phoneId:this.phoneid
         }
     }).then(res => {
         if (res.data.code == -1) {
@@ -265,8 +274,8 @@ export default {
         }
         this.listLoading = false
         import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['商品名称', '订单号','订单IP', '用户名', '支付渠道', '创建时间', '支付时间', '支付金额', '价格', '服务费', '状态']
-        const filterVal = ['orderName', 'orderNumber', 'ip', 'orderUid', 'payType', 'createTime', 'payTime', 'payPrice','price', 'fee', 'status']
+        const tHeader = ['商品名称', '订单号', '订单IP', '收款手机', '用户名', '支付渠道', '创建时间', '支付时间', '支付金额', '价格', '服务费', '状态']
+        const filterVal = ['orderName', 'orderNumber', 'ip', 'phoneId', 'orderUid', 'payType', 'createTime', 'payTime', 'payPrice', 'price', 'fee', 'status']
         this.exportList = res.data.data.order
         this.exportList.map(v=>{
           v.createTime = `${v.createTime.substring(0,10)} ${v.createTime.substring(11,19)}`
@@ -324,7 +333,8 @@ export default {
             num: this.page.num,
             orderDate:this.orderDate,
             merchantUid:this.merchantUid,
-            role:this.roles[0]
+            role:this.roles[0],
+            phoneId:this.phoneid
         }
     }).then(res => {
         if (res.data.code == -1) {

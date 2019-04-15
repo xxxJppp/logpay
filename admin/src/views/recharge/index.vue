@@ -1,6 +1,6 @@
 <template>
 <div class="recharge">
-    <p style="font-size:16px;margin:1%  0 0 2.7%;">账户充值</p>
+    <!-- <p style="font-size:16px;margin:1%  0 0 2.7%;">账户充值</p> -->
     <div class="body">
         <ul>
             <li v-for="(moneyList,i) in moneyLists" :key="i" @click="select(i,moneyList)" :class="{ active:i == selectId }">

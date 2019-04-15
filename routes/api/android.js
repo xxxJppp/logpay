@@ -9,6 +9,9 @@ const request = require('request')
 // 引用工具
 const tools = new Tools()
 // 安卓客户端回调
+router.post('/server/api/notify', (req, res)=>{
+	console.log(req.body)
+})
 router.get('/server/api/updateOrder',(req, res)=>{
     let { price, sign, type, e ,p} = req.query
 	console.log(req.query)
@@ -32,7 +35,7 @@ router.get('/server/api/updateOrder',(req, res)=>{
                                          .then(order=> {
 											    let { payPrice, price ,payType,orderName, orderUid , orderNumber, signs, callbackSign, notifyUrl,status, returnUrl, uid, expire,fee, pid} = order[0]
                                                 Order.updateOne({orderNumber,uid,payPrice,payType }, { status : 1 })
-                                                     .then(successOrder=>{	 
+                                                     .then(successOrder=>{ 
 														 // 异步通知
 													let requestData = {
 														orderUid,
@@ -55,7 +58,6 @@ router.get('/server/api/updateOrder',(req, res)=>{
 															console.log(body)
 															if (!error && response.statusCode == 200) {
 																//异步回调成功
-																console.log(body)
 																if (body === 'SUCCESS') {
 																	let date = new Date()
 																	let YearMD = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')} `
@@ -98,9 +100,9 @@ router.get('/server/api/updateOrder',(req, res)=>{
 																} else {
 																	const childProcess = require('child_process')
 										                            let childNotify = childProcess.fork('./notify.js')
-																	requestData.pid = childNotify.pid
+																	requestData.Pid = childNotify.pid
 																	requestData.notifyUrl = notifyUrl
-																	requestData.Pid = pid
+																	requestData.pid = pid
 																    requestData.uid = uid
 																	requestData.fee = fee
 																	Order.updateOne({orderNumber, uid},{Pid:childNotify.pid})

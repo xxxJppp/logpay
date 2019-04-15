@@ -94,6 +94,27 @@ export const constantRouterMap = [
       meta: { title: '控制台', icon: 'example' }
     }]
   },
+  // 订单管理
+  {
+    path: '/manage',
+    name: 'manage',
+    component: Layout,
+    meta: { title: '订单管理', icon: 'table' },
+    children: [
+      {
+        path: 'order',
+        name: 'Order',
+        component: () => import('@/views/order/index'),
+        meta: { title: '交易订单' }
+      },
+      {
+        path: 'missOrder',
+        name: 'missOrder',
+        component: () => import('@/views/missorder/index'),
+        meta: { title: '未匹配订单' }
+      }
+    ]
+  },
   // 应用配置
   {
     path: '/config',
@@ -127,27 +148,6 @@ export const constantRouterMap = [
       }
     ]
   },
-  // 订单管理
-  {
-    path: '/manage',
-    name: 'manage',
-    component: Layout,
-    meta: { title: '订单管理', icon: 'table' },
-    children: [
-      {
-        path: 'order',
-        name: 'Order',
-        component: () => import('@/views/order/index'),
-        meta: { title: '交易订单' }
-      },
-      {
-        path: 'missOrder',
-        name: 'missOrder',
-        component: () => import('@/views/missorder/index'),
-        meta: { title: '未匹配订单' }
-      }
-    ]
-  },
   // 个人中心
   {
     path: '/user',
@@ -155,12 +155,12 @@ export const constantRouterMap = [
     name: 'user',
     meta: { title: '个人中心', icon: 'user' },
     children: [
-      {
-        path: 'cpassword',
-        name: 'cpassword',
-        component: () => import('@/views/cpassword/index'),
-        meta: { title: '修改密码' }
-      },
+      // {
+      //   path: 'merchantMsg',
+      //   name: 'merchantMsg',
+      //   component: () => import('@/views/merchantMsg/index'),
+      //   meta: { title: '基本信息' }
+      // },
       {
         path: 'cmeal',
         name: 'cmeal',
@@ -172,6 +172,12 @@ export const constantRouterMap = [
         name: 'recharge',
         component: () => import('@/views/recharge/index'),
         meta: { title: '账户充值' }
+      },
+      {
+        path: 'cpassword',
+        name: 'cpassword',
+        component: () => import('@/views/cpassword/index'),
+        meta: { title: '修改密码' }
       }
     ]
   }

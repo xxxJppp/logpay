@@ -24,7 +24,7 @@ process.on('message', (remoteData) => {
 					let HoursMS = `${date.getHours().toString().padStart(2,'0')}:${date.getMinutes().toString().padStart(2,'0')}:${date.getSeconds().toString().padStart(2,'0')}`
 					let payTime = YearMD + HoursMS
 					try {
-						process.kill(requestData.Pid,'SIGTERM')
+						process.kill(requestData.pid,'SIGTERM')
 					} catch(e) {
 						console.log(e)
 					}
@@ -53,14 +53,15 @@ process.on('message', (remoteData) => {
 						})
 						.catch('fee-no-user')
 					}
-				    try {
-						  return process.kill(requestData.pid,'SIGTERM')		 
-						} catch (e) {
-							return console.log(e)
-					}
 					//升级status
-					Order.updateMany( { orderNumber:requestData.orderNumber}, {status:2, payTime,expire:0})
-						 .then()
+					Order.updateMany({ orderNumber:requestData.orderNumber}, {status:2, payTime,expire:0})
+						 .then( order => {
+							try {
+							  return process.kill(requestData.Pid,'SIGTERM')		 
+							} catch (e) {
+								return console.log(e)
+							}
+						 })
 						 .catch(err => res.send('请联系客服!'))
 				}
 			}

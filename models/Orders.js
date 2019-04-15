@@ -53,10 +53,6 @@ let orderSchema = new Schema({
         type: String,
         required: true
     },
-    token: {
-        type: String,
-        required: true
-    },
     status: {
         type: Number,
         required: true
@@ -90,6 +86,10 @@ let orderSchema = new Schema({
 		require: true
 	},
 	qrCode: {
+		type:String,
+		require: false
+	},
+	phoneId: {
 		type:String,
 		require: false
 	}

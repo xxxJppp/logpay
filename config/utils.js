@@ -13,6 +13,7 @@ module.exports =  class Tools {
           return d.toISOString()
     }
     getClientIP(req) {
+		//node 本机
 	  // let target = req.headers['x-forwarded-for'] || // 判断是否有反向代理 IP
 	  // req.connection.remoteAddress || // 判断 connection 的远程 IP
 	  // req.socket.remoteAddress || // 判断后端的 socket 的 IP
@@ -21,7 +22,16 @@ module.exports =  class Tools {
 	  // let reg =  /(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])$/
 	  // ip = reg.exec(target)
 	  // return ip[0]
-    return req.get("X-Real-IP") || req.get("X-Forwarded-For") || req.ip;
-//      return req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+	    // nginx
+        let ip = req.get("X-Real-IP") || req.get("X-Forwarded-For") || req.ip;
+		// 判断手机还是电脑
+		let deviceAgent = req.headers["user-agent"].toLowerCase()
+		let agentID = deviceAgent.match(/(iphone|ipod|ipad|android)/)
+		if (agentID) {
+			ip = ip + '.m'
+		} else {
+			ip = ip + '.pc'
+		}
+        return ip		
 	}
 }

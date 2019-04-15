@@ -1,4 +1,4 @@
-  <template>
+<template>
   <div class="container">
     <div class="header">
       <el-input style="width:49%;" v-model="merchantUid" placeholder="商户号" v-if="this.roles[0] === 'admin'"></el-input>
@@ -92,6 +92,8 @@ export default {
           }
           }]
         },
+        //获取phoneid
+        phoneid:'',
         // 获取日期
         missOrderDate:'',
         // 获取未匹配价格
@@ -133,6 +135,12 @@ export default {
   },
   created() {
     this.getMissOrder()
+    this.$notify({
+        title: '有4种情况可能匹配不到订单',
+        dangerouslyUseHTMLString: true,
+        message: '<div style="font-size:17px;color:red;"><span>1.有人向您收款二维码直接转账,没经过LogPay支付接口(很有可能是朋友, 所以尽量找没有朋友知道的账号)</span><br><span>2.用户用支付宝微信扫码后未及时支付,在订单超时后才回来支付,此时订单已关闭。(解决方案:如此情况较多,请在设置中适当延长二维码过期时间)</span></br><span>3.任意金额二维码收款时,用户输错金额,导致订单匹配不上。(解决方案:多上传定额收款二维码,尽量覆盖用户可能用到的金额)</span><br><span>4.手机通知延迟到订单超时和支付宝微信的重复通知,也会在这里留下记录。(解决方案:请勿在多台手机安装APP并登录同一个账号，同时确保手机网络通畅。)</span></div>',
+        duration: 0
+    })
   },
   methods: {
     // 过滤订单列表
@@ -163,7 +171,7 @@ export default {
         url: 'https://api.logpay.cn/order/getMissOrder',
         method: 'get',
         params: {
-            payPrice: money,
+            pay_price: money,
             payType:this.type,
             uid: this.uid,
             page: this.page.page,
@@ -195,7 +203,7 @@ export default {
         })
       })
     })
-    .catch(err => this.$message.error('系统繁忙'))
+    .catch(err => this.$message.error('系统繁忙请稍等' + err))
     },
     // 过滤导出订单的属性
     formatJson(filterVal, jsonData) {
@@ -225,7 +233,7 @@ export default {
             url: 'https://api.logpay.cn/order/getMissOrder',
             method: 'get',
             params: {
-                payPrice:money,
+                pay_price:money,
                 payType:this.type,
                 uid: this.uid,
                 page: this.page.page,
@@ -246,7 +254,7 @@ export default {
             this.page.total = res.data.data.missOrder.length
             this.listLoading = false
         })
-        .catch(err => this.$message.error('系统繁忙'))
+        .catch(err => this.$message.error('系统繁忙请稍等' + err))
         }
     }
 }
