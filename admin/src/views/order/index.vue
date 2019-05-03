@@ -114,6 +114,7 @@
 <script>
 import axios from 'axios'
 import { mapGetters } from 'vuex'
+import { getOrder } from '@/api/order'
 export default {
   data() {
     return {
@@ -212,30 +213,30 @@ export default {
     ])
   },
   created() {
-    this.getOrder()
+    this.get_order()
   },
   methods: {
     // 处理未通知的
     handleNotify(orderNumber,Pid) {
       axios.post('https://api.logpay.cn/server/api/query',{orderNumber,Pid,uid:this.uid,checked:'notify',})
            .then(data => {
-             this.getOrder()
+             this.get_order()
              })
            .catch(err => this.$message.error(err))
     },
     // 过滤订单列表
     selectOrder() {
-      this.getOrder()
+      this.get_order()
     },
     // 每一页有多少的订单个数
     handleSizeChange(val) {
         this.page.num = val
-        this.getOrder()
+        this.get_order()
       },
     // 下一页
     nextPage (val) {
       this.page.page = val;
-      this.getOrder()
+      this.get_order()
             },
     // 状态不同有不同的颜色
     tableRowClassName({row,status}) {
@@ -246,15 +247,12 @@ export default {
         }
       },
       // 发起导出订单
-      exportOrders() {
+      async exportOrders() {
         if (this.orderDate === null) {
           this.orderDate = ''
         }
         this.listLoading = true
-        axios({
-        url: 'https://api.logpay.cn/order/getOrder',
-        method: 'get',
-        params: {
+        let params = {
             orderNumber:this.number,
             orderUid:this.name,
             status:this.value2,
@@ -265,32 +263,26 @@ export default {
             orderDate:this.orderDate,
             merchantUid:this.merchantUid,
             role:this.roles[0],
-            phoneId:this.phoneid
-        }
-    }).then(res => {
-        if (res.data.code == -1) {
-            this.$message.error(res.data.msg)
-            return false
-        }
-        this.listLoading = false
-        import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['商品名称', '订单号', '订单IP', '收款手机', '用户名', '支付渠道', '创建时间', '支付时间', '支付金额', '价格', '服务费', '状态']
-        const filterVal = ['orderName', 'orderNumber', 'ip', 'phoneId', 'orderUid', 'payType', 'createTime', 'payTime', 'payPrice', 'price', 'fee', 'status']
-        this.exportList = res.data.data.order
-        this.exportList.map(v=>{
-          v.createTime = `${v.createTime.substring(0,10)} ${v.createTime.substring(11,19)}`
-        })
-        const data = this.formatJson(filterVal, this.exportList)
-        excel.export_json_to_excel({
-          header: tHeader,
-          data,
-          filename: 'LogPayOrders',
-          autoWidth: true,
-          bookType: 'xls'
-        })
+            phoneId: this.phoneid
+      }
+      let res = await getOrder(params)
+      this.listLoading = false
+      import('@/vendor/Export2Excel').then(excel => {
+      const tHeader = ['商品名称', '订单号', '订单IP', '收款手机', '用户名', '支付渠道', '创建时间', '支付时间', '支付金额', '价格', '服务费', '状态']
+      const filterVal = ['orderName', 'orderNumber', 'ip', 'phoneId', 'orderUid', 'payType', 'createTime', 'payTime', 'payPrice', 'price', 'fee', 'status']
+      this.exportList = res.data.order
+      this.exportList.map(v=>{
+        v.createTime = `${v.createTime.substring(0,10)} ${v.createTime.substring(11,19)}`
+      })
+      const data = this.formatJson(filterVal, this.exportList)
+      excel.export_json_to_excel({
+        header: tHeader,
+        data,
+        filename: 'LogPayOrders',
+        autoWidth: true,
+        bookType: 'xls'
       })
     })
-    .catch(err => this.$message.error('系统繁忙'))
     },
     // 过滤导出订单的属性
     formatJson(filterVal, jsonData) {
@@ -315,15 +307,12 @@ export default {
       }))
     },
     // 发起获得订单列表
-    getOrder() {
+    async get_order() {
       if (this.orderDate === null) {
           this.orderDate = ''
         }
       this.listLoading = true
-      axios({
-        url: 'https://api.logpay.cn/order/getOrder',
-        method: 'get',
-        params: {
+      let params = {
             orderNumber:this.number,
             orderUid:this.name,
             status:this.value2,
@@ -334,22 +323,16 @@ export default {
             orderDate:this.orderDate,
             merchantUid:this.merchantUid,
             role:this.roles[0],
-            phoneId:this.phoneid
-        }
-    }).then(res => {
-        if (res.data.code == -1) {
-            this.$message.error(res.data.msg)
-            return false
-        }
-        this.list = res.data.data.select
-        this.list.map(v=>{
-          v.createTime = `${v.createTime.substring(0,10)} ${v.createTime.substring(11,19)}`
-        })
-        this.page.total = res.data.data.order.length
-        this.listLoading = false
-    })
-    .catch(err => this.$message.error('系统繁忙'))
-    }
+            phoneId: this.phoneid
+      }
+      let res = await getOrder(params)
+      this.list = res.data.select
+      this.list.map(v=>{
+        v.createTime = `${v.createTime.substring(0,10)} ${v.createTime.substring(11,19)}`
+      })
+      this.page.total = res.data.order.length
+      this.listLoading = false
+  }
   }
 }
 </script>

@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import { password_reset } from '@/api/user'
 export default {
   name: 'fpassword',
   data() {
@@ -50,18 +50,13 @@ export default {
     }
   },
   methods: {
-    handleForget() {
-    axios.post('https://api.logpay.cn/user/passwordreset',{ email:this.FpasswordForm.email })
-         .then( res => {
-           if (res.data.code === -1) {
-             this.$message.error(res.data.msg)
-           }
-           this.$message.success(res.data.msg)
-         })
-         .catch(err=> this.$message.error(err))
+    async handleForget() {
+    let data = { email:this.FpasswordForm.email }
+    let res = await password_reset(data)
+    this.$message.success(res.msg)
     },
     back() {
-        location.href = 'https://www.logpay.cn/account/#/login'
+        location.href = '/account/#/login'
     }
   }
 }
@@ -115,14 +110,15 @@ $light_gray:#454545;
   width:100%;
   height:100%;
   .fpassword-form {
+    border-radius:10px;
     background-color: #fff;
     position: absolute;
     left: 0;
     right: 0;
-    width: 488px;
+    width: 433px;
     max-width: 88%;
-    padding: 35px 35px 15px 35px;
-    margin: 120px auto;
+    padding: 20px 26px 8px 26px;
+    margin: 13% auto;
   }
   .tips {
     font-size: 14px;

@@ -24,8 +24,7 @@ export function register(email, password) {
 export function getInfo(token) {
   return request({
     url: '/user/getInfo',
-    method: 'get',
-    headers: { 'Authorization': token }
+    method: 'get'
   })
 }
 

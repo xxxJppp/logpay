@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie'
 
-const TokenKey = '16201030240'
+const TokenKey = 'LogPay'
 
 export function getKey() {
   return Cookies.get(TokenKey)

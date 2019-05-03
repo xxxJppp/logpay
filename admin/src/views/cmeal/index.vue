@@ -1,6 +1,9 @@
 <template>
 <div class="wrapper">
-<div class="meal">
+<!-- <el-breadcrumb separator="/">
+    <el-breadcrumb-item style="margin:2% 0 0 1.6%;font-size:20px;">账户充值</el-breadcrumb-item>
+</el-breadcrumb> -->
+<div class="meal" >
     <p>套餐</p>
     <el-select v-model="value1" placeholder="请选择">
     <el-option
@@ -11,8 +14,8 @@
     </el-option>
     </el-select>
 </div>
-<div v-if="otherMeal">
-  <div class="mealtime">
+<div v-if="this.meal == 'mf' || this.meal == 'bz' || this.meal == 'gj'">
+  <div class="mealtime" >
     <p>时间</p>
     <el-select v-model="value2" placeholder="请选择">
         <el-option
@@ -22,24 +25,24 @@
         :value="item.value2">
         </el-option>
     </el-select>
-</div>
-<div class="meal-time">
-    <p>过期时间</p>
-    <span style="color:#67C23A;">{{ Time }}</span>
-</div>
-<div class="price">
-    <p>费用</p>
-    <p style="color:#67C23A;font-size:15px;">总费用￥{{ all_price }}, 原套餐抵扣￥{{ d_price }}, 补差价￥{{ price }}</p>
-</div>
-    <el-button type="success" style="margin-top:20px;" v-if="enough" @click="submit">确定</el-button>
-    <el-button type="success" style="margin-top:20px;" v-else><a href="https://www.logpay.cn/account/#/user/recharge">余额不足请先充值</a></el-button>
-    <el-checkbox v-model="checked" style="margin-bottom:3px;">开启自动套餐续费</el-checkbox>
+  </div>
+  <div class="meal-time">
+      <p>过期时间</p>
+      <span style="color:#67C23A;">{{ Time }}</span>
+  </div>
+  <div class="price">
+      <p>费用</p>
+      <p style="color:#67C23A;font-size:15px;">总费用￥{{ all_price }}, 原套餐抵扣￥{{ d_price }}, 补差价￥{{ price }}</p>
+  </div>
+      <el-button type="success" style="margin-top:20px;" v-if="enough" @click="submit">确定</el-button>
+      <el-button type="success" style="margin-top:20px;" v-else><a href="https://www.logpay.cn/account/#/user/recharge">余额不足请先充值</a></el-button>
+      <el-checkbox v-model="checked" style="margin-bottom:3px;">开启自动套餐续费</el-checkbox>
 </div>
 </div>
 </template>
 <script>
-import axios from 'axios'
 import { mapGetters } from 'vuex'
+import { c_meal } from '@/api/user'
 export default {
    data() {
     return {
@@ -76,25 +79,18 @@ export default {
     }
     },
     computed: {
-        otherMeal () {
-          if (this.meal === 'mf'||this.meal === 'gj'||this.meal === 'bz') {
-            return true
-          } else {
-            return false
-          }
-        },
         Time() {
           if (this.meal == this.value1 && this.meal !='mf' ) {
                      if (this.value2 == 'bb') {
                        return this.time
                      }
                      else if (this.value2 == 'ygy') {
-                        return this.getTime(this.mealtime, 1)
+                        return this.getTime(this.mealtime ,1)
                      } else if (this.value2 == 'sgy') {
                         return this.getTime(this.mealtime, 3)
-                     } else if (this.value2 == 'bn') {
+                     } else if (mealtime == 'bn') {
                         return this.getTime(this.mealtime, 6)
-                     } else if (this.value2 == 'yn') {
+                     } else if (mealtime == 'yn') {
                         return this.getTime(this.mealtime, 12)
                      }
                 } else if (this.meal == 'mf') {
@@ -173,7 +169,7 @@ export default {
             return '0.00'
           } else if (this.meal == 'bz') {
             if (this.value1 == 'mf') {
-              this.$message.error('请在该套餐到期后降低套餐')
+              alert('不能降低套餐!')
               this.value1 = 'bz'
               return '0.00'
             }
@@ -194,7 +190,7 @@ export default {
             return parseFloat(y*365*0.5+m*30*0.5+d*0.5).toFixed(2,'0')
           } else if (this.meal == 'gj') {
             if (this.value1 == 'bz' || this.value1 == 'mf') {
-              this.$message.error('请在该套餐到期后降低套餐')
+              alert('不能降低套餐!')
               this.value1 = 'gj'
               return '0.00'
             }
@@ -223,17 +219,21 @@ export default {
         date.setMonth(date.getMonth()+ month -1 )
         return `${date.getFullYear()}-${('0' + (date.getMonth()+1).toString()).slice(-2)}-${('0' + date.getDate().toString()).slice(-2)}`
       },
-      submit() {
+      async submit() {
         if (this.value1 == 'mf' && this.meal == 'mf') {
-          return this.$message.success('套餐续费成功')
+          location.href = '/#/user/cmeal'
+          return
         }
         // bz升级gj过程中防止客户损失
         if (parseFloat(this.all_price-this.d_price) < 0) {
-          return this.$message.error('充值参数有误')
+          alert('充值参数有误!')
+          return false
         }
-        axios.post('https://api.logpay.cn/user/cmeal',{ uid:this.uid, meal:this.value1,mealtime:this.value2,cmoney:this.price,renew:this.checked })
-             .then(res => this.$message.success('套餐续费成功'))
-             .catch(err => this.$message.error('系统繁忙请联系客服'))
+        let data = { uid:this.uid, meal:this.value1,mealtime:this.value2,cmoney:this.price,renew:this.checked }
+        let res = await c_meal(data)
+        if (res.code === 1) {
+          location.reload()
+        }
       },
       gettime() {
         if (this.value1 == 'mf') {
@@ -256,6 +256,7 @@ export default {
     margin:0 auto;
     .meal {
         margin:1% 0;
+        width: 168px;
     }
 }
 </style>

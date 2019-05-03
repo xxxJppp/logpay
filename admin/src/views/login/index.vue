@@ -1,7 +1,7 @@
 <template>
     <div class="login-container" ref="login-container">
       <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
-        <h3 class="title">LogPay 个人收款</h3>
+        <h3 class="title">LogPay 收款系统</h3>
         <el-form-item prop="email">
           <span class="svg-container">
             <svg-icon icon-class="user" />
@@ -29,7 +29,8 @@
           </span>
         </el-form-item>
         <el-checkbox v-model="checked" style="margin-bottom:3px;">注册一个新用户</el-checkbox>
-        <a href="https://www.logpay.cn/account/#/user/argeement" v-if="checked" style="color:#409EFF;display:block;text-align:center;margin:5px 0;font-size:15px;">注册即代表同意《LogPay 用户协议》</a>
+        <el-checkbox v-model="rememberAccount" style="margin-bottom:3px;float:right;">记住密码</el-checkbox>
+        <a href="/account/#/user/argeement" v-if="checked" style="color:#409EFF;display:block;text-align:center;margin:5px 0;font-size:15px;">注册即代表同意《LogPay 用户协议》</a>
         <el-form-item>
           <el-button :loading="loading" type="success" style="width:100%;" @click.native.prevent="handleLogin" v-if="!checked">
             登陆
@@ -64,6 +65,8 @@ export default {
       }
     }
     return {
+      // 记住密码
+      rememberAccount: true,
       checked:false,
       loginForm: {
         email: '',
@@ -98,6 +101,15 @@ export default {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
+          //判断复选框是否被勾选 勾选则调用配置cookie方法
+          if (this.rememberAccount == true) {
+              //传入账号名，密码，和保存天数3个参数
+              this.setCookie(this.loginForm.email, this.loginForm.password, 1314)
+          }else {
+            console.log("清空Cookie")
+            //清空Cookie
+            this.clearCookie()
+          }
           this.$store.dispatch('Register', this.loginForm).then(() => {
             this.loading = false
             this.$router.push({ path: this.redirect || '/' })
@@ -113,10 +125,19 @@ export default {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
+          //判断复选框是否被勾选 勾选则调用配置cookie方法
+          if (this.rememberAccount == true) {
+              //传入账号名，密码，和保存天数3个参数
+              this.setCookie(this.loginForm.email, this.loginForm.password, 1314)
+          }else {
+            console.log("清空Cookie")
+            //清空Cookie
+            this.clearCookie()
+          }
           this.$store.dispatch('Login', this.loginForm).then(() => {
             this.loading = false
             this.$router.push({ path: this.redirect || '/' })
-          }).catch(() => {
+          }).catch((err) => {
             this.loading = false
           })
         } else {
@@ -125,8 +146,40 @@ export default {
       })
     },
     handleFpassword() {
-      location.href = 'https://www.logpay.cn/account/#/user/fpassword'
+      location.href = '/account/#/user/fpassword'
+    },
+    //设置cookie
+    setCookie(c_name, c_pwd, exdays) {
+        let exdate = new Date(); //获取时间
+        exdate.setTime(exdate.getTime() + 24 * 60 * 60 * 1000 * exdays); //保存的天数
+        //字符串拼接cookie
+        window.document.cookie = "email" + "=" + c_name + ";path=/;expires=" + exdate.toGMTString();
+        window.document.cookie = "password" + "=" + c_pwd + ";path=/;expires=" + exdate.toGMTString();
+    },
+    //读取cookie
+    getCookie() {
+        if (document.cookie.length > 0) {
+            let arr = document.cookie.split('; ') //这里显示的格式需要切割一下自己可输出看下
+            for (let i = 0; i < arr.length; i++) {
+                let arr2 = arr[i].split('=') //再次切割
+                //判断查找相对应的值
+                if (arr2[0] == 'email') {
+                  //  console.log(arr2[1])
+                    this.loginForm.email = arr2[1] //保存到保存数据的地方
+                } else if (arr2[0] == 'password') {
+                  // console.log(arr2[1])
+                    this.loginForm.password = arr2[1]
+                }
+            }
+        }
+    },
+    //清除cookie
+    clearCookie() {
+        this.setCookie("", "", -1) //修改2值都为空，天数为负1天就好了
     }
+  },
+  mounted() {
+    this.getCookie()
   }
 }
 </script>

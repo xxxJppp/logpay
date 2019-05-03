@@ -1,6 +1,8 @@
 <template>
 <div class="recharge">
-    <!-- <p style="font-size:16px;margin:1%  0 0 2.7%;">账户充值</p> -->
+    <!-- <el-breadcrumb separator="/">
+        <el-breadcrumb-item style="margin:2% 0 0 3%;font-size:20px;">账户充值</el-breadcrumb-item>
+    </el-breadcrumb> -->
     <div class="body">
         <ul>
             <li v-for="(moneyList,i) in moneyLists" :key="i" @click="select(i,moneyList)" :class="{ active:i == selectId }">
@@ -31,7 +33,6 @@
 </template>
 <script>
 import { mapGetters } from 'vuex'
-import axios from 'axios'
 export default {
    data() {
     return {
@@ -53,12 +54,12 @@ export default {
       },
     methods: {
         alipay() {
-            if(parseFloat(this.money)<=0) return false
-            location.href = `https://api.logpay.cn/sdk/pay?price=${this.money}&payType=alipay&orderUid=${this.uid}&orderName=LogPayRecharge`
+                if(parseFloat(this.money)<=0) return false
+                location.href = `https://api.logpay.cn/sdk/pay?price=${this.money}&payType=alipay&orderUid=${this.uid}&orderName=LogPayRecharge`
         },
         wxpay() {
              if(parseFloat(this.money)<=0) return false
-             location.href = `https://api.logpay.cn/sdk/pay?price=${this.money}&payType=wxpay&orderUid=${this.uid}&orderName=LogPayRecharge`
+                location.href = `https://api.logpay.cn/sdk/pay?price=${this.money}&payType=wxpay&orderUid=${this.uid}&orderName=LogPayRecharge`
         },
         select(item,moneyList) {
             this.money = moneyList.money

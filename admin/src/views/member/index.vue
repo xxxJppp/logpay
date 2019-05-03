@@ -164,8 +164,9 @@
 </template>
 
 <script>
-import axios from 'axios'
 import { mapGetters } from 'vuex'
+import { get_merchant, change_merchant_meal, get_meal } from '@/api/admin'
+import { get_day_money, get_order_number } from '@/api/order'
 export default {
   data() {
     return {
@@ -238,93 +239,70 @@ export default {
         this.dialogWidth = '42%'
       }
     },
-    getDayMoney(uid) {
-      axios.get('https://api.logpay.cn/order/getDayMoney',{
-        params:{
+    async getDayMoney(uid) {
+        let params = {
         uid
         }
-      })
-      .then(res => {
-          if (res.data.code == -1) {
-              this.$message.error(res.data.msg)
-              return false
-          }
-          this.tod_yes_data[0].ali = res.data.data.tod_ali
-          this.tod_yes_data[1].ali = res.data.data.tod_ali_fee
-          this.tod_yes_data[0].wx = res.data.data.tod_wx
-          this.tod_yes_data[1].wx = res.data.data.tod_wx_fee
-          this.tod_yes_data[0].all = res.data.data.tod_all
-          this.tod_yes_data[1].all = res.data.data.tod_all_fee
-          this.yes_tod_data[0].pay_all = res.data.data.tod_all
+        let res = await get_day_money(params)
+        this.tod_yes_data[0].ali = res.data.tod_ali
+        this.tod_yes_data[1].ali = res.data.tod_ali_fee
+        this.tod_yes_data[0].wx = res.data.tod_wx
+        this.tod_yes_data[1].wx = res.data.tod_wx_fee
+        this.tod_yes_data[0].all = res.data.tod_all
+        this.tod_yes_data[1].all = res.data.tod_all_fee
+        this.yes_tod_data[0].pay_all = res.data.tod_all
 
-          this.tod_yes_data[2].ali = res.data.data.yes_ali
-          this.tod_yes_data[3].ali = res.data.data.yes_ali_fee
-          this.tod_yes_data[2].wx = res.data.data.yes_wx
-          this.tod_yes_data[3].wx = res.data.data.yes_wx_fee
-          this.tod_yes_data[2].all = res.data.data.yes_all
-          this.tod_yes_data[3].all = res.data.data.yes_all_fee
-          this.yes_tod_data[1].pay_all = res.data.data.yes_all
+        this.tod_yes_data[2].ali = res.data.yes_ali
+        this.tod_yes_data[3].ali = res.data.yes_ali_fee
+        this.tod_yes_data[2].wx = res.data.yes_wx
+        this.tod_yes_data[3].wx = res.data.yes_wx_fee
+        this.tod_yes_data[2].all = res.data.yes_all
+        this.tod_yes_data[3].all = res.data.yes_all_fee
+        this.yes_tod_data[1].pay_all = res.data.yes_all
 
-          this.tod_yes_data[4].ali = res.data.data.all_ali
-          this.tod_yes_data[5].ali = res.data.data.all_ali_fee
-          this.tod_yes_data[4].wx = res.data.data.all_wx
-          this.tod_yes_data[5].wx = res.data.data.all_wx_fee
-          this.tod_yes_data[4].all = res.data.data.all_all
-          this.tod_yes_data[5].all = res.data.data.all_all_fee
-          this.yes_tod_data[2].pay_all = res.data.data.all_all
-      })
+        this.tod_yes_data[4].ali = res.data.all_ali
+        this.tod_yes_data[5].ali = res.data.all_ali_fee
+        this.tod_yes_data[4].wx = res.data.all_wx
+        this.tod_yes_data[5].wx = res.data.all_wx_fee
+        this.tod_yes_data[4].all = res.data.all_all
+        this.tod_yes_data[5].all = res.data.all_all_fee
+        this.yes_tod_data[2].pay_all = res.data.all_all
     },
-    getOrderNumber(uid) {
-      axios.get('https://api.logpay.cn/order/getOrderNumber',{
-        params:{
+    async getOrderNumber(uid) {
+        let params = {
         uid
         }
-      })
-      .then(res => {
-          if (res.data.code == -1) {
-              this.$message.error(res.data.msg)
-              return false
-          }
-          this.yes_tod_data[0].pay_orderNumber = res.data.data.today_success_order.length
-          this.yes_tod_data[0].no_orderNumber = res.data.data.today_no_order.length
-          this.yes_tod_data[0].all_orderNumber = res.data.data.today_all_order.length
-          this.yes_tod_data[1].pay_orderNumber = res.data.data.yes_success_order.length
-          this.yes_tod_data[1].no_orderNumber = res.data.data.yes_no_order.length
-          this.yes_tod_data[1].all_orderNumber = res.data.data.yes_all_order.length
-          this.yes_tod_data[2].pay_orderNumber = res.data.data.all_success_order.length
-          this.yes_tod_data[2].no_orderNumber = res.data.data.all_no_order.length
-          this.yes_tod_data[2].all_orderNumber = res.data.data.all_order.length
-      })
+        let res = await get_order_number(params)
+        this.yes_tod_data[0].pay_orderNumber = res.data.today_success_order.length
+        this.yes_tod_data[0].no_orderNumber = res.data.today_no_order.length
+        this.yes_tod_data[0].all_orderNumber = res.data.today_all_order.length
+        this.yes_tod_data[1].pay_orderNumber = res.data.yes_success_order.length
+        this.yes_tod_data[1].no_orderNumber = res.data.yes_no_order.length
+        this.yes_tod_data[1].all_orderNumber = res.data.yes_all_order.length
+        this.yes_tod_data[2].pay_orderNumber = res.data.all_success_order.length
+        this.yes_tod_data[2].no_orderNumber = res.data.all_no_order.length
+        this.yes_tod_data[2].all_orderNumber = res.data.all_order.length
     },
-    getMealOptions() {
+    async getMealOptions() {
       let List = []
-      axios({
-        url: 'https://api.logpay.cn/user/getMeal',
-        method: 'get',
-        params: {
+      let params = {
             role:this.roles[0]
+      }
+      let res = await get_meal(params)
+      res.data.meal.forEach(v=>{
+        if (v.mealName === 'mf') {
+          List.push({value:'mf',label:'免费版'})
         }
-    }).then(res => {
-        if (res.data.code == -1) {
-            this.$message.error(res.data.msg)
-            return false
+        else if (v.mealName === 'bz') {
+          List.push({value:'bz',label:'标准版'})
         }
-        res.data.data.meal.forEach(v=>{
-          if (v.mealName === 'mf') {
-            List.push({value:'mf',label:'免费版'})
-          }
-          else if (v.mealName === 'bz') {
-            List.push({value:'bz',label:'标准版'})
-          }
-          else if (v.mealName === 'gj') {
-            List.push({value:'gj',label:'高级版'})
-          } else {
-            List.push({value:v.mealName,label:v.mealName})
-          }
-        })
-        this.mealOptions = List
-    })
-    .catch(err => this.$message.error('系统繁忙'))
+        else if (v.mealName === 'gj') {
+          List.push({value:'gj',label:'高级版'})
+        } else {
+          List.push({value:v.mealName,label:v.mealName})
+        }
+      })
+      this.mealOptions = List
     },
     cancel() {
       this.merchantEdit = false
@@ -335,19 +313,12 @@ export default {
       this.merchantMeal = row.meal
       this.merchantForm = row
     },
-    submitChange() {
+    async submitChange() {
         this.merchantEdit = false
-        axios.post('https://api.logpay.cn/user/changeMerchantMeal', {  _id:this.merchantForm._id,meal:this.merchantMeal,money:this.merchantForm.money,mealtime:this.merchantForm.mealtime,remark:this.merchantForm.remark} )
-           .then(res => {
-             if (res.data.code == -1) {
-                        this.$message.error(res.data.msg)
-                        return false
-                    } else {
-                        this.$message.success(res.data.msg)
-                        this.getMerchant()
-                }
-             })
-           .catch(err => this.$message.error(err))
+        let data = {  _id:this.merchantForm._id,meal:this.merchantMeal,money:this.merchantForm.money,mealtime:this.merchantForm.mealtime,remark:this.merchantForm.remark}
+        let res = await change_merchant_meal(data)
+        this.$message.success(res.msg)
+        this.getMerchant()
     },
     handleMerchant(row) {
       this.merchantCount = true
@@ -369,31 +340,22 @@ export default {
       this.getMerchant()
             },
     // 发起获得订单列表
-    getMerchant() {
+    async getMerchant() {
       this.listLoading = true
-      axios({
-        url: 'https://api.logpay.cn/user/getMerchant',
-        method: 'get',
-        params: {
+      let params = {
             type:this.value1,
             value:this.value2,
             page: this.page.page,
             num: this.page.num,
-            role:this.roles[0]
-        }
-    }).then(res => {
-        if (res.data.code == -1) {
-            this.$message.error(res.data.msg)
-            return false
-        }
-        this.list = res.data.data.select
-        this.list.map(v=>{
-          v.date = `${v.date.substring(0,10)} ${v.date.substring(11,19)}`
-        })
-        this.page.total = res.data.data.user.length
-        this.listLoading = false
-    })
-    .catch(err => this.$message.error('系统繁忙'))
+            role: this.roles[0]
+      }
+      let res = await get_merchant(params)
+      this.list = res.data.select
+      this.list.map(v=>{
+        v.date = `${v.date.substring(0,10)} ${v.date.substring(11,19)}`
+      })
+      this.page.total = res.data.user.length
+      this.listLoading = false
     }
   }
     // watch: {

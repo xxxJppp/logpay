@@ -82,7 +82,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import axios from 'axios'
+import { get_order_number, get_day_money } from '@/api/order'
 export default {
   computed: {
     ...mapGetters([
@@ -114,63 +114,49 @@ export default {
       }
     },
   methods: {
-    getDayMoney() {
-      axios.get('https://api.logpay.cn/order/getDayMoney',{
-        params:{
+    async getDayMoney() {
+        let params = {
         uid:this.uid
         }
-      })
-      .then(res => {
-          if (res.data.code == -1) {
-              this.$message.error(res.data.msg)
-              return false
-          }
-            this.tod_yes_data[0].ali = res.data.data.tod_ali
-            this.tod_yes_data[1].ali = res.data.data.tod_ali_fee
-            this.tod_yes_data[0].wx = res.data.data.tod_wx
-            this.tod_yes_data[1].wx = res.data.data.tod_wx_fee
-            this.tod_yes_data[0].all = res.data.data.tod_all
-            this.tod_yes_data[1].all = res.data.data.tod_all_fee
-            this.yes_tod_data[0].pay_all = res.data.data.tod_all
+        let res = await get_day_money(params)
+        this.tod_yes_data[0].ali = res.data.tod_ali
+        this.tod_yes_data[1].ali = res.data.tod_ali_fee
+        this.tod_yes_data[0].wx = res.data.tod_wx
+        this.tod_yes_data[1].wx = res.data.tod_wx_fee
+        this.tod_yes_data[0].all = res.data.tod_all
+        this.tod_yes_data[1].all = res.data.tod_all_fee
+        this.yes_tod_data[0].pay_all = res.data.tod_all
 
-            this.tod_yes_data[2].ali = res.data.data.yes_ali
-            this.tod_yes_data[3].ali = res.data.data.yes_ali_fee
-            this.tod_yes_data[2].wx = res.data.data.yes_wx
-            this.tod_yes_data[3].wx = res.data.data.yes_wx_fee
-            this.tod_yes_data[2].all = res.data.data.yes_all
-            this.tod_yes_data[3].all = res.data.data.yes_all_fee
-            this.yes_tod_data[1].pay_all = res.data.data.yes_all
+        this.tod_yes_data[2].ali = res.data.yes_ali
+        this.tod_yes_data[3].ali = res.data.yes_ali_fee
+        this.tod_yes_data[2].wx = res.data.yes_wx
+        this.tod_yes_data[3].wx = res.data.yes_wx_fee
+        this.tod_yes_data[2].all = res.data.yes_all
+        this.tod_yes_data[3].all = res.data.yes_all_fee
+        this.yes_tod_data[1].pay_all = res.data.yes_all
 
-            this.tod_yes_data[4].ali = res.data.data.all_ali
-            this.tod_yes_data[5].ali = res.data.data.all_ali_fee
-            this.tod_yes_data[4].wx = res.data.data.all_wx
-            this.tod_yes_data[5].wx = res.data.data.all_wx_fee
-            this.tod_yes_data[4].all = res.data.data.all_all
-            this.tod_yes_data[5].all = res.data.data.all_all_fee
-            this.yes_tod_data[2].pay_all = res.data.data.all_all
-      })
+        this.tod_yes_data[4].ali = res.data.all_ali
+        this.tod_yes_data[5].ali = res.data.all_ali_fee
+        this.tod_yes_data[4].wx = res.data.all_wx
+        this.tod_yes_data[5].wx = res.data.all_wx_fee
+        this.tod_yes_data[4].all = res.data.all_all
+        this.tod_yes_data[5].all = res.data.all_all_fee
+        this.yes_tod_data[2].pay_all = res.data.all_all
     },
-    getOrderNumber() {
-      axios.get('https://api.logpay.cn/order/getOrderNumber',{
-        params:{
+    async getOrderNumber() {
+        let params = {
         uid:this.uid
         }
-      })
-      .then(res => {
-          if (res.data.code == -1) {
-              this.$message.error(res.data.msg)
-              return false
-          }
-          this.yes_tod_data[0].pay_orderNumber = res.data.data.today_success_order.length
-          this.yes_tod_data[0].no_orderNumber = res.data.data.today_no_order.length
-          this.yes_tod_data[0].all_orderNumber = res.data.data.today_all_order.length
-          this.yes_tod_data[1].pay_orderNumber = res.data.data.yes_success_order.length
-          this.yes_tod_data[1].no_orderNumber = res.data.data.yes_no_order.length
-          this.yes_tod_data[1].all_orderNumber = res.data.data.yes_all_order.length
-          this.yes_tod_data[2].pay_orderNumber = res.data.data.all_success_order.length
-          this.yes_tod_data[2].no_orderNumber = res.data.data.all_no_order.length
-          this.yes_tod_data[2].all_orderNumber = res.data.data.all_order.length
-      })
+        let res = await get_order_number(params)
+        this.yes_tod_data[0].pay_orderNumber = res.data.today_success_order.length
+        this.yes_tod_data[0].no_orderNumber = res.data.today_no_order.length
+        this.yes_tod_data[0].all_orderNumber = res.data.today_all_order.length
+        this.yes_tod_data[1].pay_orderNumber = res.data.yes_success_order.length
+        this.yes_tod_data[1].no_orderNumber = res.data.yes_no_order.length
+        this.yes_tod_data[1].all_orderNumber = res.data.yes_all_order.length
+        this.yes_tod_data[2].pay_orderNumber = res.data.all_success_order.length
+        this.yes_tod_data[2].no_orderNumber = res.data.all_no_order.length
+        this.yes_tod_data[2].all_orderNumber = res.data.all_order.length
     },
     getMeal() {
       if (this.meal == 'mf') {

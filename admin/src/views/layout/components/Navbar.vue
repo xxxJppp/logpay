@@ -13,7 +13,7 @@
           </el-dropdown-item>
         </router-link>
         <el-dropdown-item divided>
-          <span style="display:block;" @click="logout">退出登录</span>
+          <span style="display:block;" @click="logout">安全退出</span>
         </el-dropdown-item>
       </el-dropdown-menu>
     </el-dropdown>

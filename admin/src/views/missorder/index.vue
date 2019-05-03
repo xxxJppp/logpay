@@ -58,8 +58,8 @@
 </template>
 
 <script>
-import axios from 'axios'
 import { mapGetters } from 'vuex'
+import { getMissOrder } from '@/api/order'
 export default {
   data() {
     return {
@@ -134,7 +134,7 @@ export default {
     ])
   },
   created() {
-    this.getMissOrder()
+    this.get_miss_order()
     this.$notify({
         title: '有4种情况可能匹配不到订单',
         dangerouslyUseHTMLString: true,
@@ -145,65 +145,56 @@ export default {
   methods: {
     // 过滤订单列表
     selectMissOrder() {
-      this.getMissOrder()
+      this.get_miss_order()
     },
     // 每一页有多少的订单个数
     handleSizeChange(val) {
         this.page.num = val
-        this.getMissOrder()
+        this.get_miss_order()
       },
     // 下一页
     nextPage (val) {
       this.page.page = val;
-      this.getMissOrder()
+      this.get_miss_order()
             },
       // 发起导出订单
-      exportMissOrders() {
-        let money = this.money
-        if (this.money !== null) {
-            money = parseFloat(this.money).toFixed(2,'0')
-        }
-        if (this.missOrderDate === null) {
-          this.missOrderDate = ''
-        }
-        this.listLoading = true
-        axios({
-        url: 'https://api.logpay.cn/order/getMissOrder',
-        method: 'get',
-        params: {
-            pay_price: money,
-            payType:this.type,
-            uid: this.uid,
-            page: this.page.page,
-            num: this.page.num,
-            missOrderDate:this.missOrderDate,
-            merchantUid:this.merchantUid,
-            role:this.roles[0]
-        }
-    }).then(res => {
-        if (res.data.code == -1) {
-            this.$message.error(res.data.msg)
-            return false
-        }
-        this.listLoading = false
-        import('@/vendor/Export2Excel').then(excel => {
-        const tHeader = ['未匹配金额', '支付渠道', '支付时间']
-        const filterVal = ['payPrice', 'payType', 'createTime']
-        this.exportMissList = res.data.data.missOrder
-        this.exportMissList.map(v => {
-            v.createTime = `${v.createTime.substring(0,10)} ${v.createTime.substring(11,19)}`
-        })
-        const data = this.formatJson(filterVal, this.exportMissList)
-        excel.export_json_to_excel({
-          header: tHeader,
-          data,
-          filename: 'LogPayMissOrders',
-          autoWidth: true,
-          bookType: 'xls'
-        })
+    async exportMissOrders() {
+      let money = this.money
+      if (this.money !== null) {
+          money = parseFloat(this.money).toFixed(2,'0')
+      }
+      if (this.missOrderDate === null) {
+        this.missOrderDate = ''
+      }
+      this.listLoading = true
+      let params = {
+          payPrice: money,
+          payType:this.type,
+          uid: this.uid,
+          page: this.page.page,
+          num: this.page.num,
+          missOrderDate:this.missOrderDate,
+          merchantUid:this.merchantUid,
+          role:this.roles[0]
+      }
+      let res = await getMissOrder(params)
+      this.listLoading = false
+      import('@/vendor/Export2Excel').then(excel => {
+      const tHeader = ['未匹配金额', '支付渠道', '支付时间']
+      const filterVal = ['payPrice', 'payType', 'createTime']
+      this.exportMissList = res.data.missOrder
+      this.exportMissList.map(v => {
+          v.createTime = `${v.createTime.substring(0,10)} ${v.createTime.substring(11,19)}`
+      })
+      const data = this.formatJson(filterVal, this.exportMissList)
+      excel.export_json_to_excel({
+        header: tHeader,
+        data,
+        filename: 'LogPayMissOrders',
+        autoWidth: true,
+        bookType: 'xls'
       })
     })
-    .catch(err => this.$message.error('系统繁忙请稍等' + err))
     },
     // 过滤导出订单的属性
     formatJson(filterVal, jsonData) {
@@ -220,7 +211,7 @@ export default {
       }))
     },
     // 发起获得订单列表
-    getMissOrder() {
+    async get_miss_order() {
         let money = this.money
         if (this.money !== null) {
             money = parseFloat(this.money).toFixed(2,'0')
@@ -229,33 +220,24 @@ export default {
             this.missOrderDate = ''
         }
         this.listLoading = true
-        axios({
-            url: 'https://api.logpay.cn/order/getMissOrder',
-            method: 'get',
-            params: {
-                pay_price:money,
-                payType:this.type,
-                uid: this.uid,
-                page: this.page.page,
-                num: this.page.num,
-                missOrderDate:this.missOrderDate,
-                merchantUid:this.merchantUid,
-                role:this.roles[0]
-            }
-        }).then(res => {
-            if (res.data.code == -1) {
-                this.$message.error(res.data.msg)
-                return false
-            }
-            this.missOrderList = res.data.data.select
-            this.missOrderList.map(v => {
-            v.createTime = `${v.createTime.substring(0,10)} ${v.createTime.substring(11,19)}`
-        })
-            this.page.total = res.data.data.missOrder.length
-            this.listLoading = false
-        })
-        .catch(err => this.$message.error('系统繁忙请稍等' + err))
+        let params = {
+            payPrice:money,
+            payType:this.type,
+            uid: this.uid,
+            page: this.page.page,
+            num: this.page.num,
+            missOrderDate:this.missOrderDate,
+            merchantUid:this.merchantUid,
+            role:this.roles[0]
         }
+        let res = await getMissOrder(params)
+        this.missOrderList = res.data.select
+        this.missOrderList.map(v => {
+        v.createTime = `${v.createTime.substring(0,10)} ${v.createTime.substring(11,19)}`
+        })
+        this.page.total = res.data.missOrder.length
+        this.listLoading = false
+      }
     }
 }
 </script>

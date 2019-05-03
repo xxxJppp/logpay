@@ -69,9 +69,8 @@
 </template>
 
 <script>
-import axios from 'axios'
 import { mapGetters } from 'vuex'
-
+import { get_meal, del_meal, add_meal, change_meal } from '@/api/admin'
 export default {
   data() {
     return {
@@ -122,33 +121,19 @@ export default {
         this.mealForm.mealPrice = ''
         this.dialogFormVisible = true
     },
-    submitAdd() {
+    async submitAdd() {
         this.dialogFormVisible = false
-        axios.post('https://api.logpay.cn/user/addMeal', this.mealForm )
-           .then(res => {
-                if (res.data.code == -1) {
-                        this.$message.error(res.data.msg)
-                        return false
-                    } else {
-                        this.$message.success(res.data.msg)
-                        this.getMealList()
-                }
-             })
-           .catch(err => this.$message.error(err))
+        let data = this.mealForm
+        let res = await add_meal(data)
+        this.$message.success(res.msg)
+        this.getMealList()
     },
-    submitChange() {
+    async submitChange() {
         this.dialogFormVisible = false
-        axios.post('https://api.logpay.cn/user/changeMeal', this.mealForm )
-           .then(res => {
-             if (res.data.code == -1) {
-                        this.$message.error(res.data.msg)
-                        return false
-                    } else {
-                        this.$message.success(res.data.msg)
-                        this.getMealList()
-                }
-             })
-           .catch(err => this.$message.error(err))
+        let data = this.mealForm
+        let res = await change_meal(data)
+        this.$message.success(res.msg)
+        this.getMealList()
     },
     // 每一页有多少的订单个数
     handleSizeChange(val) {
@@ -160,26 +145,17 @@ export default {
       this.page.page = val;
       this.getMealList()
             },
-    getMealList() {
+    async getMealList() {
       this.listLoading = true
-      axios({
-        url: 'https://api.logpay.cn/user/getMeal',
-        method: 'get',
-        params: {
-            page: this.page.page,
-            num: this.page.num,
-            role:this.roles[0]
-        }
-    }).then(res => {
-        if (res.data.code == -1) {
-            this.$message.error(res.data.msg)
-            return false
-        }
-        this.list = res.data.data.select
-        this.page.total = res.data.data.meal.length
-        this.listLoading = false
-    })
-    .catch(err => this.$message.error('系统繁忙'))
+      let params = {
+          page: this.page.page,
+          num: this.page.num,
+          role:this.roles[0]
+      }
+      let res = await get_meal(params)
+      this.list = res.data.select
+      this.page.total = res.data.meal.length
+      this.listLoading = false
     },
     handleUpdate(row) {
       this.dialogFormVisible = true
@@ -217,24 +193,15 @@ export default {
             })
     },
     delMeal (id) {
-                return new Promise(async (res, rej) => {
-                    axios({
-                        url: 'https://api.logpay.cn/user/delMeal',
-                        method: 'delete',
-                        data: {
-                            id: id
-                        }
-                    }).then(res => {
-                        if (res.data.code == -1) {
-                        this.$message.error(res.data.msg)
-                        return false
-                            } else {
-                                this.$message.success(res.data.msg)
-                                this.getMealList()
-                        }
-                    })
-                })
-            },
+        return new Promise(async (resolve, reject) => {
+            let data = {
+                id: id
+            }
+            let res = await del_meal(data)
+            this.$message.success(res.msg)
+            this.getMealList()
+        })
     }
+  }
 }
 </script>

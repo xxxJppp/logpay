@@ -1,0 +1,90 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  	<title>支付宝</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="Content-Language" content="zh-cn">
+    <meta name="apple-mobile-web-app-capable" content="no"/>
+    <meta name="apple-touch-fullscreen" content="yes"/>
+    <meta name="format-detection" content="telephone=no,email=no"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="white">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="Cache" content="no-cache">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <link href="https://pay2.xunhupay.com/content/css/pay-simple.css" rel="stylesheet" media="screen" />
+    <script type="text/javascript" src="https://pay2.xunhupay.com/content/js/jquery-2.1.4.js"></script>
+
+</head>
+
+<body>
+<div class="body">
+
+    <div class="mod-ct">
+         <div class="xh-usertitle">测试：任意金额体验 </div>
+
+        <div class="amount" id="money" style="margin-top:0">￥0.1</div>
+
+          <div class ="payweixinbtn" align="center" style="margin-top:15px;"></div>
+          <div class ="payweixinbtn" align="center">
+           <p style="color:red;text-align: center" style="margin-bottom:15px;font-size: 15px;">手机截屏后，用支付宝扫一扫相册</p>
+         </div>
+
+        <div class="qrcode-img-wrapper" data-role="qrPayImgWrapper">
+            <div data-role="qrPayImg" class="qrcode-img-area">
+                <div style="position: relative;display: inline-block;margin-top: 15px;"  id="parent-qrcode">
+                    <img id="show_qrcode" src="" width="210" height="210" style="display: block;border:solid 1px #f1f1f1;"/>
+                </div>
+            </div>
+        </div>
+       <div class="time-item"><h1>订单:#1503473</h1> </div>
+
+
+
+        <div class="tip-text"></div>
+ <script>
+   			document.addEventListener("resume", function (a) {
+              returnApp();
+            });
+   
+
+            function returnApp() {
+                AlipayJSBridge.call("exitApp");
+            }
+            function ready(a) {
+                window.AlipayJSBridge ? a && a() : document.addEventListener("AlipayJSBridgeReady", a, !1);
+            }
+
+            ready(function () {
+                try {
+                    var a = {
+                        actionType: "scan",
+                        u: "2088522593443144",
+                        a: "0.10",
+                        m: "1503473.d3",
+                        biz_data: {
+                            s: "money",
+                            u: "2088522593443144",
+                            a: "0.10",
+                            m: "1503473.d3"
+                        }
+                    }
+                } catch (b) {
+                    returnApp()
+                }
+                AlipayJSBridge.call("startApp", {
+                    appId: "20000123",
+                    param: a
+                }, function (a) {});
+            });
+
+        </script>
+
+    </div>
+</div>
+</body>
+</html>
+
