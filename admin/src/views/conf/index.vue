@@ -70,7 +70,7 @@
                 <el-button type="danger" @click="submitUserid" round>配置</el-button>
                 </div>
                 </div>
-                <p style="color:red;">第2步.上传手机 {{ value }} 的微信支付宝二维码(至少要上传支付宝微信的任意码即不固定码)。</p>
+                <p style="color:red;">第2步.上传手机 {{ value }} 的微信支付宝二维码(至少要上传支付宝微信的任意码即不固定码 <a style="color:blue;" target="_blank" href="https://www.logpay.cn/document/#getCode">怎么获取收款二维码？</a>)。</p>
                 <el-upload
                     :multiple = "true"
                     class="upload-demo"
