@@ -27,6 +27,14 @@ let phoneIdsSchema = new Schema({
     alipayLimit: {
         type: String,
         default: null
+    },
+    alipayRemark: {
+        type: String,
+        required: false
+    },
+	wxpayRemark: {
+        type: String,
+        required: false
     }
 })
 

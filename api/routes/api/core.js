@@ -10,7 +10,7 @@ const Meal = require('../../models/Meals')
 const PhoneId = require('../../models/PhoneIds')
 const request = require('request')
 const passport = require('passport')
-		let urlencode = require('urlencode')
+let urlencode = require('urlencode')
 // 引用工具
 let tools = new Tools()
 // 16进制编码
@@ -40,6 +40,7 @@ router.post('/server/api/pay', async (req,res)=>{
 					// 如果没有useid
 					if(phone.userid) {
 						let alipayCodeUrl = 'alipays://platformapi/startapp?appId=20000123&actionType=scan&biz_data={"s":"money","u":"'+ phone.userid +'","a":"'+payPrice+'","m":""}'
+					let h5Url = 'https://render.alipay.com/p/s/i?scheme=' + encodeUrl( 'alipays://platformapi/startapp?saId=10000007&qrcode=' + encodeUrl('https://api.logpay.cn/server/api/alipayH5?u='+ phone.userid + '&a='+ payPrice+'&_s=web-other'))
 						res.render('alipay.html',{
 							    createTime:createTime,
 								money: payPrice,
@@ -49,7 +50,7 @@ router.post('/server/api/pay', async (req,res)=>{
 								codeUrl: alipayCodeUrl,
 								expire: expire,
 								uid:uid,
-								goAlipay: 'alipays:plantformapi'
+								goAlipay:h5Url
 							})
 						} else {
 						Qrcode.findOne({price:payPrice, phoneId, uid, type:'支付宝'})
@@ -127,6 +128,21 @@ router.post('/server/api/pay', async (req,res)=>{
 	let deviceAgent = req.headers["user-agent"].toLowerCase()
     let agentID = deviceAgent.match(/(iphone|ipod|ipad|android)/)
 	let { uid, price, orderNumber, payType, notifyUrl, returnUrl, sign, orderUid, orderName, ip } = req.body
+	if (!uid) {
+		res.send('缺少商户uid参数')
+	}
+	if (!price) {
+		res.send('缺少price参数')
+	}
+	if (!payType) {
+		res.send('缺少payType参数')
+	}
+	if (!orderNumber) {
+		res.send('缺少orderNumber参数')
+	}
+	if (!notifyUrl) {
+		res.send('缺少notifyUrl参数')
+	}
 	console.log(req.body)
     // 获取指定用户的token
 	let token = tools.getToken(uid)
@@ -522,6 +538,17 @@ router.get('/server/api/alipay', (req, res)=>{
 		 })
 		 .catch(err => res.json('网关错误' + err))
 })
-
-
+// h5跳转
+router.get('/server/api/alipayH5', (req, res)=>{
+	let { u, a } = req.query
+	// 判断浏览器
+	let deviceAgent = req.headers["user-agent"].toLowerCase()
+    let agentID = deviceAgent.match(/(alipay)/)
+	if (agentID) {
+		let h5Url ='https://render.alipay.com/p/s/i/?scheme='+encodeUrl('alipays://platformapi/startapp?appId=20000123&actionType=scanAndRoute&qrcode=alipays://platformapi/startapp?appId=20000123&actionType=scan&biz_data={"s":"money","u":"'+u+'","a":"'+a+'","m":""}')
+	res.redirect(h5Url)
+	} else {
+		res.send('系统繁忙')
+	}
+})
 module.exports = router

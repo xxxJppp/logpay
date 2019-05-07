@@ -38,7 +38,7 @@
                     <img id="show_qrcode">
 					<img id="qrcode" style="display:none;">
                     <canvas id="imgCanvas" width="220" height="226" style = "display: none;"></canvas>
-                    <div id="phonePay">
+                    <div id="phonePay" style="display:none;">
 					<p>1.长按保存上面二维码(*如果无法保存请截图)</p>
 					<a id="weixin" href=""
 					<button style="
@@ -99,7 +99,6 @@
 		    $('#weixin').attr("href", "weixin://")
 
         } else {
-		$('#phonePay').css('display','none')
         $('#pc').css('display','inline')
 		}
      })

@@ -47,7 +47,7 @@
       :total="page.total">
     </el-pagination>
 
-    <el-dialog title="编辑套餐" :visible.sync="dialogFormVisible" :width="dialogWidth">
+    <el-dialog title="编辑套餐" :visible.sync="dialogFormVisible" :width="dialogWidth" top="100px">
     <el-form :model="mealForm">
         <el-form-item label="套餐费率" :label-width="formLabelWidth">
             <el-input v-model="mealForm.mealFee" autocomplete="off" placeholder="例:0.008"></el-input>

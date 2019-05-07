@@ -1,5 +1,13 @@
 <template>
 <div class="wrapper">
+  <el-alert
+      style="margin:5px 0;"
+      title="每日会对交易流水大的商户进行抽查,请不要用于违规站点! 严禁一切淫秽、涉赌、政治、钓鱼、诈骗、理财、借贷、封建迷信等非法网站使用！ 
+重点处理对象 赌博:(博彩 夺宝 竞猜 红包赌博 可变现游戏) 金融：(微盘 借贷 理财) 淫秽：(资源 盒子 网盘 打赏观看) 影响游戏公平性：(自瞄 透视 加速 无敌等等) 诈骗：(虚假商品 操纵概率) 包括但不限于此类"
+      type="error"
+      effect="dark"
+      >
+  </el-alert>
   <div class="header">
     <div class="hleft">
       <el-button type="primary" size="mini"><a href="https://www.logpay.cn/account/#/user/cmeal">修改套餐</a></el-button>
@@ -13,33 +21,33 @@
       <p>{{ money }}</p>
     </div>
   </div>
-    <div class="today">
+  <div class="today">
       <p style="text-align:center;">交易额数据</p>
       <el-table
-    :data="tod_yes_data"
-    border
-    style="width: 100%">
-    <el-table-column
-      align="center"
-      prop="tod_yes"
-      label="">
-    </el-table-column>
-    <el-table-column
-      align="center"      
-      prop="all"
-      label="总收入">
+      :data="tod_yes_data"
+      border
+      style="width: 100%">
+      <el-table-column
+        align="center"
+        prop="tod_yes"
+        label="">
       </el-table-column>
-    <el-table-column
-      align="center"      
-      prop="ali"
-      label="支付宝">
-    </el-table-column>
-    <el-table-column
-      align="center"
-      prop="wx"
-      label="微信支付">
-    </el-table-column>
-  </el-table>
+      <el-table-column
+        align="center"      
+        prop="all"
+        label="总收入">
+        </el-table-column>
+      <el-table-column
+        align="center"      
+        prop="ali"
+        label="支付宝">
+      </el-table-column>
+      <el-table-column
+        align="center"
+        prop="wx"
+        label="微信支付">
+      </el-table-column>
+    </el-table>
   <div class="yes_tod_data">
     <p style="text-align:center;">订单数据</p>
       <el-table
@@ -83,6 +91,7 @@
 <script>
 import { mapGetters } from 'vuex'
 import { get_order_number, get_day_money } from '@/api/order'
+import { constants } from 'fs';
 export default {
   computed: {
     ...mapGetters([
@@ -107,13 +116,14 @@ export default {
           {tod_yes: '总手续费',all:'加载中...',ali:'加载中...',wx:'加载中...'}
           ],
         yes_tod_data: [
-          { yes_tod:'今日', all_orderNumber:'加载中...', no_orderNumber:'加载中...', pay_orderNumber:'加载中...',pay_all: '加载中...' },
-          { yes_tod:'昨日', all_orderNumber:'加载中...', no_orderNumber:'加载中...', pay_orderNumber:'加载中...',pay_all: '加载中...' },
-          { yes_tod:'总', all_orderNumber:'加载中...', no_orderNumber:'加载中...', pay_orderNumber:'加载中...',pay_all: '加载中...' }
+          { yes_tod:'今日', all_orderNumber:'加载中...', no_orderNumber:'加载中...', pay_orderNumber:'加载中...', pay_all: '加载中...' },
+          { yes_tod:'昨日', all_orderNumber:'加载中...', no_orderNumber:'加载中...', pay_orderNumber:'加载中...', pay_all: '加载中...' },
+          { yes_tod:'总', all_orderNumber:'加载中...', no_orderNumber:'加载中...', pay_orderNumber:'加载中...', pay_all: '加载中...' }
         ]
       }
     },
   methods: {
+    // 获取手机
     async getDayMoney() {
         let params = {
         uid:this.uid
@@ -142,6 +152,7 @@ export default {
         this.tod_yes_data[4].all = res.data.all_all
         this.tod_yes_data[5].all = res.data.all_all_fee
         this.yes_tod_data[2].pay_all = res.data.all_all
+        this.tod_yes_data = this.tod_yes_data.concat(res.data.phoneIdsArr)
     },
     async getOrderNumber() {
         let params = {

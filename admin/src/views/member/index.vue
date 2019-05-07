@@ -57,7 +57,7 @@
       :total="page.total">
     </el-pagination>
 
-    <el-dialog title="编辑商户" :visible.sync="merchantEdit"  :width="dialogWidth">
+    <el-dialog title="编辑商户" :visible.sync="merchantEdit"  :width="dialogWidth" top="100px">
     <el-form :model="merchantForm">
         <el-form-item label="商户号" :label-width="formLabelWidth">
             <el-input v-model="merchantForm.uid" auto-complete="off" placeholder="" :disabled="true"></el-input>
@@ -93,7 +93,7 @@
     </div>
     </el-dialog>
 
-    <el-dialog title="商户统计" :visible.sync="merchantCount" :width="dialogWidth">
+    <el-dialog title="商户统计" :visible.sync="merchantCount" :width="dialogWidth" top="100px">
         <p style="text-align:center;">交易额数据</p>
         <el-table
         :data="tod_yes_data"

@@ -1,12 +1,14 @@
 const express = require('express')
 const router = express.Router()
 const Order = require('../../models/Orders')
-const MissOrder = require('../../models/MissOrders') 
+const MissOrder = require('../../models/MissOrders')
+const PhoneId = require('../../models/PhoneIds')
 const Tools = require('../../utils/utils')
 const passport = require('passport')
 // 引用工具
 let tools = new Tools()
 let { localDate } = tools
+// 获取订单
 router.get('/order/getOrder', passport.authenticate("jwt",{session:false}), (req, res)=>{
   try {
         let params = req.query
@@ -86,6 +88,7 @@ router.get('/order/getOrder', passport.authenticate("jwt",{session:false}), (req
             }
 })
 
+// 获取未匹配订单
 router.get('/order/getMissOrder', passport.authenticate("jwt",{session:false}), (req, res)=>{
   try {  
         let params = req.query
@@ -152,6 +155,7 @@ router.get('/order/getMissOrder', passport.authenticate("jwt",{session:false}), 
                 })
             }
 })
+// 获取钱
 router.get('/order/getDayMoney', passport.authenticate("jwt",{session:false}), async (req, res)=>{
 try {
     let { uid,role } = req.query
@@ -182,6 +186,29 @@ try {
              .catch( err => reject(err))
         })
         }
+		// 获取商户手机列表
+		const getPhoneIds = (uid) => {
+        return new Promise((resolve, reject)=>{
+            PhoneId.find({uid})
+             .then( phone =>{
+                 resolve(phone.map(v =>{
+					 return v.id
+				 }))
+             })
+             .catch( err => reject(err))
+        })
+        }
+		// 获取商户手机各订单列表
+		const getPhoneIdsOrderArr = (phone, order) =>{
+			return new Promise((resolve, reject)=>{
+				phone.forEach(p =>{
+					// 组成订单
+						resolve(order.filter( v=>{
+						return v.phoneId == p
+					}))
+				})
+			})
+		}
         const sum = (property,arr) => {
             let s = 0
             arr.forEach(e => {
@@ -189,6 +216,35 @@ try {
             })
             return parseFloat(s)
         }
+		// 手机详细费用
+		const getPhoneIdsMoneyArr = (dayType, all_success_order, ali_success_order, wx_success_order) => {
+            let tod_arr = []
+			for (let i = 0; i < phoneIds.length; i++) {
+				let p = phoneIds[i]
+				let all_phoneId_order = all_success_order.filter( v=>{
+					return v.phoneId == p
+				})
+				let ali_phoneId_order = ali_success_order.filter( v=>{
+					return v.phoneId == p
+				})
+				let wx_phoneId_order = wx_success_order.filter( v=>{
+					return v.phoneId == p
+				})
+				let all_phoneId_money = sum('payPrice', all_phoneId_order).toFixed(2,'0')
+				let ali_phoneId_money = sum('payPrice', ali_phoneId_order).toFixed(2,'0')
+				let wx_phoneId_money = sum('payPrice', wx_phoneId_order).toFixed(2,'0')
+				let tod_yes = ''
+				if(dayType == 'tod') {
+					tod_yes = '今手机'+p+'交易额'
+				} else if(dayType == 'yes') {
+					tod_yes = '昨手机'+p+'交易额'
+				} else if(dayType == 'all') {
+					tod_yes = '总手机'+p+'交易额'
+				}
+				tod_arr.push({tod_yes, all:all_phoneId_money, ali:ali_phoneId_money, wx:wx_phoneId_money})
+			}
+            return tod_arr		
+		}
         if (role === 'admin') {
             // 今日交易额数据
             let tod_ali_success_order = await getDayMoney('alipay','',{$gte:now})
@@ -199,6 +255,7 @@ try {
             let tod_wx = sum('payPrice',tod_wx_success_order).toFixed(2,'0')
             let tod_all = (parseFloat(tod_ali) + parseFloat(tod_wx)).toFixed(2, '0')
             let tod_all_fee = (parseFloat(tod_ali_fee) + parseFloat(tod_wx_fee)).toFixed(3, '0')
+			
             // 昨日交易额数据
             let yes_ali_success_order = await getDayMoney('alipay','',{$gte:yes,$lt:now})
             let yes_ali = sum('payPrice',yes_ali_success_order).toFixed(2,'0')
@@ -241,8 +298,10 @@ try {
                     all_ali_fee
                 }
             })
-    }       
-            let tod_ali_success_order = await getDayMoney('alipay',uid,{$gte:now})
+    }       // 获取商户手机列表数组
+			let phoneIds = await getPhoneIds(uid)
+			let tod_all_success_order = await getDayMoney('', uid, {$gte:now})
+            let tod_ali_success_order = await getDayMoney('alipay', uid, {$gte:now})
             let tod_ali = sum('payPrice',tod_ali_success_order).toFixed(2,'0')
 			let tod_ali_fee = sum('fee',tod_ali_success_order).toFixed(3,'0')
             let tod_wx_success_order = await getDayMoney('wxpay',uid,{$gte:now})
@@ -250,7 +309,9 @@ try {
 			let tod_wx_fee = sum('fee',tod_wx_success_order).toFixed(3,'0')
             let tod_all = (parseFloat(tod_ali) + parseFloat(tod_wx)).toFixed(2, '0')
 			let tod_all_fee = (parseFloat(tod_ali_fee) + parseFloat(tod_wx_fee)).toFixed(3, '0')
-
+			let todPhoneIdsArr = getPhoneIdsMoneyArr('tod',tod_all_success_order, tod_ali_success_order, tod_wx_success_order)
+			
+			let yes_all_success_order = await getDayMoney('', uid, {$gte:yes,$lt:now})
             let yes_ali_success_order = await getDayMoney('alipay',uid,{$gte:yes,$lt:now})
             let yes_ali = sum('payPrice', yes_ali_success_order).toFixed(2,'0')
 			let yes_ali_fee = sum('fee',yes_ali_success_order).toFixed(3,'0')
@@ -259,7 +320,9 @@ try {
 			let yes_wx_fee = sum('fee',yes_wx_success_order).toFixed(3,'0')
             let yes_all = (parseFloat(yes_ali) + parseFloat(yes_wx)).toFixed(2, '0')
 			let yes_all_fee = (parseFloat(yes_ali_fee) + parseFloat(yes_wx_fee)).toFixed(3, '0')
-
+			let yesPhoneIdsArr = getPhoneIdsMoneyArr('yes', yes_all_success_order, yes_ali_success_order, yes_wx_success_order)
+			
+			let all_all_success_order = await getDayMoney('',uid,'')
             let all_ali_success_order = await getDayMoney('alipay',uid,'')
             let all_ali = sum('payPrice', all_ali_success_order).toFixed(2,'0')
 			let all_ali_fee = sum('fee',all_ali_success_order).toFixed(3,'0')
@@ -268,6 +331,8 @@ try {
             let all_wx_fee = sum('fee',all_wx_success_order).toFixed(3,'0')
             let all_all = (parseFloat(all_ali) + parseFloat(all_wx)).toFixed(2, '0')
 			let all_all_fee = (parseFloat(all_ali_fee) + parseFloat(all_wx_fee)).toFixed(3, '0')
+			let allPhoneIdsArr = getPhoneIdsMoneyArr('all', all_all_success_order, all_ali_success_order, all_wx_success_order)
+			let phoneIdsArr = todPhoneIdsArr.concat(yesPhoneIdsArr).concat(allPhoneIdsArr)
             res.json({
                 code:1,
                 data:{
@@ -288,7 +353,8 @@ try {
                     all_all,
                     all_wx_fee,
                     all_all_fee,
-                    all_ali_fee
+                    all_ali_fee,
+					phoneIdsArr
                 }
             })
 } catch (e) {

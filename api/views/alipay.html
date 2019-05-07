@@ -38,7 +38,7 @@
                     <img id="show_qrcode">
 					<img id="qrcode" style="display:none;">
                     <canvas id="imgCanvas" width="220" height="226" style = "display: none;"></canvas>
-                    <a id="phonePay1" style="color:#fff;display:none;" href="{{ codeUrl }}">
+                    <a id="phonePay1" style="color:#fff;display:none;" href="{{ goAlipay }}">
                     <button  style="
                         width: 300px;
                         background-color:#67C23A;
@@ -103,6 +103,7 @@
 		    $('#phonePay1').css('display','block')
 		    } else {
 			$('#phonePay2').css('display','block')
+			$('#phonePay1').css('display','block')
 			}
         } else {
             $('#pc').css('display','inline')

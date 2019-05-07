@@ -33,7 +33,7 @@
         <el-button type="primary" style="margin:1% 0 1% 46px;" v-if="codeEdit" @click="limitMoney()">设置限额(默认无限额)</el-button>
         <span style="color:green;" v-if="codeEdit">（*多手机并且开启收款时，将轮询收款，如果希望关闭某个手机收款，点击关闭收款即可，如果收款超过限额或没有合适二维码将跳至其他合适手机）</span>
         </div>
-        <el-dialog title="设置限额" :visible.sync="limitMoneyEdit" :width="dialogWidth">
+        <el-dialog title="设置限额" :visible.sync="limitMoneyEdit" :width="dialogWidth" top="200px">
             <el-form :model="limitForm">
                 <el-form-item label="支付宝" :label-width="formLabelWidth">
                     <el-input v-model="limitForm.alipayLimit" autocomplete="off" placeholder="例:100"></el-input>
@@ -61,6 +61,17 @@
                     </el-switch>
                 </el-breadcrumb>
             </div>
+            <div class="remark">
+                    <div class="accountRow">
+                        支付宝<el-input v-model="alipayRemark" placeholder="用于备注可不填"></el-input>
+                    </div>
+                    <span style="margin-left:10px;"></span>
+                    <div class="accountRow">
+                        <span></span>
+                        微信<el-input v-model="wxpayRemark" placeholder="用于备注可不填"></el-input>
+                    </div>
+                    <el-button type="danger" style="margin-left:10px;" @click="submitRemark" round>备注</el-button>
+            </div>
             <div class="container">
                 <div class="attention">
                     <p style="color:red;">第1步.用收款手机 {{ value }} 的支付宝扫描二维码下方获得userid，并在下方配置(*不使用支付宝可跳过)。</p>
@@ -87,7 +98,7 @@
                     <div class="el-upload__tip" slot="tip">单次最多上传300张<span style="color:red;">(*可批量多选上传，如需更大量上传请联系客服)</span></div>
                 </el-upload>
                 <p style="color:red;">第3步. <el-button type="success" style="margin:10px 0;" @click="handleTest()">线上测试</el-button></p>
-                <el-dialog title="线上测试" :visible.sync="testEdit" :width="dialogWidth">
+                <el-dialog title="线上测试" :visible.sync="testEdit" :width="dialogWidth" top="100px">
                     <el-form :model="testForm">
                         <el-form-item label="金额" :label-width="formLabelWidth">
                             <el-input v-model="testForm.price" autocomplete="off" placeholder="例:100"></el-input>
@@ -193,12 +204,16 @@
 </template>
 <script>
 import { mapGetters } from 'vuex'
-import { get_userid ,submit_userid, get_phoneIds, add_phone, get_phone_open, c_phone_open, get_limit_money, c_limit_money} from '@/api/user'
+import { get_userid ,submit_userid, get_phoneIds, add_phone, get_phone_open, c_phone_open, get_limit_money, c_limit_money, submit_remark, get_remark} from '@/api/user'
 import { open_code, remove_type, remove_all, remove_select, del_qrcode, up_qiniu, get_qr_list, get_qr_content } from '@/api/qrcode'
 export default {
   name: 'recharge',
   data() {
     return {
+      // 支付宝备注
+      alipayRemark:'',
+      // 微信备注
+      wxpayRemark:'',
       // form的label宽度
       formLabelWidth: '110px',
       dialogWidth:'92%',
@@ -244,11 +259,8 @@ export default {
     },
     mounted () {
         this.getScreenWidth()
-        this.value = '1'
         this.getPhoneIds()
-        this.getPhoneOpen()
         this.upqiniu()
-        this.getQrList()
         },
     computed: {
       ...mapGetters([
@@ -266,12 +278,35 @@ export default {
             this.getQrList()
             this.getLimitMoney()
             this.getUserid()
+            this.getRemark()
         },
         openPhone (val, oldval) {
             this.cPhoneOpen(val)
         }
     },
     methods:{
+        // 获取账号备注
+        async getRemark() {
+            let params = {
+                uid:this.uid,
+                phoneId:this.value
+            }
+            let res = await get_remark(params)
+            this.alipayRemark = res.data.alipayRemark
+            this.wxpayRemark = res.data.wxpayRemark
+        },
+        // 提交修改
+        async submitRemark() {
+            let data = {
+                uid:this.uid,
+                phoneId:this.value,
+                alipayRemark:this.alipayRemark,
+                wxpayRemark:this.wxpayRemark
+            }
+            let res = await submit_remark(data)
+            this.$message.success(res.msg)
+            this.getRemark()
+        },
         // 打开测试页面
         handleTest() {
             this.testEdit = true
@@ -486,6 +521,7 @@ export default {
             this.phoneIds = list
             if (this.phoneIds.length > 0) {
                 this.codeEdit = true
+                this.value = '1'
             }
         },
         handleExceed (files, fileList) {
@@ -500,6 +536,7 @@ export default {
             let data = { uid:this.uid , phoneId:this.value, userid:this.userid }
             let res = await submit_userid(data)
             this.$message.success(res.msg)
+            this.getUserid()
         },
         handleDelete (type, row) { // 删除
                 let that = this
@@ -640,6 +677,21 @@ export default {
       }
     .code {
         padding-top: 5px;
+            .remark {
+                white-space:nowrap;
+                overflow-x:auto;
+                overflow-y:hidden;
+                display:-webkit-box;
+                width: 100%;
+                margin: 5px 0;
+                .accountRow {
+                    display: inline-block;
+                    .el-input {
+                        margin-left: 5px;
+                        width: 188px;
+                    }
+                }
+            }
             .attention {
             .userid {
                 width: 100%;

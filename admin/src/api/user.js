@@ -78,3 +78,19 @@ export function password_reset(data) {
     data
   })
 }
+
+// remark
+export function get_remark(params) {
+  return request({
+    url: '/user/getPhoneRemark',
+    method: 'get',
+    params
+  })
+}
+export function submit_remark(data) {
+  return request({
+    url: '/user/cPhoneRemark',
+    method: 'post',
+    data
+  })
+}

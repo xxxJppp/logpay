@@ -812,6 +812,65 @@ router.get('/user/test', (req, res)=>{
     })
 })
 
+// 获取帐户备注
+router.get('/user/getPhoneRemark', passport.authenticate("jwt",{session:false}), (req, res)=>{
+	let { uid, phoneId } = req.query
+	PhoneId.findOne({ uid, id:phoneId })
+	       .then( phone=>{
+			   if (phone.alipayRemark != null && phone.wxpayRemark != null) {
+					if (phone) {
+					   res.json({
+						   code: 1,
+						   data: {
+							   alipayRemark:phone.alipayRemark,
+							   wxpayRemark:phone.wxpayRemark
+						   },
+						   msg: '获取成功'
+					   })
+				   } else {
+					   res.send({
+						   code: 0,
+						   msg: '无该手机'
+					   })
+				   }
+			   } else {
+				res.json({
+				   code: 1,
+				   data:{
+					   alipayRemark: '',
+					   wxpayRemark: ''
+				   },
+				   msg: '获取成功'
+			   })
+			   }			   
+		   })
+		   .catch(err =>{
+			   res.json({
+				   code: -1,
+				   errData: err,
+				   msg: '系统繁忙请稍等' + err
+			   })
+		   })
+})
+
+// 帐户备注
+router.post('/user/cPhoneRemark', passport.authenticate("jwt",{session:false}), (req, res)=>{
+	let { uid, phoneId, alipayRemark, wxpayRemark } = req.body
+	PhoneId.updateMany({ uid, id:phoneId }, { alipayRemark, wxpayRemark })
+	       .then( phone=>{
+			   res.json({
+				   code: 1,
+				   msg: '备注成功'
+			   })
+		   })
+		   .catch(err =>{
+			   res.json({
+				   code: -1,
+				   errData: err,
+				   msg: '系统繁忙请稍等' + err
+			   })
+		   })
+})
 // 配置文件下载
 router.get("/download/APK", (req, res)=>{
     res.download("public/download/LogPay.apk")
