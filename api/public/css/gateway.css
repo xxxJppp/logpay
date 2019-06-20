@@ -126,7 +126,7 @@ body, .body {
 .ico_log {
     display: inline-block;
     width: 130px;
-    height: 38px;
+    height: 40px;
     vertical-align: middle;
     margin-right: 7px
 }
@@ -139,6 +139,11 @@ body, .body {
 
 .ico-wxpay {
     background: url("/public/img/logo_weixin.jpg") no-repeat;
+    background-size:cover;
+}
+
+.ico-lakala {
+    background: url("/public/img/logo_lakala.png") no-repeat;
     background-size:cover;
 }
 

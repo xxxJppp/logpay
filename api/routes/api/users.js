@@ -256,7 +256,7 @@ router.post('/user/cmeal', passport.authenticate("jwt",{session:false}), (req, r
                      }
                 }
                 user.meal = meal
-                user.money = parseFloat(user.money - cmoney).toFixed(2,'0')
+                user.money = parseFloat(user.money - cmoney).toFixed(2)
                 if ((user.money) < 0) {
                     return false
                 }

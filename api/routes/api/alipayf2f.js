@@ -58,7 +58,7 @@ router.post('/server/api/alipayF2fNotify',(req, res)=>{
 									User.findOne({uid})
 									.then(merchant =>{
 										let money = parseFloat(merchant.money) - parseFloat(fee)
-										let Money = money.toFixed(2, '0')
+										let Money = money.toFixed(2)
 										if (Money < 0) {
 											res.json('账户余额不足')
 										}
@@ -67,9 +67,14 @@ router.post('/server/api/alipayF2fNotify',(req, res)=>{
 												User.findOne({uid:'10001'})
 													.then(admin=>{
 														let money = parseFloat(admin.money) + parseFloat(fee)
-														let Money = money.toFixed(2, '0')
+														let Money = money.toFixed(2)
 														User.updateOne({uid:'10001'},{money:Money})
-															.then()
+															.then(Admin => {
+																//升级status
+																Order.updateMany( { orderNumber}, {status:2, payTime, expire:0})
+																		.then(order => res.send('SUCCESS'))
+																		.catch(err => res.send('请联系客服'))
+															})
 															.catch(err=>res.json('fee主账户增加失败'))
 													})
 													.catch(err => res.json('-fee-admin-find-err'))
@@ -77,12 +82,13 @@ router.post('/server/api/alipayF2fNotify',(req, res)=>{
 											.catch(err =>res.json('账户fee扣除失败'))
 									})
 									.catch('fee-no-user')
-								}
+								} else {
 								//升级status
 								Order.updateMany( { orderNumber}, {status:2, payTime, expire:0})
 										.then(order => res.send('SUCCESS'))
 										.catch(err => res.send('请联系客服'))
 								}
+								}	
 						}
 					})
 					})

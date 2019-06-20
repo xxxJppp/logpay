@@ -53,10 +53,13 @@ router.get('/server/api/updateOrder',(req, res)=>{
 															},
 															body: requestData
 														}, (error, response, body) => {
-															console.log(body)
-															if (!error && response.statusCode == 200) {
+															if (error) {
+																console.log(error)
+															    console.log(body)
+															}
+															if (!error) {
 																//异步回调成功
-																if (body === 'SUCCESS') {
+																if (body === 'SUCCESS' || body == ' SUCCESS') {
 																	let date = new Date()
 																	let YearMD = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')} `
 																	let HoursMS = `${date.getHours().toString().padStart(2,'0')}:${date.getMinutes().toString().padStart(2,'0')}:${date.getSeconds().toString().padStart(2,'0')}`
@@ -71,7 +74,7 @@ router.get('/server/api/updateOrder',(req, res)=>{
 																		User.findOne({uid})
 																		.then(merchant =>{
 																			let money = parseFloat(merchant.money) - parseFloat(fee)
-																			let Money = money.toFixed(2, '0')
+																			let Money = money.toFixed(2)
 																			if (Money < 0) {
 																				res.json('账户余额不足')
 																			}
@@ -80,7 +83,7 @@ router.get('/server/api/updateOrder',(req, res)=>{
 																					User.findOne({uid:'10001'})
 																						.then(admin=>{
 																							let money = parseFloat(admin.money) + parseFloat(fee)
-																							let Money = money.toFixed(2, '0')
+																							let Money = money.toFixed(2)
 																							User.updateOne({uid:'10001'},{money:Money})
 																						        .then( Admin =>{
 																									//升级status
@@ -102,6 +105,7 @@ router.get('/server/api/updateOrder',(req, res)=>{
 																			 .catch(err => res.send('请联系客服!'))
 																	}
 																} else {
+																	console.log(body)
 																	const childProcess = require('child_process')
 										                            let childNotify = childProcess.fork('./notify.js')
 																	requestData.Pid = childNotify.pid

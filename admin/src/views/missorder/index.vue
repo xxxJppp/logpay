@@ -39,6 +39,7 @@
       <el-table-column prop="payType" label="支付渠道" align="center">
         <template slot-scope="scope">
             <span v-if="scope.row.payType == 'alipay'">支付宝</span>
+            <span v-else-if="scope.row.payType == 'lakala'">拉卡拉</span>
             <span v-else>微信支付</span>
         </template>
       </el-table-column>
@@ -51,8 +52,7 @@
       :page-sizes="[10, 20, 30, 40]"
       :page-size="page.num"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="page.total"
-      style="width:100px;">
+      :total="page.total">
     </el-pagination>
   </div>
 </template>
@@ -110,6 +110,10 @@ export default {
           }, {
             type: 'wxpay',
             label: '微信'
+          },
+          {
+            type: 'lakala',
+            label: '拉卡拉'
           }],
           type: null,
         // 过滤得到得订单列表
@@ -205,6 +209,8 @@ export default {
           return '支付宝'
         } else if (v[j] === 'wxpay') {
           return '微信支付'
+        } else if (v[j] === 'lakala') {
+          return '拉卡拉'
         } else {
           return v[j]
         }

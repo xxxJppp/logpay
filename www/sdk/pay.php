@@ -50,6 +50,24 @@ function Ip() {
 
 $Data['ip'] = Ip();
 // 发送请求
+if ($_GET['json']) {
+echo '<html>
+        <head><title>redirect...</title></head>
+            <form id="post_data" method="post" action="https://api.logpay.cn/server/api/pay?format=json">
+                <input type="hidden" name="payType" value='.$Data["payType"].'>
+                <input type="hidden" name="sign" value='.$sign.'>
+                <input type="hidden" name="notifyUrl" value='.$Data['notifyUrl'].'>
+                <input type="hidden" name="orderNumber" value='.$Data['orderNumber'].'>
+                <input type="hidden" name="price" value='.$Data["price"].'>
+                <input type="hidden" name="returnUrl" value='.$Data['returnUrl'].'>
+                <input type="hidden" name="uid" value='.$Data['uid'].'>
+                <input type="hidden" name="orderUid" value='.$Data['orderUid'].'>
+                <input type="hidden" name="orderName" value='.$Data['orderName'].'>
+                <input type="hidden" name="ip" value='.$Data['ip'].'>
+            </form>
+            <script>document.getElementById("post_data").submit();</script>
+</html>';
+} else {
 echo '<html>
         <head><title>redirect...</title></head>
             <form id="post_data" method="post" action="https://api.logpay.cn/server/api/pay">
@@ -65,4 +83,5 @@ echo '<html>
                 <input type="hidden" name="ip" value='.$Data['ip'].'>
             </form>
             <script>document.getElementById("post_data").submit();</script>
-</html>';
+</html>';	
+}

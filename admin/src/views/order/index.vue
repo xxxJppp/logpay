@@ -65,6 +65,7 @@
       <el-table-column prop="payType" label="支付渠道" align="center">
         <template slot-scope="scope">
             <span v-if="scope.row.payType == 'alipay'">支付宝(个人)</span>
+            <span v-if="scope.row.payType == 'lakala'">拉卡拉</span>
             <span v-if="scope.row.payType == 'alipayf2f'">支付宝(原生)</span>
             <span v-if="scope.row.payType == 'wxpay'">微信(个人)</span>
         </template>
@@ -87,15 +88,16 @@
               <el-button
               size="mini"
               type="danger"
-              @click="handleNotify(scope.row.orderNumber, scope.row.Pid)" v-if="scope.row.status == 1">手动回调</el-button>
+              @click="handleNotify(scope.row.orderNumber, scope.row.uid, scope.row.status)" v-if="scope.row.status == 1">手动回调</el-button>
               <el-button
               size="mini"
               type="primary"
               v-if="scope.row.status == 2">^-^</el-button>
               <el-button
               size="mini"
-              type="Info"
-              v-else-if="scope.row.status == -1">........</el-button>
+              type="danger"
+              @click="handleNotify(scope.row.orderNumber, scope.row.uid, scope.row.status)"
+              v-else-if="scope.row.status == -1">手动回调</el-button>
           </template>
       </el-table-column>
     </el-table>
@@ -173,6 +175,10 @@ export default {
           {
             value1: 'wxpay',
             label: '微信(个人)'
+          },
+          {
+            value1: 'lakala',
+            label: '拉卡拉'
           }],
           value1: null,
         // 支付状态得选择
@@ -217,12 +223,20 @@ export default {
   },
   methods: {
     // 处理未通知的
-    handleNotify(orderNumber,Pid) {
-      axios.post('https://api.logpay.cn/server/api/query',{orderNumber,Pid,uid:this.uid,checked:'notify',})
-           .then(data => {
-             this.get_order()
-             })
-           .catch(err => this.$message.error(err))
+    handleNotify(orderNumber, uid, Status) {
+      this.$confirm('确定否定系统判断执行手动回调?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    axios.post('https://api.logpay.cn/server/api/query',{orderNumber, uid, Status, checked:'notify'})
+                    .then(data => {
+                      this.get_order()
+                      })
+                    .catch(err => this.$message.error(err))
+                }).catch((err) => {
+                    console.log(err)
+                })
     },
     // 过滤订单列表
     selectOrder() {
@@ -295,6 +309,8 @@ export default {
           return '支付宝(原生)'
         } else if (v[j] === 'wxpay') {
           return '微信支付(个人)'
+        } else if (v[j] === 'lakala') {
+          return '拉卡拉'
         } else if (v[j] === -1) {
           return '未支付'
         } else if (v[j] === 1) {

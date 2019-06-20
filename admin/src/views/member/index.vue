@@ -184,7 +184,7 @@ export default {
           { yes_tod:'昨日', all_orderNumber:'加载中...', no_orderNumber:'加载中...', pay_orderNumber:'加载中...',pay_all: '加载中...' },
           { yes_tod:'总', all_orderNumber:'加载中...', no_orderNumber:'加载中...', pay_orderNumber:'加载中...',pay_all: '加载中...' }
         ],
-      formLabelWidth:'70px',
+      formLabelWidth:'100px',
       merchantMeal:'',
       mealOptions:'',
       merchantEdit:false,

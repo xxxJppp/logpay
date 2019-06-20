@@ -29,7 +29,7 @@ router.get('/order/getOrder', passport.authenticate("jwt",{session:false}), (req
             let start = trueDate[0]
 		    let end = trueDate[1]
             if ( start && end ) {
-				query.createTime = {$gte:start,$lt:end}
+				query.createTime = {$gt:start,$lte:end}
 			}		
         }
         if (phoneId) {
@@ -91,6 +91,7 @@ router.get('/order/getOrder', passport.authenticate("jwt",{session:false}), (req
 // 获取未匹配订单
 router.get('/order/getMissOrder', passport.authenticate("jwt",{session:false}), (req, res)=>{
   try {  
+        console.log(req.query)
         let params = req.query
         let payType = params.payType
 		let missOrderDate = params.missOrderDate
@@ -109,7 +110,7 @@ router.get('/order/getMissOrder', passport.authenticate("jwt",{session:false}), 
             let start = trueMissDate[0]
 		    let end = trueMissDate[1]
             if ( start && end ) {
-				query.createTime = {$gte:start,$lt:end}
+				query.createTime = {$gt:start,$lte:end}
 			}			
 		}
         if (payType) {
@@ -230,9 +231,9 @@ try {
 				let wx_phoneId_order = wx_success_order.filter( v=>{
 					return v.phoneId == p
 				})
-				let all_phoneId_money = sum('payPrice', all_phoneId_order).toFixed(2,'0')
-				let ali_phoneId_money = sum('payPrice', ali_phoneId_order).toFixed(2,'0')
-				let wx_phoneId_money = sum('payPrice', wx_phoneId_order).toFixed(2,'0')
+				let all_phoneId_money = sum('payPrice', all_phoneId_order).toFixed(2)
+				let ali_phoneId_money = sum('payPrice', ali_phoneId_order).toFixed(2)
+				let wx_phoneId_money = sum('payPrice', wx_phoneId_order).toFixed(2)
 				let tod_yes = ''
 				if(dayType == 'tod') {
 					tod_yes = '今手机'+p+'交易额'
@@ -247,34 +248,34 @@ try {
 		}
         if (role === 'admin') {
             // 今日交易额数据
-            let tod_ali_success_order = await getDayMoney('alipay','',{$gte:now})
-            let tod_ali = sum('payPrice',tod_ali_success_order).toFixed(2,'0')
-            let tod_ali_fee = sum('fee',tod_ali_success_order).toFixed(3,'0')
-            let tod_wx_success_order = await getDayMoney('wxpay','',{$gte:now})
-            let tod_wx_fee = sum('fee',tod_wx_success_order).toFixed(3,'0')
-            let tod_wx = sum('payPrice',tod_wx_success_order).toFixed(2,'0')
-            let tod_all = (parseFloat(tod_ali) + parseFloat(tod_wx)).toFixed(2, '0')
-            let tod_all_fee = (parseFloat(tod_ali_fee) + parseFloat(tod_wx_fee)).toFixed(3, '0')
+            let tod_ali_success_order = await getDayMoney('alipay','',{$gt:now})
+            let tod_ali = sum('payPrice',tod_ali_success_order).toFixed(2)
+            let tod_ali_fee = sum('fee',tod_ali_success_order).toFixed(3)
+            let tod_wx_success_order = await getDayMoney('wxpay','',{$gt:now})
+            let tod_wx_fee = sum('fee',tod_wx_success_order).toFixed(3)
+            let tod_wx = sum('payPrice',tod_wx_success_order).toFixed(2)
+            let tod_all = sum('payPrice', await getDayMoney('','',{$gt:now})).toFixed(2)
+            let tod_all_fee = sum('fee', await getDayMoney('','',{$gt:now})).toFixed(3)
 			
             // 昨日交易额数据
-            let yes_ali_success_order = await getDayMoney('alipay','',{$gte:yes,$lt:now})
-            let yes_ali = sum('payPrice',yes_ali_success_order).toFixed(2,'0')
-            let yes_ali_fee = sum('fee',yes_ali_success_order).toFixed(3,'0')
-            let yes_wx_success_order = await getDayMoney('wxpay','',{$gte:yes,$lt:now})
-            let yes_wx = sum('payPrice',yes_wx_success_order).toFixed(2,'0')
-            let yes_wx_fee = sum('fee',yes_wx_success_order).toFixed(3,'0')
-            let yes_all = (parseFloat(yes_ali) + parseFloat(yes_wx)).toFixed(2, '0')
-            let yes_all_fee = (parseFloat(yes_ali_fee) + parseFloat(yes_wx_fee)).toFixed(3, '0')
+            let yes_ali_success_order = await getDayMoney('alipay','',{$gt:yes,$lte:now})
+            let yes_ali = sum('payPrice',yes_ali_success_order).toFixed(2)
+            let yes_ali_fee = sum('fee',yes_ali_success_order).toFixed(3)
+            let yes_wx_success_order = await getDayMoney('wxpay','',{$gt:yes,$lte:now})
+            let yes_wx = sum('payPrice',yes_wx_success_order).toFixed(2)
+            let yes_wx_fee = sum('fee',yes_wx_success_order).toFixed(3)
+            let yes_all = sum('payPrice', await getDayMoney('','',{$gt:yes,$lte:now})).toFixed(2)
+            let yes_all_fee = sum('fee', await getDayMoney('','',{$gt:yes,$lte:now})).toFixed(3)
 
             // 平台总交易额
             let all_ali_success_order = await getDayMoney('alipay','','')
-            let all_ali = sum('payPrice', all_ali_success_order).toFixed(2,'0')
-            let all_ali_fee = sum('fee',all_ali_success_order).toFixed(3,'0')
+            let all_ali = sum('payPrice', all_ali_success_order).toFixed(2)
+            let all_ali_fee = sum('fee',all_ali_success_order).toFixed(3)
             let all_wx_success_order = await getDayMoney('wxpay','','')
-            let all_wx = sum('payPrice',all_wx_success_order).toFixed(2,'0')
-            let all_wx_fee = sum('fee',all_wx_success_order).toFixed(3,'0')
-            let all_all = (parseFloat(all_ali) + parseFloat(all_wx)).toFixed(2, '0')
-            let all_all_fee = (parseFloat(all_ali_fee) + parseFloat(all_wx_fee)).toFixed(3, '0')
+            let all_wx = sum('payPrice',all_wx_success_order).toFixed(2)
+            let all_wx_fee = sum('fee',all_wx_success_order).toFixed(3)
+            let all_all = sum('payPrice', await getDayMoney('','','')).toFixed(2)
+            let all_all_fee = sum('fee', await getDayMoney('','','')).toFixed(3)
             return res.json({
                 code:1,
                 data:{
@@ -300,37 +301,37 @@ try {
             })
     }       // 获取商户手机列表数组
 			let phoneIds = await getPhoneIds(uid)
-			let tod_all_success_order = await getDayMoney('', uid, {$gte:now})
-            let tod_ali_success_order = await getDayMoney('alipay', uid, {$gte:now})
-            let tod_ali = sum('payPrice',tod_ali_success_order).toFixed(2,'0')
-			let tod_ali_fee = sum('fee',tod_ali_success_order).toFixed(3,'0')
-            let tod_wx_success_order = await getDayMoney('wxpay',uid,{$gte:now})
-            let tod_wx = sum('payPrice',tod_wx_success_order).toFixed(2,'0')
-			let tod_wx_fee = sum('fee',tod_wx_success_order).toFixed(3,'0')
-            let tod_all = (parseFloat(tod_ali) + parseFloat(tod_wx)).toFixed(2, '0')
-			let tod_all_fee = (parseFloat(tod_ali_fee) + parseFloat(tod_wx_fee)).toFixed(3, '0')
+			let tod_all_success_order = await getDayMoney('', uid, {$gt:now})
+            let tod_ali_success_order = await getDayMoney('alipay', uid, {$gt:now})
+            let tod_ali = sum('payPrice',tod_ali_success_order).toFixed(2)
+			let tod_ali_fee = sum('fee',tod_ali_success_order).toFixed(3)
+            let tod_wx_success_order = await getDayMoney('wxpay',uid,{$gt:now})
+            let tod_wx = sum('payPrice',tod_wx_success_order).toFixed(2)
+			let tod_wx_fee = sum('fee',tod_wx_success_order).toFixed(3)
+            let tod_all = sum('payPrice', await getDayMoney('',uid,{$gt:now})).toFixed(2)
+            let tod_all_fee = sum('fee', await getDayMoney('',uid,{$gt:now})).toFixed(3)
 			let todPhoneIdsArr = getPhoneIdsMoneyArr('tod',tod_all_success_order, tod_ali_success_order, tod_wx_success_order)
 			
-			let yes_all_success_order = await getDayMoney('', uid, {$gte:yes,$lt:now})
-            let yes_ali_success_order = await getDayMoney('alipay',uid,{$gte:yes,$lt:now})
-            let yes_ali = sum('payPrice', yes_ali_success_order).toFixed(2,'0')
-			let yes_ali_fee = sum('fee',yes_ali_success_order).toFixed(3,'0')
-            let yes_wx_success_order = await getDayMoney('wxpay',uid,{$gte:yes,$lt:now})
-            let yes_wx = sum('payPrice',yes_wx_success_order).toFixed(2,'0')
-			let yes_wx_fee = sum('fee',yes_wx_success_order).toFixed(3,'0')
-            let yes_all = (parseFloat(yes_ali) + parseFloat(yes_wx)).toFixed(2, '0')
-			let yes_all_fee = (parseFloat(yes_ali_fee) + parseFloat(yes_wx_fee)).toFixed(3, '0')
+			let yes_all_success_order = await getDayMoney('', uid, {$gt:yes,$lte:now})
+            let yes_ali_success_order = await getDayMoney('alipay',uid,{$gt:yes,$lte:now})
+            let yes_ali = sum('payPrice', yes_ali_success_order).toFixed(2)
+			let yes_ali_fee = sum('fee',yes_ali_success_order).toFixed(3)
+            let yes_wx_success_order = await getDayMoney('wxpay',uid,{$gt:yes,$lte:now})
+            let yes_wx = sum('payPrice',yes_wx_success_order).toFixed(2)
+			let yes_wx_fee = sum('fee',yes_wx_success_order).toFixed(3)
+            let yes_all = sum('payPrice', await getDayMoney('', uid,{$gt:yes,$lte:now})).toFixed(2)
+            let yes_all_fee = sum('fee', await getDayMoney('', uid,{$gt:yes,$lte:now})).toFixed(3)
 			let yesPhoneIdsArr = getPhoneIdsMoneyArr('yes', yes_all_success_order, yes_ali_success_order, yes_wx_success_order)
 			
 			let all_all_success_order = await getDayMoney('',uid,'')
             let all_ali_success_order = await getDayMoney('alipay',uid,'')
-            let all_ali = sum('payPrice', all_ali_success_order).toFixed(2,'0')
-			let all_ali_fee = sum('fee',all_ali_success_order).toFixed(3,'0')
+            let all_ali = sum('payPrice', all_ali_success_order).toFixed(2)
+			let all_ali_fee = sum('fee',all_ali_success_order).toFixed(3)
             let all_wx_success_order = await getDayMoney('wxpay',uid,'')
-            let all_wx = sum('payPrice',all_wx_success_order).toFixed(2,'0')
-            let all_wx_fee = sum('fee',all_wx_success_order).toFixed(3,'0')
-            let all_all = (parseFloat(all_ali) + parseFloat(all_wx)).toFixed(2, '0')
-			let all_all_fee = (parseFloat(all_ali_fee) + parseFloat(all_wx_fee)).toFixed(3, '0')
+            let all_wx = sum('payPrice',all_wx_success_order).toFixed(2)
+            let all_wx_fee = sum('fee',all_wx_success_order).toFixed(3)
+            let all_all = sum('payPrice', await getDayMoney('',uid,'')).toFixed(2)
+            let all_all_fee = sum('fee', await getDayMoney('',uid,'')).toFixed(3)
 			let allPhoneIdsArr = getPhoneIdsMoneyArr('all', all_all_success_order, all_ali_success_order, all_wx_success_order)
 			let phoneIdsArr = todPhoneIdsArr.concat(yesPhoneIdsArr).concat(allPhoneIdsArr)
             res.json({
@@ -396,12 +397,12 @@ try {
         })
         }
     if (role === 'admin') {
-        let today_success_order = await getOrderNumber(2,'',{$gte:now})
-        let today_no_order = await getOrderNumber(1,'',{$gte:now})
-        let today_all_order = await getOrderNumber('','',{$gte:now})
-        let yes_success_order = await getOrderNumber(2,'',{$gte:yes,$lt:now})
-        let yes_no_order = await getOrderNumber(1,'',{$gte:yes,$lt:now})
-        let yes_all_order = await getOrderNumber('','',{$gte:yes,$lt:now})
+        let today_success_order = await getOrderNumber(2,'',{$gt:now})
+        let today_no_order = await getOrderNumber(1,'',{$gt:now})
+        let today_all_order = await getOrderNumber('','',{$gt:now})
+        let yes_success_order = await getOrderNumber(2,'',{$gt:yes,$lte:now})
+        let yes_no_order = await getOrderNumber(1,'',{$gt:yes,$lte:now})
+        let yes_all_order = await getOrderNumber('','',{$gt:yes,$lte:now})
         let all_success_order = await getOrderNumber(2,'','')
         let all_no_order = await getOrderNumber(1,'','')
         let all_order = await getOrderNumber('','','')
@@ -420,12 +421,12 @@ try {
             }
         })
     }
-        let today_success_order = await getOrderNumber(2,uid,{$gte:now})
-        let today_no_order = await getOrderNumber(1,uid,{$gte:now})
-        let today_all_order = await getOrderNumber('',uid,{$gte:now})
-        let yes_success_order = await getOrderNumber(2,uid,{$gte:yes,$lt:now})
-        let yes_no_order = await getOrderNumber(1,uid,{$gte:yes,$lt:now})
-        let yes_all_order = await getOrderNumber('',uid,{$gte:yes,$lt:now})
+        let today_success_order = await getOrderNumber(2,uid,{$gt:now})
+        let today_no_order = await getOrderNumber(1,uid,{$gt:now})
+        let today_all_order = await getOrderNumber('',uid,{$gt:now})
+        let yes_success_order = await getOrderNumber(2,uid,{$gt:yes,$lte:now})
+        let yes_no_order = await getOrderNumber(1,uid,{$gt:yes,$lte:now})
+        let yes_all_order = await getOrderNumber('',uid,{$gt:yes,$lte:now})
         let all_success_order = await getOrderNumber(2,uid,'')
         let all_no_order = await getOrderNumber(1,uid,'')
         let all_order = await getOrderNumber('',uid,'')

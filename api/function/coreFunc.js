@@ -147,9 +147,9 @@ module.exports = {
 	},
 
 	// 价格递变查询
-	priceSort (uid, price, payType) {
+	priceSort (uid, price, payType, orderNumber) {
 	return new Promise((resolve, reject)=>{
-	Order.find({ uid, price, payType, status: -1, expire: { $gt: 0, $lt: 300 } })
+	Order.find({ uid, price, payType, status: -1, orderNumber:{$ne: orderNumber},expire: { $gt: 0, $lte: 300 } })
 		.then( order => resolve(order))
 		.catch( err => reject('order-finduids-error ' + err))
 	})
@@ -182,7 +182,7 @@ module.exports = {
 	mathTest (arr, price) {
 	for (let i = 0; i < arr.length; i++) {
 	if( arr[i].payPrice != (parseFloat(price) - i*0.01).toFixed(2,'0')) {
-	payPrice = parseFloat(price) - 0.01*i
+	let payPrice = parseFloat(price) - 0.01*i
 	return payPrice
 	}
 	}

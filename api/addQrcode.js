@@ -42,15 +42,36 @@ process.on('message', async (remoteData) => {
 					else if (element.words.includes('推荐使用微信')) {
 						payData.type = '微信'
 					}
+					else if (element.words.includes('拉卡拉')) {
+						payData.type = '拉卡拉'
+					}
 					if (element.words.includes('￥')) {
 						payData.price = element.words.substring(1)
 					}
 				})
 				if (payData.type === '') {
-					throw ('二维码有误，请上传支付宝或微信收款二维码!')
+					process.send({
+							  code: -1,
+							  msg: '二维码有误，请上传支付宝或微信收款二维码',
+							  errData: '二维码有误，请上传支付宝或微信收款二维码'
+						})
+						try {
+							process.kill(pid,'SIGTERM')
+						} catch(e) {
+							console.log(e)
+						}
 				}
 				if (payData.price <=0 ) {
-					throw ('二维码有误，请上传支付宝或微信收款二维码!')
+					process.send({
+							  code: -1,
+							  msg: '二维码有误，请上传支付宝或微信收款二维码',
+							  errData: '二维码有误，请上传支付宝或微信收款二维码'
+						})
+						try {
+							process.kill(pid,'SIGTERM')
+						} catch(e) {
+							console.log(e)
+						}
 				}
 		// 识别付款码支付url
 		let imgData = (url) => {

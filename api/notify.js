@@ -16,9 +16,13 @@ process.on('message', (remoteData) => {
 			},
 			body: requestData
 		}, (error, response, body) => {
-			if (!error && response.statusCode == 200) {
+			if (error) {
+				console.log(error)
+				console.log(body)
+			}
+			if (!error) {
 				//异步回调成功
-				if (body === 'SUCCESS') {
+				if (body === 'SUCCESS' || body == ' SUCCESS') {
 					let date = new Date()
 					let YearMD = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')} `
 					let HoursMS = `${date.getHours().toString().padStart(2,'0')}:${date.getMinutes().toString().padStart(2,'0')}:${date.getSeconds().toString().padStart(2,'0')}`
@@ -75,6 +79,8 @@ process.on('message', (remoteData) => {
 						})
 						.catch(err => res.send('请联系客服!'))
 					}
+				} else {
+					console.log(body)
 				}
 			}
 		})

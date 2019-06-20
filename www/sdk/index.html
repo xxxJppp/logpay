@@ -27,8 +27,10 @@
 							<div class="input-group input-group-xs">
 								<div class="input-group-addon">支付通道</div>
 									<select class="form-control" name="payType" size="1">
-									  <option value="alipay">支付宝个码H5通道(电脑和移动版两种)</option>
-									  <option value="wxpay">微信个码通道(电脑和移动版两种)</option>
+									  <option value="alipay">支付宝个码伪H5通道(电脑和移动版两种)</option>
+									  <option value="wxpay">微信个码伪H5通道(电脑和移动版两种)</option>
+									  <option value="alipayH5">支付宝个码H5通道(电脑和移动版两种)</option>
+									  <option value="lakala">拉卡拉商户码通道(电脑和移动版两种)</option>
 									  <option value="alipayf2f">支付宝H5通道(需要原生代收款通道请联系客服，通道应有尽有)</option>
 									</select>
 						</div><br>						
@@ -39,7 +41,11 @@
                         <div class="input-group input-group-xs">
 							<div class="input-group-addon">订单名称</div>
 								<input class="js-icon-search form-control" type="text" id="orderName" name="orderName" value="测试订单">
-						</div><br>  
+						</div><br>
+						<div class="input-group input-group-xs">
+							<div class="input-group-addon">返回JSON数据</div>
+							     <input type="checkbox" class="js-icon-search form-control" name="json" value="true" />
+						</div><br>
 						<div class="form-group">
 							<div class="col-xs-12 col-sm-12 col-md-12">
 								<button class="btn btn-block btn-primary" type="submit">提交订单</button>
